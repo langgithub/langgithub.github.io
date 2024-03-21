@@ -3709,6 +3709,31 @@
     
     
     <entry>
+      <title>逆向-frida-编译与特征</title>
+      <link href="/2024/03/21/%E9%80%86%E5%90%91-frida-%E7%BC%96%E8%AF%91%E4%B8%8E%E7%89%B9%E5%BE%81/"/>
+      <url>/2024/03/21/%E9%80%86%E5%90%91-frida-%E7%BC%96%E8%AF%91%E4%B8%8E%E7%89%B9%E5%BE%81/</url>
+      
+        <content type="html"><![CDATA[<blockquote><p>搬砖</p></blockquote><h1 id="frida编译"><a href="#frida编译" class="headerlink" title="frida编译"></a>frida编译</h1><h2 id="1-原始frida编译"><a href="#1-原始frida编译" class="headerlink" title="1.原始frida编译"></a>1.原始frida编译</h2><p>编译先看：<a href="https://frida.re/docs/building/">https://frida.re/docs/building/</a></p><ul><li>git clone –recurse-submodules <a href="https://github.com/frida/frida.git">https://github.com/frida/frida.git</a></li><li>git checkout 16.2.1</li><li>git submodule update</li><li>cd frida</li><li>make</li><li>make core-android-arm64</li></ul><p><strong>编译环境补充</strong></p><ul><li>sudo apt-get install build-essential curl git lib32stdc++-9-dev <br>  libc6-dev-i386 nodejs npm python3-dev python3-pip</li></ul><p>不出意外的话应该会报错</p><blockquote><p>问题一：没有ANDROID_NDK_ROOT</p></blockquote><p>解决办法：我是从Android studio中Android sdk选项卡中安装指定报错版本的ndk，然后配置ANDROID_NDK_ROOT环境变量</p><ul><li>export ANDROID_NDK_ROOT&#x3D;&#x2F;home&#x2F;cozy&#x2F;Android&#x2F;Sdk&#x2F;ndk&#x2F;25.2.9519653</li><li>export PATH&#x3D;$ANDROID_NDK_ROOT:$PATH</li></ul><blockquote><p>问题二：没有node环境</p></blockquote><p>虽然安装了nodejs，但是可能版本不对也会提示编译失败</p><ol><li>npm doctor  #查看项目使用的nodejs版本</li><li>curl -o- <a href="https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh">https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh</a> | bash  #使用nvm来安装nodejs</li><li>nvm install v20.11.1 #我这里用的是v20.11.1</li></ol><h2 id="2-定制库hluwa"><a href="#2-定制库hluwa" class="headerlink" title="2.定制库hluwa"></a>2.定制库hluwa</h2><p>在frida源码同级目录下，clone hluwa代码.当然这里只适配到frida 15.0.4</p><ol><li>git clone <a href="https://github.com/hluwa/Patchs.git">https://github.com/hluwa/Patchs.git</a></li><li>git checkout 15.0.4  </li><li>git submodule update –recursive</li><li>git am ..&#x2F;..&#x2F;Patchs&#x2F;strongR-frida&#x2F;frida-core&#x2F;*.patch</li><li>make core-android-arm64</li></ol><p>我本人应为下载 frida&#x3D;&#x3D;16.2.1, Patchs脚本只支持到15.0.4，所以就手动复制，顺便熟悉下魔改点</p><h2 id="3-frida检测点"><a href="#3-frida检测点" class="headerlink" title="3. frida检测点"></a>3. frida检测点</h2><p>简单检测</p><ul><li><a href="https://www.52pojie.cn/thread-1783400-1-1.html">https://www.52pojie.cn/thread-1783400-1-1.html</a></li></ul><p>一般检查主要是通过frida关键词特征</p><ol><li>查看&#x2F;proc&#x2F;pid&#x2F;maps，查看这个文件中frida关键词</li><li>读取&#x2F;proc&#x2F;pid&#x2F;maps映射内存，从内存中检测“frida:rpc”类似关键词</li><li>查看&#x2F;proc&#x2F;self&#x2F;task&#x2F;pid&#x2F;status, 从对现场描述文件中查找frida相关进程，如 gmain gum-js-loop pool-frida 线程名称</li><li>读取readlink &#x2F;proc&#x2F;self&#x2F;fd&#x2F;XXX，从frida通过管道建立双向通信角度检测frida</li></ol><p>高级检查</p><ul><li><a href="https://bbs.kanxue.com/thread-268586-1.htm">https://bbs.kanxue.com/thread-268586-1.htm</a></li><li><a href="https://mp.weixin.qq.com/s?__biz=MzIxNDcwOTcwOQ==&mid=2247492981&idx=2&sn=1337a0dd0259195efe078be55d1d4a55&chksm=97a1c1d7a0d648c14f09d0fd9a43e150f53ce79c82ab5098b7dca6cffc663ce7d32eb5a27b2e&scene=126&sessionid=1653073641&key=0a9f15bc7a0b11091058c506225c7aacc781814ef557c1c6195dacd423a4d7507afa9035592752f9405e452a884945d59fe8a303e08a2720f63543e053d51f5610aa3b9c39f4022a941e44e6a95a4e7f94a498dbe19a9910e426a2efb448776eb27f191dff8d34dd848894604e6cda8798d3d39de7b44611a7a06cc8fdf43826&ascene=1&uin=MTA3Mzc3OTIzNQ==&devicetype=Windows+Server+2016+x64&version=6305002e&lang=zh_CN&session_us=gh_86e8b32f4148&exportkey=AScNPRbXZl0lSD8Me34jl4w=&acctmode=0&pass_ticket=CLipu1oc3Xo23kKaFPk9VMmJWr0KzXLDKmtoNd6o2PRzCklLCrUb3XxUITQ9X3B0&wx_header=0&fontgear=2">https://mp.weixin.qq.com/s?__biz=MzIxNDcwOTcwOQ==&amp;mid=2247492981&amp;idx=2&amp;sn=1337a0dd0259195efe078be55d1d4a55&amp;chksm=97a1c1d7a0d648c14f09d0fd9a43e150f53ce79c82ab5098b7dca6cffc663ce7d32eb5a27b2e&amp;scene=126&amp;sessionid=1653073641&amp;key=0a9f15bc7a0b11091058c506225c7aacc781814ef557c1c6195dacd423a4d7507afa9035592752f9405e452a884945d59fe8a303e08a2720f63543e053d51f5610aa3b9c39f4022a941e44e6a95a4e7f94a498dbe19a9910e426a2efb448776eb27f191dff8d34dd848894604e6cda8798d3d39de7b44611a7a06cc8fdf43826&amp;ascene=1&amp;uin=MTA3Mzc3OTIzNQ%3D%3D&amp;devicetype=Windows+Server+2016+x64&amp;version=6305002e&amp;lang=zh_CN&amp;session_us=gh_86e8b32f4148&amp;exportkey=AScNPRbXZl0lSD8Me34jl4w%3D&amp;acctmode=0&amp;pass_ticket=CLipu1oc3Xo23kKaFPk9VMmJWr0KzXLDKmtoNd6o2PRzCklLCrUb3XxUITQ9X3B0&amp;wx_header=0&amp;fontgear=2</a></li><li><a href="https://bbs.kanxue.com/thread-278423.htm">https://bbs.kanxue.com/thread-278423.htm</a></li></ul><p>我个人认为高级点检查点如下：</p><ol><li>对核心native文件checksum检查，主要是对与maps文件中存在 r*xp 权限的so文件做checksum检查（注入文件前后checksum大小不一样）</li><li>todo: 从内核角度对linehook检测</li></ol><h2 id="4-frida-gum内核学习"><a href="#4-frida-gum内核学习" class="headerlink" title="4. frida-gum内核学习"></a>4. frida-gum内核学习</h2><p><img src="/../img/%E9%80%86%E5%90%91-frida-%E7%BC%96%E8%AF%91%E4%B8%8E%E7%89%B9%E5%BE%811.png" alt="Frida inline hook 的执行流程"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 逆向-frida </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> frida </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>操作系统</title>
       <link href="/2017/12/24/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
       <url>/2017/12/24/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/</url>
