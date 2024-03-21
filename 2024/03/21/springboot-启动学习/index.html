@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="springboot-启动学习GeneralSpringboot启动流程图https:&#x2F;&#x2F;www.processon.com&#x2F;view&#x2F;60102b775653bb06f27a17d6?fromnew&#x3D;1 springboot启动代码分析https:&#x2F;&#x2F;my.oschina.net&#x2F;wotrd&#x2F;blog&#x2F;4405846 Springboot启动核心分析https:&#x2F;&#x2F;www.cnblogs.com">
+<meta property="og:type" content="article">
+<meta property="og:title" content="springboot-启动学习">
+<meta property="og:url" content="https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="springboot-启动学习GeneralSpringboot启动流程图https:&#x2F;&#x2F;www.processon.com&#x2F;view&#x2F;60102b775653bb06f27a17d6?fromnew&#x3D;1 springboot启动代码分析https:&#x2F;&#x2F;my.oschina.net&#x2F;wotrd&#x2F;blog&#x2F;4405846 Springboot启动核心分析https:&#x2F;&#x2F;www.cnblogs.com">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-03-21T08:13:59.733Z">
+<meta property="article:modified_time" content="2024-03-21T08:13:59.733Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>springboot-启动学习</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Articles</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/langgithub">Github</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/03/21/sublime3%20%E6%97%A0%E6%B3%95%E8%81%94%E7%BD%91%E5%AE%89%E8%A3%85%E6%8F%92%E4%BB%B6/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2024/03/21/Spark/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&text=springboot-启动学习"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&title=springboot-启动学习"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&is_video=false&description=springboot-启动学习"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=springboot-启动学习&body=Check out this article: https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&title=springboot-启动学习"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&title=springboot-启动学习"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&title=springboot-启动学习"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&title=springboot-启动学习"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&name=springboot-启动学习&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&t=springboot-启动学习"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0"><span class="toc-number">1.</span> <span class="toc-text">springboot-启动学习</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#General"><span class="toc-number">1.1.</span> <span class="toc-text">General</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Springboot%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-number">1.1.1.</span> <span class="toc-text">Springboot启动流程图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#springboot%E5%90%AF%E5%8A%A8%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">1.1.2.</span> <span class="toc-text">springboot启动代码分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Springboot%E5%90%AF%E5%8A%A8%E6%A0%B8%E5%BF%83%E5%88%86%E6%9E%90"><span class="toc-number">1.1.3.</span> <span class="toc-text">Springboot启动核心分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#springboot%E9%A1%B9%E7%9B%AE%E5%AD%A6%E4%B9%A0"><span class="toc-number">1.1.4.</span> <span class="toc-text">springboot项目学习</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WebMvcAutoConfiguration-%EF%BC%88springMVC%EF%BC%89"><span class="toc-number">1.1.5.</span> <span class="toc-text">WebMvcAutoConfiguration （springMVC）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#springSecurity"><span class="toc-number">1.1.6.</span> <span class="toc-text">springSecurity</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shiro%E6%95%B4%E5%90%88"><span class="toc-number">1.1.7.</span> <span class="toc-text">Shiro整合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#spring-mybatis"><span class="toc-number">1.1.8.</span> <span class="toc-text">spring-mybatis</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8%EF%BC%8Cserverlet%EF%BC%8C%E6%8B%A6%E6%88%AA%E5%99%A8"><span class="toc-number">1.1.9.</span> <span class="toc-text">过滤器，serverlet，拦截器</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        springboot-启动学习
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-03-21T08:13:59.733Z" class="dt-published" itemprop="datePublished">2024-03-21</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/code-java/">code-java</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/java/" rel="tag">java</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="springboot-启动学习"><a href="#springboot-启动学习" class="headerlink" title="springboot-启动学习"></a>springboot-启动学习</h1><h2 id="General"><a href="#General" class="headerlink" title="General"></a>General</h2><h3 id="Springboot启动流程图"><a href="#Springboot启动流程图" class="headerlink" title="Springboot启动流程图"></a>Springboot启动流程图</h3><p><a target="_blank" rel="noopener" href="https://www.processon.com/view/60102b775653bb06f27a17d6?fromnew=1">https://www.processon.com/view/60102b775653bb06f27a17d6?fromnew=1</a></p>
+<h3 id="springboot启动代码分析"><a href="#springboot启动代码分析" class="headerlink" title="springboot启动代码分析"></a>springboot启动代码分析</h3><p><a target="_blank" rel="noopener" href="https://my.oschina.net/wotrd/blog/4405846">https://my.oschina.net/wotrd/blog/4405846</a></p>
+<h3 id="Springboot启动核心分析"><a href="#Springboot启动核心分析" class="headerlink" title="Springboot启动核心分析"></a>Springboot启动核心分析</h3><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/theRhyme/p/11057233.html">https://www.cnblogs.com/theRhyme/p/11057233.html</a></p>
+<p>（重点）其中，最关键的要属@Import(AutoConfigurationImportSelector.class)，借助AutoConfigurationImportSelector，@EnableAutoConfiguration可以帮助SpringBoot应用将所有符合条件(spring.factories)的bean定义（如Java Config@Configuration配置）都加载到当前SpringBoot创建并使用的IoC容器。</p>
+<h3 id="springboot项目学习"><a href="#springboot项目学习" class="headerlink" title="springboot项目学习"></a>springboot项目学习</h3><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hellokuangshen/tag/SpringBoot%E7%B3%BB%E5%88%97/">https://www.cnblogs.com/hellokuangshen/tag/SpringBoot%E7%B3%BB%E5%88%97/</a></p>
+<h3 id="WebMvcAutoConfiguration-（springMVC）"><a href="#WebMvcAutoConfiguration-（springMVC）" class="headerlink" title="WebMvcAutoConfiguration （springMVC）"></a>WebMvcAutoConfiguration （springMVC）</h3><ol>
+<li>静态资源访问</li>
+</ol>
+<ul>
+<li>webjars</li>
+<li>public &#x2F;** resources static</li>
+</ul>
+<ol start="2">
+<li>优先级<br>resources&gt;static&gt;public</li>
+<li>templatef 必须要配置，通过controler跳转</li>
+<li>扩展springmvc <a target="_blank" rel="noopener" href="https://www.cnblogs.com/hellokuangshen/p/12531328.html">https://www.cnblogs.com/hellokuangshen/p/12531328.html</a></li>
+</ol>
+<h3 id="springSecurity"><a href="#springSecurity" class="headerlink" title="springSecurity"></a>springSecurity</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_33369905/article/details/106647308">https://blog.csdn.net/qq_33369905/article/details/106647308</a></p>
+<h3 id="Shiro整合"><a href="#Shiro整合" class="headerlink" title="Shiro整合"></a>Shiro整合</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44449838/article/details/108692864">https://blog.csdn.net/weixin_44449838/article/details/108692864</a><br><a target="_blank" rel="noopener" href="https://cnblogs.com/shiguanzui/p/11913730.html">https://cnblogs.com/shiguanzui/p/11913730.html</a></p>
+<h3 id="spring-mybatis"><a href="#spring-mybatis" class="headerlink" title="spring-mybatis"></a>spring-mybatis</h3><p><a target="_blank" rel="noopener" href="http://www.choupangxia.com/2020/05/28/springboot-mybatis-cache/">http://www.choupangxia.com/2020/05/28/springboot-mybatis-cache/</a></p>
+<h3 id="过滤器，serverlet，拦截器"><a href="#过滤器，serverlet，拦截器" class="headerlink" title="过滤器，serverlet，拦截器"></a>过滤器，serverlet，拦截器</h3><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/juanzila/p/11276067.html">https://www.cnblogs.com/juanzila/p/11276067.html</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/2d1fa2834d9c">https://www.jianshu.com/p/2d1fa2834d9c</a><br>总结： <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/148184216">https://zhuanlan.zhihu.com/p/148184216</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">Categories</a></li>
+        
+          <li><a href="/archives/">Articles</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/langgithub">Github</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0"><span class="toc-number">1.</span> <span class="toc-text">springboot-启动学习</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#General"><span class="toc-number">1.1.</span> <span class="toc-text">General</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Springboot%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-number">1.1.1.</span> <span class="toc-text">Springboot启动流程图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#springboot%E5%90%AF%E5%8A%A8%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">1.1.2.</span> <span class="toc-text">springboot启动代码分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Springboot%E5%90%AF%E5%8A%A8%E6%A0%B8%E5%BF%83%E5%88%86%E6%9E%90"><span class="toc-number">1.1.3.</span> <span class="toc-text">Springboot启动核心分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#springboot%E9%A1%B9%E7%9B%AE%E5%AD%A6%E4%B9%A0"><span class="toc-number">1.1.4.</span> <span class="toc-text">springboot项目学习</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WebMvcAutoConfiguration-%EF%BC%88springMVC%EF%BC%89"><span class="toc-number">1.1.5.</span> <span class="toc-text">WebMvcAutoConfiguration （springMVC）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#springSecurity"><span class="toc-number">1.1.6.</span> <span class="toc-text">springSecurity</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shiro%E6%95%B4%E5%90%88"><span class="toc-number">1.1.7.</span> <span class="toc-text">Shiro整合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#spring-mybatis"><span class="toc-number">1.1.8.</span> <span class="toc-text">spring-mybatis</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8%EF%BC%8Cserverlet%EF%BC%8C%E6%8B%A6%E6%88%AA%E5%99%A8"><span class="toc-number">1.1.9.</span> <span class="toc-text">过滤器，serverlet，拦截器</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&text=springboot-启动学习"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&title=springboot-启动学习"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&is_video=false&description=springboot-启动学习"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=springboot-启动学习&body=Check out this article: https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&title=springboot-启动学习"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&title=springboot-启动学习"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&title=springboot-启动学习"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&title=springboot-启动学习"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&name=springboot-启动学习&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://langgithub.github.io/2024/03/21/springboot-%E5%90%AF%E5%8A%A8%E5%AD%A6%E4%B9%A0/&t=springboot-启动学习"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Articles</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/langgithub">Github</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

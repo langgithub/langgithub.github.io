@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="frida使用总结   frida使用总结 Gerneral frida 安装测试 frida 主动抛出异常，monitor查看调用栈（包含日志打印） frida hook 内部类 frida map打印 反射操作 hook toast打印堆栈 app中防止ptrace,会创建子进程ptrace父进程导致无法hook app okhttp一般hook方式 堆栈打印2 特殊字符打印 jni动态注册函">
+<meta property="og:type" content="article">
+<meta property="og:title" content="frida使用总结">
+<meta property="og:url" content="https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="frida使用总结   frida使用总结 Gerneral frida 安装测试 frida 主动抛出异常，monitor查看调用栈（包含日志打印） frida hook 内部类 frida map打印 反射操作 hook toast打印堆栈 app中防止ptrace,会创建子进程ptrace父进程导致无法hook app okhttp一般hook方式 堆栈打印2 特殊字符打印 jni动态注册函">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-03-21T08:13:59.010Z">
+<meta property="article:modified_time" content="2024-03-21T08:13:59.011Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="frida">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>frida使用总结</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Articles</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/langgithub">Github</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/03/21/git%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2024/03/21/ELF%E6%96%87%E4%BB%B6%E9%9D%99%E6%80%81%E6%84%9F%E6%9F%93%E6%B3%A8%E5%85%A5%20copy/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&text=frida使用总结"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&title=frida使用总结"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&is_video=false&description=frida使用总结"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=frida使用总结&body=Check out this article: https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&title=frida使用总结"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&title=frida使用总结"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&title=frida使用总结"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&title=frida使用总结"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&name=frida使用总结&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&t=frida使用总结"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93"><span class="toc-number">1.</span> <span class="toc-text">frida使用总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Gerneral"><span class="toc-number">1.1.</span> <span class="toc-text">Gerneral</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#frida-%E5%AE%89%E8%A3%85%E6%B5%8B%E8%AF%95"><span class="toc-number">1.1.1.</span> <span class="toc-text">frida 安装测试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#frida-%E4%B8%BB%E5%8A%A8%E6%8A%9B%E5%87%BA%E5%BC%82%E5%B8%B8%EF%BC%8Cmonitor%E6%9F%A5%E7%9C%8B%E8%B0%83%E7%94%A8%E6%A0%88%EF%BC%88%E5%8C%85%E5%90%AB%E6%97%A5%E5%BF%97%E6%89%93%E5%8D%B0%EF%BC%89"><span class="toc-number">1.1.2.</span> <span class="toc-text">frida 主动抛出异常，monitor查看调用栈（包含日志打印）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#frida-hook-%E5%86%85%E9%83%A8%E7%B1%BB"><span class="toc-number">1.1.3.</span> <span class="toc-text">frida hook 内部类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#frida-map%E6%89%93%E5%8D%B0"><span class="toc-number">1.1.4.</span> <span class="toc-text">frida map打印</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8D%E5%B0%84%E6%93%8D%E4%BD%9C-hook-toast%E6%89%93%E5%8D%B0%E5%A0%86%E6%A0%88"><span class="toc-number">1.1.5.</span> <span class="toc-text">反射操作 hook toast打印堆栈</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#app%E4%B8%AD%E9%98%B2%E6%AD%A2ptrace-%E4%BC%9A%E5%88%9B%E5%BB%BA%E5%AD%90%E8%BF%9B%E7%A8%8Bptrace%E7%88%B6%E8%BF%9B%E7%A8%8B%E5%AF%BC%E8%87%B4%E6%97%A0%E6%B3%95hook-app"><span class="toc-number">1.1.6.</span> <span class="toc-text">app中防止ptrace,会创建子进程ptrace父进程导致无法hook app</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#okhttp%E4%B8%80%E8%88%AChook%E6%96%B9%E5%BC%8F"><span class="toc-number">1.1.7.</span> <span class="toc-text">okhttp一般hook方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A0%86%E6%A0%88%E6%89%93%E5%8D%B02"><span class="toc-number">1.1.8.</span> <span class="toc-text">堆栈打印2</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%E6%89%93%E5%8D%B0"><span class="toc-number">1.1.9.</span> <span class="toc-text">特殊字符打印</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#jni%E5%8A%A8%E6%80%81%E6%B3%A8%E5%86%8C%E5%87%BD%E6%95%B0%E6%89%93%E5%8D%B0"><span class="toc-number">1.1.10.</span> <span class="toc-text">jni动态注册函数打印</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#jni%E5%90%84%E7%A7%8D%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0%E6%89%93%E5%8D%B0"><span class="toc-number">1.1.11.</span> <span class="toc-text">jni各种类型参数打印</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8A%A8%E6%80%81hook-Native%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.12.</span> <span class="toc-text">动态hook Native函数</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        frida使用总结
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-03-21T08:13:59.010Z" class="dt-published" itemprop="datePublished">2024-03-21</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E7%88%AC%E8%99%AB-Android%E9%80%86%E5%90%91/">爬虫-Android逆向</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/frida/" rel="tag">frida</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="frida使用总结"><a href="#frida使用总结" class="headerlink" title="frida使用总结"></a>frida使用总结</h2><!-- TOC -->
+
+<ul>
+<li><a href="#frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93">frida使用总结</a><ul>
+<li><a href="#gerneral">Gerneral</a><ul>
+<li><a href="#frida-%E5%AE%89%E8%A3%85%E6%B5%8B%E8%AF%95">frida 安装测试</a></li>
+<li><a href="#frida-%E4%B8%BB%E5%8A%A8%E6%8A%9B%E5%87%BA%E5%BC%82%E5%B8%B8monitor%E6%9F%A5%E7%9C%8B%E8%B0%83%E7%94%A8%E6%A0%88%E5%8C%85%E5%90%AB%E6%97%A5%E5%BF%97%E6%89%93%E5%8D%B0">frida 主动抛出异常，monitor查看调用栈（包含日志打印）</a></li>
+<li><a href="#frida-hook-%E5%86%85%E9%83%A8%E7%B1%BB">frida hook 内部类</a></li>
+<li><a href="#frida-map%E6%89%93%E5%8D%B0">frida map打印</a></li>
+<li><a href="#%E5%8F%8D%E5%B0%84%E6%93%8D%E4%BD%9C-hook-toast%E6%89%93%E5%8D%B0%E5%A0%86%E6%A0%88">反射操作 hook toast打印堆栈</a></li>
+<li><a href="#app%E4%B8%AD%E9%98%B2%E6%AD%A2ptrace%E4%BC%9A%E5%88%9B%E5%BB%BA%E5%AD%90%E8%BF%9B%E7%A8%8Bptrace%E7%88%B6%E8%BF%9B%E7%A8%8B%E5%AF%BC%E8%87%B4%E6%97%A0%E6%B3%95hook-app">app中防止ptrace,会创建子进程ptrace父进程导致无法hook app</a></li>
+<li><a href="#okhttp%E4%B8%80%E8%88%AChook%E6%96%B9%E5%BC%8F">okhttp一般hook方式</a></li>
+<li><a href="#%E5%A0%86%E6%A0%88%E6%89%93%E5%8D%B02">堆栈打印2</a></li>
+<li><a href="#%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%E6%89%93%E5%8D%B0">特殊字符打印</a></li>
+<li><a href="#jni%E5%8A%A8%E6%80%81%E6%B3%A8%E5%86%8C%E5%87%BD%E6%95%B0%E6%89%93%E5%8D%B0">jni动态注册函数打印</a></li>
+<li><a href="#jni%E5%90%84%E7%A7%8D%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0%E6%89%93%E5%8D%B0">jni各种类型参数打印</a></li>
+<li><a href="#%E5%8A%A8%E6%80%81hook-native%E5%87%BD%E6%95%B0">动态hook Native函数</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!-- /TOC -->
+
+<h3 id="Gerneral"><a href="#Gerneral" class="headerlink" title="Gerneral"></a>Gerneral</h3><p>工作中收集的Frida使用方式方法，帮助快速定位文件位置</p>
+<h4 id="frida-安装测试"><a href="#frida-安装测试" class="headerlink" title="frida 安装测试"></a>frida 安装测试</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import frida, sys</span><br><span class="line"></span><br><span class="line">def on_message(message, data):</span><br><span class="line">    if message[&#x27;type&#x27;] == &#x27;send&#x27;:</span><br><span class="line">        print(&quot;[*] &#123;0&#125;&quot;.format(message[&#x27;payload&#x27;]))</span><br><span class="line">    else:</span><br><span class="line">        print(message)</span><br><span class="line"></span><br><span class="line">jscode = &quot;&quot;&quot;</span><br><span class="line">Java.perform(function () &#123;</span><br><span class="line">    send(&quot;Success!&quot;)</span><br><span class="line">    var MainActivity = Java.use(&#x27;com.lang.frida.MainActivity&#x27;);</span><br><span class="line">    MainActivity.stringFromJNI.implementation = function () &#123;</span><br><span class="line">        send(&quot;Hook Start...&quot;);</span><br><span class="line">        send(&quot;Success!&quot;);</span><br><span class="line">        return &quot;i love you&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">process = frida.get_usb_device().attach(&#x27;com.lang.frida&#x27;)</span><br><span class="line">script = process.create_script(jscode)</span><br><span class="line">script.on(&#x27;message&#x27;, on_message)</span><br><span class="line">script.load()</span><br><span class="line">sys.stdin.read()</span><br></pre></td></tr></table></figure>
+
+<h4 id="frida-主动抛出异常，monitor查看调用栈（包含日志打印）"><a href="#frida-主动抛出异常，monitor查看调用栈（包含日志打印）" class="headerlink" title="frida 主动抛出异常，monitor查看调用栈（包含日志打印）"></a>frida 主动抛出异常，monitor查看调用栈（包含日志打印）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">Java.perform(function () &#123;</span><br><span class="line"></span><br><span class="line">    var e=Java.use(&quot;io.dcloud.feature.ui.e&quot;);</span><br><span class="line">    var exception=Java.use(&quot;java.lang.Exception&quot;);</span><br><span class="line">    var Logger=Java.use(&quot;io.dcloud.common.adapter.util.Logger&quot;);</span><br><span class="line">    e.a.overload(&#x27;io.dcloud.feature.ui.a&#x27;, &#x27;io.dcloud.common.DHInterface.IWebview&#x27;, &#x27;org.json.JSONArray&#x27;, &#x27;io.dcloud.common.DHInterface.IApp&#x27;, &#x27;java.lang.String&#x27;, &#x27;boolean&#x27;).implementation=function(v0,v1,v2,v3,v4,v5)&#123;</span><br><span class="line">        send(&quot;log Hook Start...&quot;);</span><br><span class="line">        Logger.setOpen(true);</span><br><span class="line">        //throw exception.$new(&quot;-----hook exception -----------------&quot;);</span><br><span class="line">        return this.a(v0,v1,v2,v3,v4,v5)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    Logger.setOpen.implementation=function(flag)&#123;</span><br><span class="line">        send(&quot;Logger update Hook Start...&quot;);</span><br><span class="line">        return this.setOpen(True)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="frida-hook-内部类"><a href="#frida-hook-内部类" class="headerlink" title="frida hook 内部类"></a>frida hook 内部类</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var f = Java.use(&#x27;cn.blackfish.android.financialmarketlib.view.activity.FmLoginActivity$f&#x27;);</span><br><span class="line">f.onClick.implementation = function (arg1) &#123;</span><br><span class="line">    send(&quot;Hook Start...&quot;);</span><br><span class="line">    return this.onClick(arg1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="frida-map打印"><a href="#frida-map打印" class="headerlink" title="frida map打印"></a>frida map打印</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var result = &quot;&quot;;</span><br><span class="line">var keyset = arg1.keySet();</span><br><span class="line">var it = keyset.iterator();</span><br><span class="line">while(it.hasNext())&#123;</span><br><span class="line">    var keystr = it.next().toString();</span><br><span class="line">    var valuestr = arg1.get(keystr).toString();</span><br><span class="line">    var map= keystr+&#x27;:&#x27;+valuestr+&#x27; ||&#x27;;</span><br><span class="line">    result+=map</span><br><span class="line">&#125;</span><br><span class="line">send(result);</span><br></pre></td></tr></table></figure>
+
+<h4 id="反射操作-hook-toast打印堆栈"><a href="#反射操作-hook-toast打印堆栈" class="headerlink" title="反射操作 hook toast打印堆栈"></a>反射操作 hook toast打印堆栈</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">jscode = &quot;&quot;&quot;</span><br><span class="line">Java.perform(function () &#123;</span><br><span class="line">    send(&quot;Success!&quot;)</span><br><span class="line">    var objectclass= Java.use(&quot;java.lang.Object&quot;);</span><br><span class="line">    var exception=Java.use(&quot;java.lang.Exception&quot;);</span><br><span class="line">    var Toast = Java.use(&#x27;android.widget.Toast&#x27;);</span><br><span class="line">    var BaseRequest = Java.use(&#x27;cn.blackfish.android.financialmarketlib.model.bean.BaseRequest&#x27;);</span><br><span class="line">    var JsonParser=Java.use(&#x27;com.google.gson.q&#x27;);</span><br><span class="line"></span><br><span class="line">    Toast.show.implementation = function () &#123;</span><br><span class="line">        send(&quot;Hook show Start...&quot;);</span><br><span class="line">        //var clazz = Java.cast(&quot;cn.blackfish.android.financialmarketlib.model.bean.BaseRequest&quot;,BaseRequest);</span><br><span class="line">        var method=BaseRequest.class.getDeclaredMethod(&quot;addSign&quot;,null);</span><br><span class="line">        var bizParams=BaseRequest.class.getDeclaredField(&quot;bizParams&quot;);</span><br><span class="line">        method.setAccessible(true)</span><br><span class="line">        bizParams.setAccessible(true)</span><br><span class="line"></span><br><span class="line">        var jsonParser = JsonParser.$new();</span><br><span class="line">        var jsonObject = jsonParser.a(&quot;&#123;&#x27;phoneNum&#x27;:&#x27;17621972154&#x27;,&#x27;templateId&#x27;:0,&#x27;thirdAuthType&#x27;:0&#125;&quot;);</span><br><span class="line">        var o = BaseRequest.$new(jsonObject);  </span><br><span class="line"></span><br><span class="line">        var mes=method.invoke(o,null)</span><br><span class="line">        send(mes.toString())</span><br><span class="line"></span><br><span class="line">        // this.toFlatMap(this.bizParams)</span><br><span class="line">        var map=o.toFlatMap(bizParams.get(o))</span><br><span class="line">        send(map.toString())</span><br><span class="line"></span><br><span class="line">        //throw exception.$new(&quot;-----hook exception -----------------&quot;);</span><br><span class="line">        return this.show();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="app中防止ptrace-会创建子进程ptrace父进程导致无法hook-app"><a href="#app中防止ptrace-会创建子进程ptrace父进程导致无法hook-app" class="headerlink" title="app中防止ptrace,会创建子进程ptrace父进程导致无法hook app"></a>app中防止ptrace,会创建子进程ptrace父进程导致无法hook app</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">import frida, sys</span><br><span class="line"></span><br><span class="line">def on_message(message, data):</span><br><span class="line">    if message[&#x27;type&#x27;] == &#x27;send&#x27;:</span><br><span class="line">        print(&quot;[*] &#123;0&#125;&quot;.format(message[&#x27;payload&#x27;]))</span><br><span class="line">    else:</span><br><span class="line">        print(message)</span><br><span class="line"></span><br><span class="line">jscode = &quot;&quot;&quot;</span><br><span class="line">Java.perform(function () &#123;</span><br><span class="line">    send(&quot;Success!&quot;)</span><br><span class="line">    var Config = Java.use(&#x27;com.hengchang.baselibrary.utils.LogUtils$Config&#x27;);</span><br><span class="line">    Config.$init.implementation = function (arg1) &#123;</span><br><span class="line">        send(&quot;Hook show Start...&quot;);</span><br><span class="line">        return this.$init(arg1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;);</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">device = frida.get_device_manager().enumerate_devices()[-1]</span><br><span class="line">pid = device.spawn([&quot;com.hengchang.client&quot;])</span><br><span class="line">session = device.attach(pid)</span><br><span class="line">print(&quot;[*] Attach Application id:&quot;,pid)</span><br><span class="line">device.resume(pid)</span><br><span class="line">print(&quot;[*] Application onResume&quot;)</span><br><span class="line">script = session.create_script(jscode)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">process = frida.get_usb_device().attach(&quot;cn.thecover.www.covermedia&quot;)</span><br><span class="line">script = process.create_script(jscode)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">script.on(&#x27;message&#x27;, on_message)</span><br><span class="line">print(&#x27;[*] Running CTF&#x27;)</span><br><span class="line">script.load()</span><br><span class="line">sys.stdin.read()</span><br></pre></td></tr></table></figure>
+
+<h4 id="okhttp一般hook方式"><a href="#okhttp一般hook方式" class="headerlink" title="okhttp一般hook方式"></a>okhttp一般hook方式</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">var RetryAndFollowUpInterceptor=Java.use(&quot;okhttp3.internal.http.RetryAndFollowUpInterceptor&quot;);</span><br><span class="line">var Buffer=Java.use(&quot;okio.Buffer&quot;);</span><br><span class="line">var Charset=Java.use(&quot;java.nio.charset.Charset&quot;);</span><br><span class="line">var exception=Java.use(&quot;java.lang.Exception&quot;);</span><br><span class="line">RetryAndFollowUpInterceptor.intercept.implementation = function (chain) &#123;</span><br><span class="line">    send(&quot;chain Hook show Start2...&quot;);</span><br><span class="line">    //throw exception.$new(&quot;----------exception--------------&quot;);</span><br><span class="line">    var userRequest = chain.request();</span><br><span class="line">    var requestBody = userRequest.body();</span><br><span class="line">    var buffer = Buffer.$new();</span><br><span class="line">    requestBody.writeTo(buffer);</span><br><span class="line">    var charset = Charset.forName(&quot;UTF-8&quot;);</span><br><span class="line">    var contentType = requestBody.contentType();</span><br><span class="line">    if (contentType != null) &#123;</span><br><span class="line">        charset = contentType.charset(charset);</span><br><span class="line">    &#125;</span><br><span class="line">    send(buffer.readString(charset))</span><br><span class="line">    return this.intercept(chain);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="堆栈打印2"><a href="#堆栈打印2" class="headerlink" title="堆栈打印2"></a>堆栈打印2</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">var k=Java.use(&quot;com.yxcorp.retrofit.k&quot;);</span><br><span class="line">var Thread=Java.use(&quot;java.lang.Thread&quot;);</span><br><span class="line">k.b.implementation = function (map) &#123;</span><br><span class="line">    send(&quot;Hook show map Start...&quot;);</span><br><span class="line">    var stack=Thread.currentThread().getStackTrace();  </span><br><span class="line">    for(var i=0;i&lt;stack.length;i++)&#123;</span><br><span class="line">        var line=stack[i].getClassName()+&quot;.&quot;+stack[i].getMethodName()+&quot;(&quot;+stack[i].getFileName()+&quot;:&quot;+stack[i].getLineNumber()+&quot;)&quot;</span><br><span class="line">        send(line)</span><br><span class="line">    &#125;</span><br><span class="line">    //throw exception.$new(&quot;-----hook exception -----------------&quot;);</span><br><span class="line">    return this.a();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="特殊字符打印"><a href="#特殊字符打印" class="headerlink" title="特殊字符打印"></a>特殊字符打印</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">send(escape(result)); unescape解密</span><br></pre></td></tr></table></figure>
+
+<h4 id="jni动态注册函数打印"><a href="#jni动态注册函数打印" class="headerlink" title="jni动态注册函数打印"></a>jni动态注册函数打印</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line">var ishook_libart = false;</span><br><span class="line"></span><br><span class="line">function hook_libart() &#123;</span><br><span class="line">    if (ishook_libart === true) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    var symbols = Module.enumerateSymbolsSync(&quot;libart.so&quot;);</span><br><span class="line">    var addrGetStringUTFChars = null;</span><br><span class="line">    var addrNewStringUTF = null;</span><br><span class="line">    var addrFindClass = null;</span><br><span class="line">    var addrGetMethodID = null;</span><br><span class="line">    var addrGetStaticMethodID = null;</span><br><span class="line">    var addrGetFieldID = null;</span><br><span class="line">    var addrGetStaticFieldID = null;</span><br><span class="line">    var addrRegisterNatives = null;</span><br><span class="line">    var addrAllocObject = null;</span><br><span class="line">    var addrCallObjectMethod = null;</span><br><span class="line">    var addrGetObjectClass = null;</span><br><span class="line">    var addrReleaseStringUTFChars = null;</span><br><span class="line">    for (var i = 0; i &lt; symbols.length; i++) &#123;</span><br><span class="line">        var symbol = symbols[i];</span><br><span class="line">        if (symbol.name == &quot;_ZN3art3JNI17GetStringUTFCharsEP7_JNIEnvP8_jstringPh&quot;) &#123;</span><br><span class="line">            addrGetStringUTFChars = symbol.address;</span><br><span class="line">            console.log(&quot;GetStringUTFChars is at &quot;, symbol.address, symbol.name);</span><br><span class="line">        &#125; else if (symbol.name == &quot;_ZN3art3JNI12NewStringUTFEP7_JNIEnvPKc&quot;) &#123;</span><br><span class="line">            addrNewStringUTF = symbol.address;</span><br><span class="line">            console.log(&quot;NewStringUTF is at &quot;, symbol.address, symbol.name);</span><br><span class="line">        &#125; else if (symbol.name == &quot;_ZN3art3JNI9FindClassEP7_JNIEnvPKc&quot;) &#123;</span><br><span class="line">            addrFindClass = symbol.address;</span><br><span class="line">            console.log(&quot;FindClass is at &quot;, symbol.address, symbol.name);</span><br><span class="line">        &#125; else if (symbol.name == &quot;_ZN3art3JNI11GetMethodIDEP7_JNIEnvP7_jclassPKcS6_&quot;) &#123;</span><br><span class="line">            addrGetMethodID = symbol.address;</span><br><span class="line">            console.log(&quot;GetMethodID is at &quot;, symbol.address, symbol.name);</span><br><span class="line">        &#125; else if (symbol.name == &quot;_ZN3art3JNI17GetStaticMethodIDEP7_JNIEnvP7_jclassPKcS6_&quot;) &#123;</span><br><span class="line">            addrGetStaticMethodID = symbol.address;</span><br><span class="line">            console.log(&quot;GetStaticMethodID is at &quot;, symbol.address, symbol.name);</span><br><span class="line">        &#125; else if (symbol.name == &quot;_ZN3art3JNI10GetFieldIDEP7_JNIEnvP7_jclassPKcS6_&quot;) &#123;</span><br><span class="line">            addrGetFieldID = symbol.address;</span><br><span class="line">            console.log(&quot;GetFieldID is at &quot;, symbol.address, symbol.name);</span><br><span class="line">        &#125; else if (symbol.name == &quot;_ZN3art3JNI16GetStaticFieldIDEP7_JNIEnvP7_jclassPKcS6_&quot;) &#123;</span><br><span class="line">            addrGetStaticFieldID = symbol.address;</span><br><span class="line">            console.log(&quot;GetStaticFieldID is at &quot;, symbol.address, symbol.name);</span><br><span class="line">        &#125; else if (symbol.name == &quot;_ZN3art3JNI15RegisterNativesEP7_JNIEnvP7_jclassPK15JNINativeMethodi&quot;) &#123;</span><br><span class="line">            addrRegisterNatives = symbol.address;</span><br><span class="line">            console.log(&quot;RegisterNatives is at &quot;, symbol.address, symbol.name);</span><br><span class="line">        &#125; else if (symbol.name.indexOf(&quot;_ZN3art3JNI11AllocObjectEP7_JNIEnvP7_jclass&quot;) &gt;= 0) &#123;</span><br><span class="line">            addrAllocObject = symbol.address;</span><br><span class="line">            console.log(&quot;AllocObject is at &quot;, symbol.address, symbol.name);</span><br><span class="line">        &#125;  else if (symbol.name.indexOf(&quot;_ZN3art3JNI16CallObjectMethodEP7_JNIEnvP8_jobjectP10_jmethodIDz&quot;) &gt;= 0) &#123;</span><br><span class="line">            addrCallObjectMethod = symbol.address;</span><br><span class="line">            console.log(&quot;CallObjectMethod is at &quot;, symbol.address, symbol.name);</span><br><span class="line">        &#125; else if (symbol.name.indexOf(&quot;_ZN3art3JNI14GetObjectClassEP7_JNIEnvP8_jobject&quot;) &gt;= 0) &#123;</span><br><span class="line">            addrGetObjectClass = symbol.address;</span><br><span class="line">            console.log(&quot;GetObjectClass is at &quot;, symbol.address, symbol.name);</span><br><span class="line">        &#125; else if (symbol.name.indexOf(&quot;_ZN3art3JNI21ReleaseStringUTFCharsEP7_JNIEnvP8_jstringPKc&quot;) &gt;= 0) &#123;</span><br><span class="line">            addrReleaseStringUTFChars = symbol.address;</span><br><span class="line">            console.log(&quot;ReleaseStringUTFChars is at &quot;, symbol.address, symbol.name);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (addrRegisterNatives != null) &#123;</span><br><span class="line">        Interceptor.attach(addrRegisterNatives, &#123;</span><br><span class="line">            onEnter: function (args) &#123;</span><br><span class="line">                console.log(&quot;[RegisterNatives] method_count:&quot;, args[3]);</span><br><span class="line">                var env = args[0];</span><br><span class="line">                var java_class = args[1];</span><br><span class="line">                </span><br><span class="line">                var funcAllocObject = new NativeFunction(addrAllocObject, &quot;pointer&quot;, [&quot;pointer&quot;, &quot;pointer&quot;]);</span><br><span class="line">                var funcGetMethodID = new NativeFunction(addrGetMethodID, &quot;pointer&quot;, [&quot;pointer&quot;, &quot;pointer&quot;, &quot;pointer&quot;, &quot;pointer&quot;]);</span><br><span class="line">                var funcCallObjectMethod = new NativeFunction(addrCallObjectMethod, &quot;pointer&quot;, [&quot;pointer&quot;, &quot;pointer&quot;, &quot;pointer&quot;]);</span><br><span class="line">                var funcGetObjectClass = new NativeFunction(addrGetObjectClass, &quot;pointer&quot;, [&quot;pointer&quot;, &quot;pointer&quot;]);</span><br><span class="line">                var funcGetStringUTFChars = new NativeFunction(addrGetStringUTFChars, &quot;pointer&quot;, [&quot;pointer&quot;, &quot;pointer&quot;, &quot;pointer&quot;]);</span><br><span class="line">                var funcReleaseStringUTFChars = new NativeFunction(addrReleaseStringUTFChars, &quot;void&quot;, [&quot;pointer&quot;, &quot;pointer&quot;, &quot;pointer&quot;]);</span><br><span class="line"></span><br><span class="line">                var clz_obj = funcAllocObject(env, java_class);</span><br><span class="line">                var mid_getClass = funcGetMethodID(env, java_class, Memory.allocUtf8String(&quot;getClass&quot;), Memory.allocUtf8String(&quot;()Ljava/lang/Class;&quot;));</span><br><span class="line">                var clz_obj2 = funcCallObjectMethod(env, clz_obj, mid_getClass);</span><br><span class="line">                var cls = funcGetObjectClass(env, clz_obj2);</span><br><span class="line">                var mid_getName = funcGetMethodID(env, cls, Memory.allocUtf8String(&quot;getName&quot;), Memory.allocUtf8String(&quot;()Ljava/lang/String;&quot;));</span><br><span class="line">                var name_jstring = funcCallObjectMethod(env, clz_obj2, mid_getName);</span><br><span class="line">                var name_pchar = funcGetStringUTFChars(env, name_jstring, ptr(0));</span><br><span class="line">                var class_name = ptr(name_pchar).readCString();</span><br><span class="line">                funcReleaseStringUTFChars(env, name_jstring, name_pchar);</span><br><span class="line"></span><br><span class="line">                //console.log(class_name);</span><br><span class="line"></span><br><span class="line">                var methods_ptr = ptr(args[2]);</span><br><span class="line"></span><br><span class="line">                var method_count = parseInt(args[3]);</span><br><span class="line">                for (var i = 0; i &lt; method_count; i++) &#123;</span><br><span class="line">                    var name_ptr = Memory.readPointer(methods_ptr.add(i * Process.pointerSize * 3));</span><br><span class="line">                    var sig_ptr = Memory.readPointer(methods_ptr.add(i * Process.pointerSize * 3 + Process.pointerSize));</span><br><span class="line">                    var fnPtr_ptr = Memory.readPointer(methods_ptr.add(i * Process.pointerSize * 3 + Process.pointerSize * 2));</span><br><span class="line"></span><br><span class="line">                    var name = Memory.readCString(name_ptr);</span><br><span class="line">                    var sig = Memory.readCString(sig_ptr);</span><br><span class="line">                    var find_module = Process.findModuleByAddress(fnPtr_ptr);</span><br><span class="line">                    console.log(&quot;[RegisterNatives] java_class:&quot;, class_name, &quot;name:&quot;, name, &quot;sig:&quot;, sig, &quot;fnPtr:&quot;, fnPtr_ptr, &quot;module_name:&quot;, find_module.name, &quot;module_base:&quot;, find_module.base, &quot;offset:&quot;, ptr(fnPtr_ptr).sub(find_module.base));</span><br><span class="line"></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            onLeave: function (retval) &#123; &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ishook_libart = true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="jni各种类型参数打印"><a href="#jni各种类型参数打印" class="headerlink" title="jni各种类型参数打印"></a>jni各种类型参数打印</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">function abc()&#123;</span><br><span class="line">    var base_address=Module.findBaseAddress(&#x27;libcms.so&#x27;)</span><br><span class="line">    if (base_address!=null)&#123;</span><br><span class="line">        </span><br><span class="line">        console.log(&quot;param:ok&quot;);</span><br><span class="line">        var str;</span><br><span class="line">        Java.perform(function () &#123;</span><br><span class="line">            str = Java.use(&quot;java.lang.String&quot;);</span><br><span class="line">        &#125;);</span><br><span class="line">        Interceptor.attach(base_address.add(0x16e19), &#123;</span><br><span class="line">            onEnter: function (args) &#123;</span><br><span class="line">                </span><br><span class="line">                // console.log(&quot;param1&gt;&gt;&gt;&gt;&gt;&gt;&gt;&quot; +  args[0].readCString());</span><br><span class="line">                // console.log(&quot;param1&gt;&gt;&gt;&gt;&gt;&gt;&gt;&quot; +  Memory.readUtf16String(args[0]));</span><br><span class="line">                // readAnsiString</span><br><span class="line">                console.log(&quot;hook success&quot;);</span><br><span class="line">                var s3 = Java.cast(args[3], str);</span><br><span class="line">                var s5 = Java.cast(args[5], str);</span><br><span class="line">                console.log(&quot;param2&gt;&gt;&gt;&gt;&gt;&gt;&gt;&quot; +  args[2].toInt32());</span><br><span class="line">                console.log(&quot;param3&gt;&gt;&gt;&gt;&gt;&gt;&gt;&quot; +  s3);</span><br><span class="line">                const length = Java.vm.getEnv().getArrayLength(args[4]);</span><br><span class="line">                var array=[];</span><br><span class="line">                for(var i=0;i&lt;length;i++)&#123;</span><br><span class="line">                    var obj=Java.vm.getEnv().getObjectArrayElement (args[4],i)</span><br><span class="line">                    var result=Java.vm.getEnv().stringFromJni(obj)</span><br><span class="line">                    array.push(result);</span><br><span class="line">                &#125;</span><br><span class="line">                console.log(&quot;param4&gt;&gt;&gt;&gt;&gt;&gt;&gt;&quot; + JSON.stringify(array));</span><br><span class="line">                console.log(&quot;param5&gt;&gt;&gt;&gt;&gt;&gt;&gt;&quot; +  s5);</span><br><span class="line">            &#125;,</span><br><span class="line">            onLeave: function (retval) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">abc();</span><br></pre></td></tr></table></figure>
+
+<h4 id="动态hook-Native函数"><a href="#动态hook-Native函数" class="headerlink" title="动态hook Native函数"></a>动态hook Native函数</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"># Exports[i].name 可通过ida分析找出</span><br><span class="line">function c()&#123;</span><br><span class="line">        const hooks = Module.load(&#x27;libcore.so&#x27;);</span><br><span class="line">        var Exports = hooks.enumerateExports();</span><br><span class="line">        for(var i = 0; i &lt; Exports.length; i++) &#123;</span><br><span class="line">            </span><br><span class="line">            var str;</span><br><span class="line">            Java.perform(function () &#123;</span><br><span class="line">                str = Java.use(&quot;java.lang.String&quot;);</span><br><span class="line">            &#125;);</span><br><span class="line">            if(Exports[i].name==&quot;Java_com_yxcorp_gifshow_util_CPU_getClock&quot;)&#123;</span><br><span class="line">                //函数类型</span><br><span class="line">                console.log(&quot;type:&quot;,Exports[i].type);</span><br><span class="line">                //函数名称</span><br><span class="line">                console.log(&quot;name:&quot;,Exports[i].name);</span><br><span class="line">                //函数地址</span><br><span class="line">                console.log(&quot;address:&quot;,(Exports[i].address));</span><br><span class="line">                Interceptor.attach(Exports[i].address, &#123;</span><br><span class="line">                    onEnter: function (args) &#123;</span><br><span class="line">                        // Java.vm.getEnv().GetObjectClass(args[0])</span><br><span class="line">                        // console.log(&quot;param1&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;--------------------------&quot;+Memory.readUtf16String(args[0]));</span><br><span class="line">                    &#125;,</span><br><span class="line">                    onLeave: function (retval) &#123;</span><br><span class="line">                        // console.log(&quot;param1&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;--------------------------&quot;)</span><br><span class="line">                        // var result=Java.vm.getEnv().newStringUtf(retval)</span><br><span class="line">                        // console.log(&quot;param result&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;--------------------------&quot;+Java.cast(retval, str));</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">Categories</a></li>
+        
+          <li><a href="/archives/">Articles</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/langgithub">Github</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93"><span class="toc-number">1.</span> <span class="toc-text">frida使用总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Gerneral"><span class="toc-number">1.1.</span> <span class="toc-text">Gerneral</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#frida-%E5%AE%89%E8%A3%85%E6%B5%8B%E8%AF%95"><span class="toc-number">1.1.1.</span> <span class="toc-text">frida 安装测试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#frida-%E4%B8%BB%E5%8A%A8%E6%8A%9B%E5%87%BA%E5%BC%82%E5%B8%B8%EF%BC%8Cmonitor%E6%9F%A5%E7%9C%8B%E8%B0%83%E7%94%A8%E6%A0%88%EF%BC%88%E5%8C%85%E5%90%AB%E6%97%A5%E5%BF%97%E6%89%93%E5%8D%B0%EF%BC%89"><span class="toc-number">1.1.2.</span> <span class="toc-text">frida 主动抛出异常，monitor查看调用栈（包含日志打印）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#frida-hook-%E5%86%85%E9%83%A8%E7%B1%BB"><span class="toc-number">1.1.3.</span> <span class="toc-text">frida hook 内部类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#frida-map%E6%89%93%E5%8D%B0"><span class="toc-number">1.1.4.</span> <span class="toc-text">frida map打印</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8D%E5%B0%84%E6%93%8D%E4%BD%9C-hook-toast%E6%89%93%E5%8D%B0%E5%A0%86%E6%A0%88"><span class="toc-number">1.1.5.</span> <span class="toc-text">反射操作 hook toast打印堆栈</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#app%E4%B8%AD%E9%98%B2%E6%AD%A2ptrace-%E4%BC%9A%E5%88%9B%E5%BB%BA%E5%AD%90%E8%BF%9B%E7%A8%8Bptrace%E7%88%B6%E8%BF%9B%E7%A8%8B%E5%AF%BC%E8%87%B4%E6%97%A0%E6%B3%95hook-app"><span class="toc-number">1.1.6.</span> <span class="toc-text">app中防止ptrace,会创建子进程ptrace父进程导致无法hook app</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#okhttp%E4%B8%80%E8%88%AChook%E6%96%B9%E5%BC%8F"><span class="toc-number">1.1.7.</span> <span class="toc-text">okhttp一般hook方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A0%86%E6%A0%88%E6%89%93%E5%8D%B02"><span class="toc-number">1.1.8.</span> <span class="toc-text">堆栈打印2</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%E6%89%93%E5%8D%B0"><span class="toc-number">1.1.9.</span> <span class="toc-text">特殊字符打印</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#jni%E5%8A%A8%E6%80%81%E6%B3%A8%E5%86%8C%E5%87%BD%E6%95%B0%E6%89%93%E5%8D%B0"><span class="toc-number">1.1.10.</span> <span class="toc-text">jni动态注册函数打印</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#jni%E5%90%84%E7%A7%8D%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0%E6%89%93%E5%8D%B0"><span class="toc-number">1.1.11.</span> <span class="toc-text">jni各种类型参数打印</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8A%A8%E6%80%81hook-Native%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.12.</span> <span class="toc-text">动态hook Native函数</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&text=frida使用总结"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&title=frida使用总结"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&is_video=false&description=frida使用总结"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=frida使用总结&body=Check out this article: https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&title=frida使用总结"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&title=frida使用总结"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&title=frida使用总结"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&title=frida使用总结"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&name=frida使用总结&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://langgithub.github.io/2024/03/21/frida%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/&t=frida使用总结"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Articles</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/langgithub">Github</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
