@@ -6,20 +6,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-    <meta name="description" content="计算机网络原理 物理层（比特传输）集线器 1.1 通讯方式 单工，半双工，全双工 数据链路层（交换机） 2.1 解决问题     封装成帧     透明传输     差错检测 2.2 信道分类     广播信道 （CSMA&#x2F;CD协议）{多点接入，载波监听，碰撞检测} &#x3D;》2T     点对点信道 （ppp协议）PPP 协议是用户计算机和 ISP进行通信时所使用的数据链路层协议。">
+    <meta name="description" content="计算机-常识-网络原理  1.计算机网络原理1. 物理层（比特传输）集线器     1.1 通讯方式         单工，半双工，全双工 2. 数据链路层（交换机）     2.1 解决问题             封装成帧             透明传输             差错检测     2.2 信道分类             广播信道 （CSMA&#x2F;CD协议）&#123;多点接入">
 <meta property="og:type" content="article">
 <meta property="og:title" content="计算机-常识-网络原理">
 <meta property="og:url" content="https://langgithub.github.io/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86/index.html">
 <meta property="og:site_name" content="yuan lang">
-<meta property="og:description" content="计算机网络原理 物理层（比特传输）集线器 1.1 通讯方式 单工，半双工，全双工 数据链路层（交换机） 2.1 解决问题     封装成帧     透明传输     差错检测 2.2 信道分类     广播信道 （CSMA&#x2F;CD协议）{多点接入，载波监听，碰撞检测} &#x3D;》2T     点对点信道 （ppp协议）PPP 协议是用户计算机和 ISP进行通信时所使用的数据链路层协议。">
+<meta property="og:description" content="计算机-常识-网络原理  1.计算机网络原理1. 物理层（比特传输）集线器     1.1 通讯方式         单工，半双工，全双工 2. 数据链路层（交换机）     2.1 解决问题             封装成帧             透明传输             差错检测     2.2 信道分类             广播信道 （CSMA&#x2F;CD协议）&#123;多点接入">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://wx1.sinaimg.cn/mw690/005EpKr8ly1g3y5qbaxcwj30u00minbw.jpg">
 <meta property="og:image" content="https://wx2.sinaimg.cn/mw690/005EpKr8ly1g3y8b6fqmzj30i40bd750.jpg">
 <meta property="og:image" content="https://wx2.sinaimg.cn/mw690/005EpKr8ly1g3y8b6g2zmj30ik0cvab9.jpg">
 <meta property="article:published_time" content="2017-12-23T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-04-17T08:49:56.714Z">
+<meta property="article:modified_time" content="2024-04-19T07:10:48.187Z">
 <meta property="article:author" content="yuan lang">
-<meta property="article:tag" content="计算机网络原理">
+<meta property="article:tag" content="计算机-常识">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://wx1.sinaimg.cn/mw690/005EpKr8ly1g3y5qbaxcwj30u00minbw.jpg">
     
@@ -88,7 +88,7 @@
     <span id="actions">
       <ul>
         
-        <li><a class="icon" aria-label="Previous post" href="/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Previous post" href="/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
         
         
         <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
@@ -119,7 +119,7 @@
     
     
       <div id="toc">
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">计算机网络原理</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">1.计算机网络原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%BD%91%E7%BB%9C%E5%B1%82"><span class="toc-number">2.</span> <span class="toc-text">3. 网络层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E4%BC%A0%E8%BE%93%E5%B1%82"><span class="toc-number">3.</span> <span class="toc-text">4. 传输层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%BA%94%E7%94%A8%E5%B1%82"><span class="toc-number">4.</span> <span class="toc-text">5. 应用层</span></a></li></ol>
       </div>
     
   </span>
@@ -153,14 +153,14 @@
       
     <div class="article-category">
         <i class="fa-solid fa-archive"></i>
-        <a class="category-link" href="/categories/%E9%9D%A2%E8%AF%95/">面试</a>
+        <a class="category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86/">计算机-常识</a>
     </div>
 
 
       
     <div class="article-tag">
         <i class="fa-solid fa-tag"></i>
-        <a class="p-category" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86/" rel="tag">计算机网络原理</a>
+        <a class="p-category" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86/" rel="tag">计算机-常识</a>
     </div>
 
 
@@ -169,13 +169,46 @@
   
 
   <div class="content e-content" itemprop="articleBody">
-    <h1 id="计算机网络原理"><a href="#计算机网络原理" class="headerlink" title="计算机网络原理"></a>计算机网络原理</h1><ol>
-<li>物理层（比特传输）集线器<br> 1.1 通讯方式<br> 单工，半双工，全双工</li>
-<li>数据链路层（交换机）<br> 2.1 解决问题<br>     封装成帧<br>     透明传输<br>     差错检测<br> 2.2 信道分类<br>     广播信道 （CSMA&#x2F;CD协议）{多点接入，载波监听，碰撞检测} &#x3D;》2T<br>     点对点信道 （ppp协议）PPP 协议是用户计算机和 ISP进行通信时所使用的数据链路层协议。<br> 2.3 信道复用技术<br>     频分复用<br>     时分复用<br>     统计时分复用<br>     波分复用<br>     码分复用</li>
-<li>网络层<br> 3.1 网络分类<br><img src="https://wx1.sinaimg.cn/mw690/005EpKr8ly1g3y5qbaxcwj30u00minbw.jpg" alt="网络分类"><br> 3.2 相关协议<br> ARP （mac地址解析协议 ip-mac）<br> ICMP<br> IGMP<br> IP<br> 3.3 路由分组转发</li>
-<li>传输层<br> 4.1 UDP与TCP<br> 4.2 TCP三次握手<br> <img src="https://wx2.sinaimg.cn/mw690/005EpKr8ly1g3y8b6fqmzj30i40bd750.jpg" alt="TCP三次握手"><br> 4.3 TCP四次挥手<br> <img src="https://wx2.sinaimg.cn/mw690/005EpKr8ly1g3y8b6g2zmj30ik0cvab9.jpg" alt="TCP四次挥手"><br> 4.4 TCP滑动窗口</li>
-<li>应用层<br> DNS 53<br> FTP 20 21<br> smtp 25 发送    pop3 imap 读取<br> telnet 23<br> http 80</li>
-</ol>
+    <blockquote>
+<p><del>计算机-常识-网络原理</del></p>
+</blockquote>
+<h3 id="1-计算机网络原理"><a href="#1-计算机网络原理" class="headerlink" title="1.计算机网络原理"></a>1.计算机网络原理</h3><pre><code>1. 物理层（比特传输）集线器
+    1.1 通讯方式
+        单工，半双工，全双工
+2. 数据链路层（交换机）
+    2.1 解决问题
+            封装成帧
+            透明传输
+            差错检测
+    2.2 信道分类
+            广播信道 （CSMA/CD协议）&#123;多点接入，载波监听，碰撞检测&#125; =》2T
+            点对点信道 （ppp协议）PPP 协议是用户计算机和 ISP进行通信时所使用的数据链路层协议。
+    2.3 信道复用技术
+            频分复用
+            时分复用
+            统计时分复用
+            波分复用
+            码分复用
+</code></pre>
+<h3 id="3-网络层"><a href="#3-网络层" class="headerlink" title="3. 网络层"></a>3. 网络层</h3><p><img src="https://wx1.sinaimg.cn/mw690/005EpKr8ly1g3y5qbaxcwj30u00minbw.jpg" alt="网络分类"></p>
+<pre><code>3.1 如图
+3.2 相关协议
+    ARP （mac地址解析协议 ip-mac）
+    ICMP
+    IGMP
+    IP
+3.3 路由分组转发
+</code></pre>
+<h3 id="4-传输层"><a href="#4-传输层" class="headerlink" title="4. 传输层"></a>4. 传输层</h3><pre><code>4.1 UDP与TCP
+4.2 TCP三次握手
+</code></pre>
+<p><img src="https://wx2.sinaimg.cn/mw690/005EpKr8ly1g3y8b6fqmzj30i40bd750.jpg" alt="TCP三次握手"><br>    4.3 TCP四次挥手<br><img src="https://wx2.sinaimg.cn/mw690/005EpKr8ly1g3y8b6g2zmj30ik0cvab9.jpg" alt="TCP四次挥手"><br>    4.4 TCP滑动窗口</p>
+<h3 id="5-应用层"><a href="#5-应用层" class="headerlink" title="5. 应用层"></a>5. 应用层</h3><pre><code>DNS 53
+FTP 20 21
+smtp 25 发送    pop3 imap 读取
+telnet 23
+http 80
+</code></pre>
 
   </div>
 </article>
@@ -205,7 +238,7 @@
     
     
       <div id="toc-footer" style="display: none">
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">计算机网络原理</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">1.计算机网络原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%BD%91%E7%BB%9C%E5%B1%82"><span class="toc-number">2.</span> <span class="toc-text">3. 网络层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E4%BC%A0%E8%BE%93%E5%B1%82"><span class="toc-number">3.</span> <span class="toc-text">4. 传输层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%BA%94%E7%94%A8%E5%B1%82"><span class="toc-number">4.</span> <span class="toc-text">5. 应用层</span></a></li></ol>
       </div>
     
 
