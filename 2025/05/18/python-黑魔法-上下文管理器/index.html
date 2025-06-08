@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="python 上下文管理器 with的作用是什么 @contextlib.contextmanager与with有什么关系 上下文管理器使用案例 多个管理器嵌套 nested函数  问题一with是一款语法糖 大致执行分为三个阶段  enter(self): with进入前 with 内部代码 exit(self, type, value, traceback) with 退出后  问题二 在理解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python-黑魔法-上下文管理器">
+<meta property="og:url" content="http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="python 上下文管理器 with的作用是什么 @contextlib.contextmanager与with有什么关系 上下文管理器使用案例 多个管理器嵌套 nested函数  问题一with是一款语法糖 大致执行分为三个阶段  enter(self): with进入前 with 内部代码 exit(self, type, value, traceback) with 退出后  问题二 在理解">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>python-黑魔法-上下文管理器</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&text=python-黑魔法-上下文管理器"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&title=python-黑魔法-上下文管理器"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&is_video=false&description=python-黑魔法-上下文管理器"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-黑魔法-上下文管理器&body=Check out this article: http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&title=python-黑魔法-上下文管理器"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&title=python-黑魔法-上下文管理器"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&title=python-黑魔法-上下文管理器"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&title=python-黑魔法-上下文管理器"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&name=python-黑魔法-上下文管理器&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&t=python-黑魔法-上下文管理器"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#python-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8"><span class="toc-number">1.</span> <span class="toc-text">python 上下文管理器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E4%B8%80"><span class="toc-number">1.0.1.</span> <span class="toc-text">问题一</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E4%BA%8C"><span class="toc-number">1.0.2.</span> <span class="toc-text">问题二</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E4%B8%89"><span class="toc-number">1.0.3.</span> <span class="toc-text">问题三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%984"><span class="toc-number">1.0.4.</span> <span class="toc-text">问题4</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        python-黑魔法-上下文管理器
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/python/">python</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/python/" rel="tag">python</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="python-上下文管理器"><a href="#python-上下文管理器" class="headerlink" title="python 上下文管理器"></a>python 上下文管理器</h1><ol>
+<li>with的作用是什么</li>
+<li>@contextlib.contextmanager与with有什么关系</li>
+<li>上下文管理器使用案例</li>
+<li>多个管理器嵌套 nested函数</li>
+</ol>
+<h3 id="问题一"><a href="#问题一" class="headerlink" title="问题一"></a>问题一</h3><p>with是一款语法糖 大致执行分为三个阶段</p>
+<ol>
+<li><strong>enter</strong>(self): with进入前</li>
+<li>with 内部代码</li>
+<li><strong>exit</strong>(self, type, value, traceback) with 退出后</li>
+</ol>
+<h3 id="问题二"><a href="#问题二" class="headerlink" title="问题二"></a>问题二</h3><ul>
+<li>在理解 @contextlib.contextmanager内部先看下</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#未使用上下文管理器，handle_query代码啰嗦</span><br><span class="line">class Database(object):</span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.connected = False</span><br><span class="line"></span><br><span class="line">    def connect(self):</span><br><span class="line">        self.connected = True</span><br><span class="line"></span><br><span class="line">    def close(self):</span><br><span class="line">        self.connected = False</span><br><span class="line"></span><br><span class="line">    def query(self):</span><br><span class="line">        if self.connected:</span><br><span class="line">            return &#x27;query data&#x27;</span><br><span class="line">        else:</span><br><span class="line">            raise ValueError(&#x27;DB not connected &#x27;)</span><br><span class="line"></span><br><span class="line">def handle_query():</span><br><span class="line">    db = Database()</span><br><span class="line">    db.connect()</span><br><span class="line">    print &#x27;handle --- &#x27;, db.query()</span><br><span class="line">    db.close()</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    handle_query()</span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用上下文管理器后</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">#handle_query 简单多了</span><br><span class="line">import contextlib</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Database(object):</span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.connected = False</span><br><span class="line"></span><br><span class="line">    def connect(self):</span><br><span class="line">        self.connected = True</span><br><span class="line"></span><br><span class="line">    def close(self):</span><br><span class="line">        self.connected = False</span><br><span class="line"></span><br><span class="line">    def query(self):</span><br><span class="line">        if self.connected:</span><br><span class="line">            return &#x27;query data&#x27;</span><br><span class="line">        else:</span><br><span class="line">            raise ValueError(&#x27;DB not connected &#x27;)</span><br><span class="line"></span><br><span class="line">@contextlib.contextmanager</span><br><span class="line">def database():</span><br><span class="line">    db = Database()</span><br><span class="line">    try:</span><br><span class="line">        if not db.connected:</span><br><span class="line">            db.connect()</span><br><span class="line">        yield db</span><br><span class="line">    except Exception as e:</span><br><span class="line">        db.close()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def handle_query():</span><br><span class="line">    with database() as db:</span><br><span class="line">        print(&#x27;handle ---&#x27;, db.query())</span><br><span class="line"></span><br><span class="line">handle_query()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>分析下代码执行逻辑</li>
+</ul>
+<ol>
+<li>进入@contextlib.contextmanager 实质是contextlib.contextmanager(database)<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#进入装饰器后又来一个装饰器wrap</span><br><span class="line">#简单说明下wrap装饰器的作用是将 要装饰的方法相关属性的指针指向装饰器，也就是将func的属性地址给 helper</span><br><span class="line">@wraps(func)</span><br><span class="line">def helper(*args, **kwds):</span><br><span class="line">    return _GeneratorContextManager(func, args, kwds)</span><br><span class="line">return helper</span><br></pre></td></tr></table></figure></li>
+<li>执行到whit database() 的database()时候进入到return _GeneratorContextManager(func, args, kwds)，初始化 _GeneratorContextManager过程中 func（&#x3D;&#x3D;database）协程初始化完成</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">class _GeneratorContextManager(ContextDecorator, AbstractContextManager):</span><br><span class="line">    &quot;&quot;&quot;Helper for @contextmanager decorator.&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">    def __init__(self, func, args, kwds):</span><br><span class="line">        self.gen = func(*args, **kwds)</span><br><span class="line">        self.func, self.args, self.kwds = func, args, kwds</span><br><span class="line">        # Issue 19330: ensure context manager instances have good docstrings</span><br><span class="line">        doc = getattr(func, &quot;__doc__&quot;, None)</span><br><span class="line">        if doc is None:</span><br><span class="line">            doc = type(self).__doc__</span><br><span class="line">        self.__doc__ = doc</span><br><span class="line">        # Unfortunately, this still doesn&#x27;t provide good help output when</span><br><span class="line">        # inspecting the created context manager instances, since pydoc</span><br><span class="line">        # currently bypasses the instance docstring and shows the docstring</span><br><span class="line">        # for the class instead.</span><br><span class="line">        # See http://bugs.python.org/issue19404 for more details.</span><br><span class="line"></span><br><span class="line">    def _recreate_cm(self):</span><br><span class="line">        # _GCM instances are one-shot context managers, so the</span><br><span class="line">        # CM must be recreated each time a decorated function is</span><br><span class="line">        # called</span><br><span class="line">        return self.__class__(self.func, self.args, self.kwds)</span><br><span class="line"></span><br><span class="line">    def __enter__(self):</span><br><span class="line">        try:</span><br><span class="line">            return next(self.gen)</span><br><span class="line">        except StopIteration:</span><br><span class="line">            raise RuntimeError(&quot;generator didn&#x27;t yield&quot;) from None</span><br><span class="line"></span><br><span class="line">    def __exit__(self, type, value, traceback):</span><br><span class="line">        if type is None:</span><br><span class="line">            try:</span><br><span class="line">                next(self.gen)</span><br><span class="line">            except StopIteration:</span><br><span class="line">                return False</span><br><span class="line">            else:</span><br><span class="line">                raise RuntimeError(&quot;generator didn&#x27;t stop&quot;)</span><br><span class="line">        else:</span><br><span class="line">            if value is None:</span><br><span class="line">                # Need to force instantiation so we can reliably</span><br><span class="line">                # tell if we get the same exception back</span><br><span class="line">                value = type()</span><br><span class="line">            try:</span><br><span class="line">                self.gen.throw(type, value, traceback)</span><br><span class="line">            except StopIteration as exc:</span><br><span class="line">                # Suppress StopIteration *unless* it&#x27;s the same exception that</span><br><span class="line">                # was passed to throw().  This prevents a StopIteration</span><br><span class="line">                # raised inside the &quot;with&quot; statement from being suppressed.</span><br><span class="line">                return exc is not value</span><br><span class="line">            except RuntimeError as exc:</span><br><span class="line">                # Don&#x27;t re-raise the passed in exception. (issue27122)</span><br><span class="line">                if exc is value:</span><br><span class="line">                    return False</span><br><span class="line">                # Likewise, avoid suppressing if a StopIteration exception</span><br><span class="line">                # was passed to throw() and later wrapped into a RuntimeError</span><br><span class="line">                # (see PEP 479).</span><br><span class="line">                if type is StopIteration and exc.__cause__ is value:</span><br><span class="line">                    return False</span><br><span class="line">                raise</span><br><span class="line">            except:</span><br><span class="line">                # only re-raise if it&#x27;s *not* the exception that was</span><br><span class="line">                # passed to throw(), because __exit__() must not raise</span><br><span class="line">                # an exception unless __exit__() itself failed.  But throw()</span><br><span class="line">                # has to raise the exception to signal propagation, so this</span><br><span class="line">                # fixes the impedance mismatch between the throw() protocol</span><br><span class="line">                # and the __exit__() protocol.</span><br><span class="line">                #</span><br><span class="line">                if sys.exc_info()[1] is value:</span><br><span class="line">                    return False</span><br><span class="line">                raise</span><br><span class="line">            raise RuntimeError(&quot;generator didn&#x27;t stop after throw()&quot;)</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>触发__enter__ ，通过next(self.gen)启动协程</li>
+<li>进入函数database yield db 挂起自己，释放控制权返回db<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">def database():</span><br><span class="line">    db = Database()</span><br><span class="line">    try:</span><br><span class="line">        if not db.connected:</span><br><span class="line">            db.connect()</span><br><span class="line">        yield db</span><br><span class="line">    except Exception as e:</span><br><span class="line">        db.close()</span><br></pre></td></tr></table></figure></li>
+<li>进入with内部 print(‘handle —‘, db.query())</li>
+<li>触发__exit__ 继续回到协程 yeild db，关闭连接 退出with</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">问题二：</span><br><span class="line">可以看到 with 是要与具有__enter__，__exit__的对象一起使用，而contextlib.contextmanager就是那个对象</span><br></pre></td></tr></table></figure>
+<h3 id="问题三"><a href="#问题三" class="headerlink" title="问题三"></a>问题三</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#锁资源</span><br><span class="line">@contextmanager</span><br><span class="line">def locked(lock):</span><br><span class="line">    lock.acquire()</span><br><span class="line">    try:</span><br><span class="line">        yield</span><br><span class="line">    finally:</span><br><span class="line">        lock.release()</span><br><span class="line"></span><br><span class="line">with locked(myLock):</span><br><span class="line">    #代码执行到这里时，myLock已经自动上锁</span><br><span class="line">    pass</span><br><span class="line">    #执行完后会，会自动释放锁</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#文件资源</span><br><span class="line">@contextmanager</span><br><span class="line">def myopen(filename, mode=&quot;r&quot;):</span><br><span class="line">    f = open(filename,mode)</span><br><span class="line">    try:</span><br><span class="line">        yield f</span><br><span class="line">    finally:</span><br><span class="line">        f.close()</span><br><span class="line"></span><br><span class="line">with myopen(&quot;test.txt&quot;) as f:</span><br><span class="line">    for line in f:</span><br><span class="line">        print(line)</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">#数据库资源</span><br><span class="line">@contextmanager</span><br><span class="line">def transaction(db):</span><br><span class="line">    db.begin()</span><br><span class="line">    try：</span><br><span class="line">        yield </span><br><span class="line">    except:</span><br><span class="line">        db.rollback()</span><br><span class="line">        raise</span><br><span class="line">    else:</span><br><span class="line">        db.commit()</span><br><span class="line"></span><br><span class="line">with transaction(mydb):</span><br><span class="line">    mydb.cursor.execute(sql)</span><br><span class="line">    mydb.cursor.execute(sql)</span><br><span class="line">    mydb.cursor.execute(sql)</span><br><span class="line">    mydb.cursor.execute(sql)</span><br></pre></td></tr></table></figure>
+
+<h3 id="问题4"><a href="#问题4" class="headerlink" title="问题4"></a>问题4</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">from contextlib import contextmanager</span><br><span class="line">from contextlib import nested</span><br><span class="line">from contextlib import closing</span><br><span class="line"></span><br><span class="line">@contextmanager</span><br><span class="line">def my_context(name):</span><br><span class="line">    print(&quot;enter&quot;)</span><br><span class="line">    try:</span><br><span class="line">        yield name</span><br><span class="line">    finally:</span><br><span class="line">        print(&quot;exit&quot;)</span><br><span class="line"></span><br><span class="line">#使用nested函数来调用多个管理器</span><br><span class="line">print(&quot;---------使用nested函数调用多个管理器-----------&quot;)</span><br><span class="line">with nested(my_context(&quot;管理器一&quot;), my_context(&quot;管理器二&quot;),my_context(&quot;管理器三&quot;)) as (m1,m2,m3):</span><br><span class="line">    print(m1)</span><br><span class="line">    print(m2)</span><br><span class="line">    print(m3)</span><br><span class="line"></span><br><span class="line">#直接使用with来调用调用多个管理器</span><br><span class="line">print(&quot;---------使用with调用多个管理器-----------&quot;)</span><br><span class="line">with my_context(&quot;管理器一&quot;) as m1, my_context(&quot;管理器二&quot;) as m2, my_context(&quot;管理器三&quot;) as m3:</span><br><span class="line">    print(m1)</span><br><span class="line">    print(m2)</span><br><span class="line">    print(m3)</span><br></pre></td></tr></table></figure>
+
+
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#python-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8"><span class="toc-number">1.</span> <span class="toc-text">python 上下文管理器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E4%B8%80"><span class="toc-number">1.0.1.</span> <span class="toc-text">问题一</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E4%BA%8C"><span class="toc-number">1.0.2.</span> <span class="toc-text">问题二</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E4%B8%89"><span class="toc-number">1.0.3.</span> <span class="toc-text">问题三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%984"><span class="toc-number">1.0.4.</span> <span class="toc-text">问题4</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&text=python-黑魔法-上下文管理器"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&title=python-黑魔法-上下文管理器"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&is_video=false&description=python-黑魔法-上下文管理器"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-黑魔法-上下文管理器&body=Check out this article: http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&title=python-黑魔法-上下文管理器"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&title=python-黑魔法-上下文管理器"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&title=python-黑魔法-上下文管理器"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&title=python-黑魔法-上下文管理器"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&name=python-黑魔法-上下文管理器&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/&t=python-黑魔法-上下文管理器"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="背景 app存在的危险 代码修改（广告植入，替换广告id） 资源修改（界面替换广告，链接替换） 破解（应用收费，内购） 篡改数据（无效金币，砖石） 加入恶意代码（木马，隐私，交易） 动态注入，数据拦截，窃取，修改 协议修改  加固目的 需要防止逆向分析（防逆向）–防止核心代码被反编译 控制二次打包（防篡改）– 校验完整性，签名，防止盗版 防止调试和注入（防调试）–防止动态调试，注入获取关键数据 防">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android脱壳系列-背景">
+<meta property="og:url" content="http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="背景 app存在的危险 代码修改（广告植入，替换广告id） 资源修改（界面替换广告，链接替换） 破解（应用收费，内购） 篡改数据（无效金币，砖石） 加入恶意代码（木马，隐私，交易） 动态注入，数据拦截，窃取，修改 协议修改  加固目的 需要防止逆向分析（防逆向）–防止核心代码被反编译 控制二次打包（防篡改）– 校验完整性，签名，防止盗版 防止调试和注入（防调试）–防止动态调试，注入获取关键数据 防">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="脱壳">
+<meta property="article:tag" content="so">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Android脱壳系列-背景</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E7%99%BE%E5%BA%A6%E5%8A%A0%E5%9B%BA%E5%88%86%E6%9E%90/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%85%BE%E8%AE%AF%E5%8A%A0%E5%9B%BA%E5%88%86%E6%9E%90/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&text=Android脱壳系列-背景"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&title=Android脱壳系列-背景"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&is_video=false&description=Android脱壳系列-背景"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Android脱壳系列-背景&body=Check out this article: http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&title=Android脱壳系列-背景"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&title=Android脱壳系列-背景"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&title=Android脱壳系列-背景"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&title=Android脱壳系列-背景"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&name=Android脱壳系列-背景&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&t=Android脱壳系列-背景"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A3%B3%E8%BF%9B%E5%8C%96"><span class="toc-number">2.</span> <span class="toc-text">壳进化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%84%B1%E5%A3%B3%E6%80%9D%E8%B7%AF"><span class="toc-number">2.1.</span> <span class="toc-text">脱壳思路</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E4%BB%A3%E5%A3%B3"><span class="toc-number">2.1.1.</span> <span class="toc-text">第一代壳</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E4%BB%A3%E5%A3%B3"><span class="toc-number">2.1.2.</span> <span class="toc-text">第二代壳</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E4%BB%A3%E5%A3%B3-%E6%96%B9%E6%B3%95%E6%8C%87%E4%BB%A4%E6%8A%BD%E5%8F%96"><span class="toc-number">2.1.3.</span> <span class="toc-text">第三代壳 方法指令抽取</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E4%BB%A3%E5%A3%B3"><span class="toc-number">2.1.4.</span> <span class="toc-text">第四代壳</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.2.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A3%B3%E7%89%B9%E7%82%B9"><span class="toc-number">2.3.</span> <span class="toc-text">壳特点</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Android脱壳系列-背景
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E7%88%AC%E8%99%AB-Android%E9%80%86%E5%90%91/">爬虫-Android逆向</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/so/" rel="tag">so</a>, <a class="p-category" href="/tags/%E8%84%B1%E5%A3%B3/" rel="tag">脱壳</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><ol>
+<li><p>app存在的危险<br> 代码修改（广告植入，替换广告id）<br> 资源修改（界面替换广告，链接替换）<br> 破解（应用收费，内购）<br> 篡改数据（无效金币，砖石）<br> 加入恶意代码（木马，隐私，交易）<br> 动态注入，数据拦截，窃取，修改<br> 协议修改</p>
+</li>
+<li><p>加固目的<br> 需要防止逆向分析（防逆向）–防止核心代码被反编译<br> 控制二次打包（防篡改）– 校验完整性，签名，防止盗版<br> 防止调试和注入（防调试）–防止动态调试，注入获取关键数据<br> 防止应用数据窃取（防窃取）– 加密敏感数据<br> 防止协议直接被盗刷–加密协议通信</p>
+</li>
+<li><p>常用加固方式<br> 类加载技术<br> 针对apk中的classes.dex文件进行处理，放入特定的文件中，通过native代码来运行进行解密（爱加密，梆梆）<br> 方法替换技术<br> 将class.dex文件中的方法代码进行提取，抽取方法，在运行时对器进行动态解密还原</p>
+</li>
+<li><p>脱壳手法<br> 修改系统源码自动脱壳<br> 通过hook对关键函数进行脱壳<br> 开源工具zjdroid,dexhunter进行脱壳<br> 利用IDA或者GDB动态调试进行脱壳</p>
+</li>
+</ol>
+<h3 id="壳进化"><a href="#壳进化" class="headerlink" title="壳进化"></a>壳进化</h3><ol>
+<li><p>第一代壳 dex 加密<br> dex字符串加密<br> 资源加密<br> 对抗反调试<br> 反调试<br> 自定义dexClassLoader</p>
+</li>
+<li><p>第二代壳 dex抽取和so加固<br> dex代码抽取到外部<br> dex动态加载<br> so加密</p>
+</li>
+<li><p>第三代壳 dex动态解密和So混淆<br> dex代码动态解密<br> so代码混淆</p>
+</li>
+</ol>
+<h4 id="脱壳思路"><a href="#脱壳思路" class="headerlink" title="脱壳思路"></a>脱壳思路</h4><h5 id="第一代壳"><a href="#第一代壳" class="headerlink" title="第一代壳"></a>第一代壳</h5><pre><code>1. 内存dump，内存中寻址dex.035 或dex.036
+2. 文件监视法
+    dex优化生成odex
+    监视文件变化（notifywait-for-Android）
+    监视dexOpt输出（notifywait-for-Android）
+3. hook法
+    hook dvmDexFileOpenPartial
+4. 定制安卓系统
+</code></pre>
+<h5 id="第二代壳"><a href="#第二代壳" class="headerlink" title="第二代壳"></a>第二代壳</h5><pre><code>1. hook dexFileParse  dexFileOpenFromMD
+2. 定制系统
+    dexHunter defineClassNative
+    绕过3进程反调试一系列系统源码
+    断点mmap, dexopt优化时，dvmContinueOptimization()-&gt;mmap()
+</code></pre>
+<h5 id="第三代壳-方法指令抽取"><a href="#第三代壳-方法指令抽取" class="headerlink" title="第三代壳 方法指令抽取"></a>第三代壳 方法指令抽取</h5><p>dex2oat<br>    ART模式下，dex2oat生成oat时，内存中的dex是完整的<br>定制系统<br>    hook Dalvik_dalvik_system_DexFile_defineClassNative dexHunter<br>    枚举所有DexClassDef，对所有class,调用dvmDefineClass进行强制加载</p>
+<h5 id="第四代壳"><a href="#第四代壳" class="headerlink" title="第四代壳"></a>第四代壳</h5><p>so+vmp<br>动态调试+人肉还原</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>爱加密 脱壳点 dvmDexFileOpenPartial</p>
+<h4 id="壳特点"><a href="#壳特点" class="headerlink" title="壳特点"></a>壳特点</h4><p>(“libsecexe.so”, “梆梆加固免费版”);<br>(“libsecmain.so”, “梆梆加固免费版”);<br>(“libSecShell.so”, “梆梆加固免费版”);<br>(“secData0.jar”, “梆梆加固免费版”);<br>(“libSecShell-x86.so”, “梆梆加固免费版”);</p>
+<p>(“libDexHelper.so”, “梆梆企业版”);<br>(“libDexHelper-x86.so”, “梆梆企业版”);<br>(“classes.jar”, “梆梆加固定制版”);<br>(“DexHelper.so”, “梆梆加固定制版”);</p>
+<p>(“libtup.so”, “腾讯加固”);<br>(“libshell.so”, “腾讯加固”);<br>(“mix.dex”, “腾讯加固”);<br>(“mixz.dex”, “腾讯加固”);<br>(“libshella-xxxx.so”, “腾讯加固”);<br>(“libshellx-xxxx.so”, “腾讯加固”);</p>
+<p>(“libtosprotection.armeabi-v7a.so”, “腾讯御安全”);<br>(“libtosprotection.armeabi.so”, “腾讯御安全”);<br>(“libtosprotection.x86.so”, “腾讯御安全”);<br>(“tosversion”, “腾讯御安全”);<br>(“libTmsdk-xxx-mfr.so”, “腾讯御安全”);</p>
+<p>(“aliprotect.dat”, “阿里加固”);<br>(“libsgmain.so”, “阿里加固”);<br>(“libsgsecuritybody.so”, “阿里加固”);<br>(“libmobisec.so”, “阿里加固”);<br>(“libfakejni.so”, “阿里加固”);<br>(“libzuma.so”, “阿里加固”);<br>(“libzumadata.so”, “阿里加固”);<br>(“libpreverify1.so”, “阿里加固”);</p>
+<p>(“kdpdata.so”, “几维加固”);<br>(“dex.dat”, “几维加固”);<br>(“libkdp.so”, “几维加固”);<br>(“libkwscmm.so”, “几维加固”);<br>(“libkwscr.so”, “几维加固”);<br>(“libkwslinker.so”, “几维加固”);</p>
+<p>(“libexec.so”, “爱加密”);<br>(“libexecmain.so”, “爱加密”);<br>(“ijiami.dat”, “爱加密”);<br>(“ijiami.ajm”, “爱加密”);<br>(“af.bin”, “爱加密”);<br>(“signed.bin”, “爱加密”);</p>
+<p>(“libchaosvmp.so”, “娜迦”);<br>(“libddog.so”, “娜迦”);<br>(“libfdog.so”, “娜迦”);<br>(“libedog.so”, “娜迦”);</p>
+<p>(“libprotectClass.so”, “360加固”);<br>(“libjiagu.so”, “360加固”);<br>(“libjiagu_art.so”, “360加固”);<br>(“libjiagu_x86.so”, “360加固”);</p>
+<p>(“libcmvmp.so”, “中国移动安全加固”);<br>(“libmogosec_dex.so”, “中国移动安全加固”);<br>(“libmogosec_sodecrypt.so”, “中国移动安全加固”);<br>(“libmogosecurity.so”, “中国移动安全加固”);</p>
+<p>(“libbaiduprotect.so”, “百度加固”);<br>(“baiduprotect1.jar”, “百度加固”);<br>(“baiduprotect.jar”, “百度加固”);</p>
+<p>(“libuusafe.jar.so”, “UU安全加固”);<br>(“libuusafe.so”, “UU安全加固”);<br>(“libuusafeempty.so”, “UU安全加固”);</p>
+<p>(“dp.arm-v7.so.dat”, “DexProtect加固”);<br>(“dp.arm.so.dat”, “DexProtect加固”);</p>
+<p>(“libegis.so”, “通付盾加固”);<br>(“libNSaferOnly.so”, “通付盾加固”);</p>
+<p>(“libreincp.so”, “珊瑚灵御加固”);<br>(“libreincp_x86.so”, “珊瑚灵御加固”);</p>
+<p>(“libnqshield.so”, “网秦加固”);</p>
+<p>(“libnesec.so”, “网易易盾”);</p>
+<p>(“libAPKProtect.so”, “APKProtect加固”);</p>
+<p>(“libx3g.so”, “顶象技术加固”);</p>
+<p>(“libitsec.so”, “海云安加固”);</p>
+<p>(“libapssec.so”, “盛大加固”);</p>
+<p>(“librsprotect.so”, “瑞星加固”);</p>
+<p>(“libapktoolplus_jiagu.so”, “apktoolplus加固”);</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A3%B3%E8%BF%9B%E5%8C%96"><span class="toc-number">2.</span> <span class="toc-text">壳进化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%84%B1%E5%A3%B3%E6%80%9D%E8%B7%AF"><span class="toc-number">2.1.</span> <span class="toc-text">脱壳思路</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E4%BB%A3%E5%A3%B3"><span class="toc-number">2.1.1.</span> <span class="toc-text">第一代壳</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E4%BB%A3%E5%A3%B3"><span class="toc-number">2.1.2.</span> <span class="toc-text">第二代壳</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E4%BB%A3%E5%A3%B3-%E6%96%B9%E6%B3%95%E6%8C%87%E4%BB%A4%E6%8A%BD%E5%8F%96"><span class="toc-number">2.1.3.</span> <span class="toc-text">第三代壳 方法指令抽取</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E4%BB%A3%E5%A3%B3"><span class="toc-number">2.1.4.</span> <span class="toc-text">第四代壳</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.2.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A3%B3%E7%89%B9%E7%82%B9"><span class="toc-number">2.3.</span> <span class="toc-text">壳特点</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&text=Android脱壳系列-背景"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&title=Android脱壳系列-背景"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&is_video=false&description=Android脱壳系列-背景"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Android脱壳系列-背景&body=Check out this article: http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&title=Android脱壳系列-背景"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&title=Android脱壳系列-背景"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&title=Android脱壳系列-背景"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&title=Android脱壳系列-背景"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&name=Android脱壳系列-背景&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E8%83%8C%E6%99%AF/&t=Android脱壳系列-背景"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

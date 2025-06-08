@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content=".1. netty-sekiro   netty-sekiro Gerneral sekiro组织架构 人观流程 解决前一版本bug sekiro 基于xposed主动hook demo        .1.1. GerneralSEKIRO 是一个android下的API服务暴露框架，可以用在app逆向、app数据抓取、android群控等场景。  sekiro 是用springboot,和ne">
+<meta property="og:type" content="article">
+<meta property="og:title" content="netty-sekiro">
+<meta property="og:url" content="http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content=".1. netty-sekiro   netty-sekiro Gerneral sekiro组织架构 人观流程 解决前一版本bug sekiro 基于xposed主动hook demo        .1.1. GerneralSEKIRO 是一个android下的API服务暴露框架，可以用在app逆向、app数据抓取、android群控等场景。  sekiro 是用springboot,和ne">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/Sekiro%E6%9E%B6%E6%9E%84.png">
+<meta property="article:published_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="netty">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/Sekiro%E6%9E%B6%E6%9E%84.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>netty-sekiro</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/%E9%80%86%E5%90%91-js-%E8%B0%83%E8%AF%95/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E9%80%86%E5%90%91-netty-learn/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&text=netty-sekiro"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&title=netty-sekiro"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&is_video=false&description=netty-sekiro"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=netty-sekiro&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&title=netty-sekiro"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&title=netty-sekiro"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&title=netty-sekiro"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&title=netty-sekiro"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&name=netty-sekiro&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&t=netty-sekiro"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-netty-sekiro"><span class="toc-number">1.</span> <span class="toc-text">.1. netty-sekiro</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-Gerneral"><span class="toc-number">1.1.</span> <span class="toc-text">.1.1. Gerneral</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-1-sekiro%E7%BB%84%E7%BB%87%E6%9E%B6%E6%9E%84"><span class="toc-number">1.1.1.</span> <span class="toc-text">.1.1.1. sekiro组织架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-2-%E4%BA%BA%E8%A7%82%E6%B5%81%E7%A8%8B"><span class="toc-number">1.1.2.</span> <span class="toc-text">.1.1.2. 人观流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-3-%E8%A7%A3%E5%86%B3%E5%89%8D%E4%B8%80%E7%89%88%E6%9C%ACbug"><span class="toc-number">1.1.3.</span> <span class="toc-text">.1.1.3. 解决前一版本bug</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-4-sekiro-%E5%9F%BA%E4%BA%8Exposed%E4%B8%BB%E5%8A%A8hook-demo"><span class="toc-number">1.1.4.</span> <span class="toc-text">.1.1.4. sekiro 基于xposed主动hook demo</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        netty-sekiro
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.429Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/code-java/">code-java</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/java/" rel="tag">java</a>, <a class="p-category" href="/tags/netty/" rel="tag">netty</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="1-netty-sekiro"><a href="#1-netty-sekiro" class="headerlink" title=".1. netty-sekiro"></a>.1. netty-sekiro</h2><!-- TOC -->
+
+<ul>
+<li><a href="#netty-sekiro">netty-sekiro</a><ul>
+<li><a href="#gerneral">Gerneral</a><ul>
+<li><a href="#sekiro%E7%BB%84%E7%BB%87%E6%9E%B6%E6%9E%84">sekiro组织架构</a></li>
+<li><a href="#%E4%BA%BA%E8%A7%82%E6%B5%81%E7%A8%8B">人观流程</a></li>
+<li><a href="#%E8%A7%A3%E5%86%B3%E5%89%8D%E4%B8%80%E7%89%88%E6%9C%ACbug">解决前一版本bug</a></li>
+<li><a href="#sekiro-%E5%9F%BA%E4%BA%8Exposed%E4%B8%BB%E5%8A%A8hook-demo">sekiro 基于xposed主动hook demo</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!-- /TOC -->
+
+<h3 id="1-1-Gerneral"><a href="#1-1-Gerneral" class="headerlink" title=".1.1. Gerneral"></a>.1.1. Gerneral</h3><p>SEKIRO 是一个android下的API服务暴露框架，可以用在app逆向、app数据抓取、android群控等场景。</p>
+<ol>
+<li>sekiro 是用springboot,和netty（nio）开发的高效通讯框架</li>
+<li>sekiro 不仅支持短连接，也支持长链接，能实时返回手机是否在线的技术</li>
+<li>sekiro 中使用了netty代表异步请求，服务器资源使用少</li>
+<li>sekiro 不依赖xposed架构，能与一切hook框架解耦合</li>
+</ol>
+<h4 id="1-1-1-sekiro组织架构"><a href="#1-1-1-sekiro组织架构" class="headerlink" title=".1.1.1. sekiro组织架构"></a>.1.1.1. sekiro组织架构</h4><p><img src="/img/Sekiro%E6%9E%B6%E6%9E%84.png" alt="sekiro组织架构"></p>
+<ol>
+<li>sekiro包含移动端开发和服务器端开发</li>
+<li>服务器端是用Springboot管理各种组件，在Springboot bean（InitializingBean）初始化 afterPropertiesSet完成会启动两个nio服务，分别监听5600，5601端口.</li>
+<li>5601 端口的nio服务器用于处理http请求，即处理调用接口处理。<ul>
+<li>RBHttpRequestDecoder 用于http解码</li>
+<li>HttpResponseEncoder 用于http编码</li>
+<li>HttpObjectAggregator 最大报文处理</li>
+<li>HttpRequestDispatcher 对拿到的http请求处理</li>
+</ul>
+</li>
+<li>HttpRequestDispatcher 中接受request请求，封装成SekiroNatMessage 发送给移动端，并且生成一个新任务设置事件回调接口并保存到concurrentmap中.</li>
+<li>5600 端口的nio服务器用于处理tcp请求，与移动端数据交互<ul>
+<li>SekiroMessageEncoder tcp编码</li>
+<li>SekiroMessageDecoder tcp解码</li>
+<li>ServerIdleCheckHandler 服务器空闲检查 读空闲，写空闲</li>
+<li>NatServerChannelHandler 自定义处理与移动端数据交互</li>
+</ul>
+</li>
+<li>pipeline中的handler是依次执行，符合条件执行</li>
+<li>SekiroNatMessage 是移动端与服务器交互数据的对象</li>
+<li>SekiroNatMessage 目前包含3中类型<ul>
+<li>SekiroNatMessage.TYPE_HEARTBEAT 用于处理心跳检查</li>
+<li>SekiroNatMessage.C_TYPE_REGISTER 用于移动端action注册</li>
+<li>SekiroNatMessage.TYPE_INVOKE 用于服务器介绍到客户端hook信息，并将信息返回给调用者</li>
+</ul>
+</li>
+<li>SekiroNatMessage.C_TYPE_REGISTER 实际是将NatClient（封装移动端与服务端的channel，clietid,group信息）保存到natClientMap，poolQueue中</li>
+<li>SekiroNatMessage.TYPE_INVOKE 从channel中获取clientid，group，换取task任务，调用回调函数。即sekiroResponseEvent.onSekiroResponse(sekiroNatMessage);是将移动端hook后的返回信息（是否注册手机号）传递给回调函数，回调函数会返回response给调用者</li>
+<li>移动端即client客户端包含一下handler<ul>
+<li>SekiroMessageDecoder</li>
+<li>SekiroMessageEncoder</li>
+<li>ClientIdleCheckHandler 与服务器连接空闲检查</li>
+<li>ClientChannelHandler 自定义处理服务器端发来的数据</li>
+</ul>
+</li>
+<li>ClientChannelHandler将服务器端发来的hook请求取出对于的action 调用</li>
+<li>sekiroResponse.success  触发channel.writeAndFlush(sekiroNatMessage); 将hook信息发送到服务端</li>
+</ol>
+<h4 id="1-1-2-人观流程"><a href="#1-1-2-人观流程" class="headerlink" title=".1.1.2. 人观流程"></a>.1.1.2. 人观流程</h4><p>总结：4（调用者的request）-&gt;7（发送hook请求注册回调）-&gt; 12（移动端寻找action调用） -&gt; 13（返回hook到的信息） -&gt; 10（服务器端收到hook消息回调给调用者）</p>
+<ol>
+<li>其中7，10步骤都是异步，不断发送和接受</li>
+<li>如何确保同一任务 这里采用 clientId + “—“ + group + “—“ + seq; 代表唯一id</li>
+</ol>
+<h4 id="1-1-3-解决前一版本bug"><a href="#1-1-3-解决前一版本bug" class="headerlink" title=".1.1.3. 解决前一版本bug"></a>.1.1.3. 解决前一版本bug</h4><p>SekiroMessageDecoder 代替原理啊的SekiroNatMessageDecoder（更名为SekiroNatMessageDecoderError）</p>
+<h4 id="1-1-4-sekiro-基于xposed主动hook-demo"><a href="#1-1-4-sekiro-基于xposed主动hook-demo" class="headerlink" title=".1.1.4. sekiro 基于xposed主动hook demo"></a>.1.1.4. sekiro 基于xposed主动hook demo</h4><p><a target="_blank" rel="noopener" href="https://github.com/langgithub/hello">https://github.com/langgithub/hello</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-netty-sekiro"><span class="toc-number">1.</span> <span class="toc-text">.1. netty-sekiro</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-Gerneral"><span class="toc-number">1.1.</span> <span class="toc-text">.1.1. Gerneral</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-1-sekiro%E7%BB%84%E7%BB%87%E6%9E%B6%E6%9E%84"><span class="toc-number">1.1.1.</span> <span class="toc-text">.1.1.1. sekiro组织架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-2-%E4%BA%BA%E8%A7%82%E6%B5%81%E7%A8%8B"><span class="toc-number">1.1.2.</span> <span class="toc-text">.1.1.2. 人观流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-3-%E8%A7%A3%E5%86%B3%E5%89%8D%E4%B8%80%E7%89%88%E6%9C%ACbug"><span class="toc-number">1.1.3.</span> <span class="toc-text">.1.1.3. 解决前一版本bug</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-4-sekiro-%E5%9F%BA%E4%BA%8Exposed%E4%B8%BB%E5%8A%A8hook-demo"><span class="toc-number">1.1.4.</span> <span class="toc-text">.1.1.4. sekiro 基于xposed主动hook demo</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&text=netty-sekiro"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&title=netty-sekiro"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&is_video=false&description=netty-sekiro"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=netty-sekiro&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&title=netty-sekiro"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&title=netty-sekiro"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&title=netty-sekiro"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&title=netty-sekiro"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&name=netty-sekiro&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/&t=netty-sekiro"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

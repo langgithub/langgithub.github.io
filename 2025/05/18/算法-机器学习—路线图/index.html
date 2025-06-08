@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="机器学习数据处理步骤： 机器学习基础与实践（一）—-数据清洗机器学习基础与实践（二）—-数据转换机器学习基础与实践（三）—-数据降维之PCA基本机器学习算法推导：决策树：https:&#x2F;&#x2F;blog.csdn.net&#x2F;yen_csdn&#x2F;article&#x2F;details&#x2F;79012871KNN分类：http:&#x2F;&#x2F;www.cnblogs.com&#x2F;bahcelor&#x2F;p&#x2F;7239997.htmlSVM:http">
+<meta property="og:type" content="article">
+<meta property="og:title" content="算法-机器学习—路线图">
+<meta property="og:url" content="http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="机器学习数据处理步骤： 机器学习基础与实践（一）—-数据清洗机器学习基础与实践（二）—-数据转换机器学习基础与实践（三）—-数据降维之PCA基本机器学习算法推导：决策树：https:&#x2F;&#x2F;blog.csdn.net&#x2F;yen_csdn&#x2F;article&#x2F;details&#x2F;79012871KNN分类：http:&#x2F;&#x2F;www.cnblogs.com&#x2F;bahcelor&#x2F;p&#x2F;7239997.htmlSVM:http">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>算法-机器学习—路线图</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E6%95%B0%E5%AD%A6%E7%9F%A5%E8%AF%86%E7%82%B9%E6%B8%85%E5%8D%95/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E8%AF%AD%E8%A8%80-cpp-%E6%8C%87%E9%92%88/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&text=算法-机器学习—路线图"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&title=算法-机器学习—路线图"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&is_video=false&description=算法-机器学习—路线图"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=算法-机器学习—路线图&body=Check out this article: http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&title=算法-机器学习—路线图"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&title=算法-机器学习—路线图"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&title=算法-机器学习—路线图"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&title=算法-机器学习—路线图"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&name=算法-机器学习—路线图&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&t=算法-机器学习—路线图"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B8%8E%E5%AE%9E%E8%B7%B5%EF%BC%88%E4%B8%80%EF%BC%89%E2%80%94-%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97"><span class="toc-number">1.</span> <span class="toc-text">机器学习基础与实践（一）—-数据清洗</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B8%8E%E5%AE%9E%E8%B7%B5%EF%BC%88%E4%BA%8C%EF%BC%89%E2%80%94-%E6%95%B0%E6%8D%AE%E8%BD%AC%E6%8D%A2"><span class="toc-number">2.</span> <span class="toc-text">机器学习基础与实践（二）—-数据转换</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B8%8E%E5%AE%9E%E8%B7%B5%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94-%E6%95%B0%E6%8D%AE%E9%99%8D%E7%BB%B4%E4%B9%8BPCA"><span class="toc-number">3.</span> <span class="toc-text">机器学习基础与实践（三）—-数据降维之PCA</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        算法-机器学习—路线图
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.429Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">算法-机器学习</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>机器学习数据处理步骤：</p>
+<h1 id="机器学习基础与实践（一）—-数据清洗"><a href="#机器学习基础与实践（一）—-数据清洗" class="headerlink" title="机器学习基础与实践（一）—-数据清洗"></a><a target="_blank" rel="noopener" href="https://www.cnblogs.com/charlotte77/p/5606926.html">机器学习基础与实践（一）—-数据清洗</a></h1><h1 id="机器学习基础与实践（二）—-数据转换"><a href="#机器学习基础与实践（二）—-数据转换" class="headerlink" title="机器学习基础与实践（二）—-数据转换"></a><a target="_blank" rel="noopener" href="https://www.cnblogs.com/charlotte77/p/5622325.html">机器学习基础与实践（二）—-数据转换</a></h1><h1 id="机器学习基础与实践（三）—-数据降维之PCA"><a href="#机器学习基础与实践（三）—-数据降维之PCA" class="headerlink" title="机器学习基础与实践（三）—-数据降维之PCA"></a><a target="_blank" rel="noopener" href="https://www.cnblogs.com/charlotte77/p/5625984.html">机器学习基础与实践（三）—-数据降维之PCA</a></h1><p>基本机器学习算法推导：<br>决策树：<a target="_blank" rel="noopener" href="https://blog.csdn.net/yen_csdn/article/details/79012871">https://blog.csdn.net/yen_csdn/article/details/79012871</a><br>KNN分类：<a target="_blank" rel="noopener" href="http://www.cnblogs.com/bahcelor/p/7239997.html">http://www.cnblogs.com/bahcelor/p/7239997.html</a><br>SVM:<a target="_blank" rel="noopener" href="https://blog.csdn.net/zxllll8898/article/details/53404484">https://blog.csdn.net/zxllll8898/article/details/53404484</a><br>神经网络：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/bahcelor/p/7252394.html">https://www.cnblogs.com/bahcelor/p/7252394.html</a><br>K-means：<a target="_blank" rel="noopener" href="https://blog.csdn.net/loveliuzz/article/details/78052711">https://blog.csdn.net/loveliuzz/article/details/78052711</a><br>卷积神经网络：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/skyfsm/p/6790245.html">https://www.cnblogs.com/skyfsm/p/6790245.html</a></p>
+<p>深度学习推导：<br><a target="_blank" rel="noopener" href="https://www.zybuluo.com/hanbingtao/note/433855">零基础入门深度学习(1) - 感知器</a> <br><a target="_blank" rel="noopener" href="https://www.zybuluo.com/hanbingtao/note/448086">零基础入门深度学习(2) - 线性单元和梯度下降</a> <br><a target="_blank" rel="noopener" href="https://www.zybuluo.com/hanbingtao/note/476663">零基础入门深度学习(3) - 神经网络和反向传播算法</a> <br><a target="_blank" rel="noopener" href="https://www.zybuluo.com/hanbingtao/note/485480">零基础入门深度学习(4) - 卷积神经网络</a> <br><a target="_blank" rel="noopener" href="https://zybuluo.com/hanbingtao/note/541458">零基础入门深度学习(5) - 循环神经网络</a> <br><a target="_blank" rel="noopener" href="https://zybuluo.com/hanbingtao/note/581764">零基础入门深度学习(6) - 长短时记忆网络(LSTM)</a> <br><a target="_blank" rel="noopener" href="https://zybuluo.com/hanbingtao/note/626300">零基础入门深度学习(7) - 递归神经网络</a></p>
+<p>难点：<br>pca降维推导：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/tbiiann/p/6259459.html">https://www.cnblogs.com/tbiiann/p/6259459.html</a><br>svd分解推导：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/tbiiann/p/6262397.html">https://www.cnblogs.com/tbiiann/p/6262397.html</a><br>机器学习中的距离：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/tbiiann/p/5968784.html">https://www.cnblogs.com/tbiiann/p/5968784.html</a><br>最小二乘法法推导：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/paiandlu/p/7843236.html">https://www.cnblogs.com/paiandlu/p/7843236.html</a><br>svm手推：<a target="_blank" rel="noopener" href="https://blog.csdn.net/v_july_v/article/details/7624837">https://blog.csdn.net/v_july_v/article/details/7624837</a><br>kkt条件解释：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/liaohuiqiang/p/7805954.html">https://www.cnblogs.com/liaohuiqiang/p/7805954.html</a><br>gbdt：<a target="_blank" rel="noopener" href="https://blog.csdn.net/lyzmyy/article/details/45665105?utm_source=blogxgwz3">https://blog.csdn.net/lyzmyy/article/details/45665105?utm_source=blogxgwz3</a><br>或者 <a target="_blank" rel="noopener" href="https://blog.csdn.net/v_july_v/article/details/40718799">https://blog.csdn.net/v_july_v/article/details/40718799</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B8%8E%E5%AE%9E%E8%B7%B5%EF%BC%88%E4%B8%80%EF%BC%89%E2%80%94-%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97"><span class="toc-number">1.</span> <span class="toc-text">机器学习基础与实践（一）—-数据清洗</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B8%8E%E5%AE%9E%E8%B7%B5%EF%BC%88%E4%BA%8C%EF%BC%89%E2%80%94-%E6%95%B0%E6%8D%AE%E8%BD%AC%E6%8D%A2"><span class="toc-number">2.</span> <span class="toc-text">机器学习基础与实践（二）—-数据转换</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B8%8E%E5%AE%9E%E8%B7%B5%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94-%E6%95%B0%E6%8D%AE%E9%99%8D%E7%BB%B4%E4%B9%8BPCA"><span class="toc-number">3.</span> <span class="toc-text">机器学习基础与实践（三）—-数据降维之PCA</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&text=算法-机器学习—路线图"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&title=算法-机器学习—路线图"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&is_video=false&description=算法-机器学习—路线图"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=算法-机器学习—路线图&body=Check out this article: http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&title=算法-机器学习—路线图"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&title=算法-机器学习—路线图"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&title=算法-机器学习—路线图"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&title=算法-机器学习—路线图"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&name=算法-机器学习—路线图&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E8%B7%AF%E7%BA%BF%E5%9B%BE/&t=算法-机器学习—路线图"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

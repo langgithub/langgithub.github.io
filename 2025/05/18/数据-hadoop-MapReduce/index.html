@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="问题导读 1.hadoop1.x中mapreduce框架与yarn有什么共同点？2.它们有什么不同点？3.yarn中有哪些改变？4.yarn中有哪些术语？  原文：Hadoop2.x 让你真正明白yarn  yarn是比较难懂的一个地方，也是很重要的一个组件，不止hadoop使用yarn，spark，storm也可以使用yarn。因此yarn的理解是非常重要的。如果刚开始学习，其实还是挺难懂的。因">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HADOOP——MapReduce">
+<meta property="og:url" content="http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="问题导读 1.hadoop1.x中mapreduce框架与yarn有什么共同点？2.它们有什么不同点？3.yarn中有哪些改变？4.yarn中有哪些术语？  原文：Hadoop2.x 让你真正明白yarn  yarn是比较难懂的一个地方，也是很重要的一个组件，不止hadoop使用yarn，spark，storm也可以使用yarn。因此yarn的理解是非常重要的。如果刚开始学习，其实还是挺难懂的。因">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3451200-27fd1512e63bfbdc.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3451200-b62b0562f46ecdbb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3451200-e01495480b3dd609.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3451200-15e09e70b83c5796.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3451200-3931425771663eb1.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3451200-a1be3818f9ef2cd4.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="hadoop">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/3451200-27fd1512e63bfbdc.gif?imageMogr2/auto-orient/strip">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>HADOOP——MapReduce</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-HDFS/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E6%95%B0%E6%8D%AE-mongodb-%E5%B8%B8%E7%94%A8%E8%84%9A%E6%AD%A5/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&text=HADOOP——MapReduce"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&title=HADOOP——MapReduce"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&is_video=false&description=HADOOP——MapReduce"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=HADOOP——MapReduce&body=Check out this article: http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&title=HADOOP——MapReduce"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&title=HADOOP——MapReduce"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&title=HADOOP——MapReduce"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&title=HADOOP——MapReduce"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&name=HADOOP——MapReduce&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&t=HADOOP——MapReduce"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        HADOOP——MapReduce
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8-bigdata/">数据存储-bigdata</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/hadoop/" rel="tag">hadoop</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>问题导读</p>
+<p>1.hadoop1.x中mapreduce框架与yarn有什么共同点？<br>2.它们有什么不同点？<br>3.yarn中有哪些改变？<br>4.yarn中有哪些术语？</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3451200-27fd1512e63bfbdc.gif?imageMogr2/auto-orient/strip" alt="image"></p>
+<p>原文：<a target="_blank" rel="noopener" href="http://www.aboutyun.com/forum.php?mod=viewthread&tid=20891">Hadoop2.x 让你真正明白yarn</a></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3451200-b62b0562f46ecdbb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>yarn是比较难懂的一个地方，也是很重要的一个组件，不止hadoop使用yarn，spark，storm也可以使用yarn。因此yarn的理解是非常重要的。如果刚开始学习，其实还是挺难懂的。因为很多的概念比较抽象。<br>如果一时理解不了，也是正常的，这时候就需要我们不断的接触和思考，不断的找资料，强化，通过时间，慢慢就能熟记并且理解。下面是个人总结，希望对大家有所帮助。</p>
+<p>相同点<br>hadoop2.x的发展是由于hadoop1.x的问题造成的。<br>那么是什么问题造成的。比较流行的说法是jobtracker的问题，比如单点故障，任务过重。我们知道了除了Jobtracker，同时还有一个TaskTracker。我们看下图：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3451200-e01495480b3dd609.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>上图中，有一个JobTracker，多个TaskTracker。</p>
+<p>Yarn比较<br>我们在来看yarn<br><img src="http://upload-images.jianshu.io/upload_images/3451200-15e09e70b83c5796.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>我们看到有一个ResourceManager，多个NodeManager。<br>也就是说hadoop1.x mapreduce框架与hadoop2.x yarn，他们的框架相同之处，都是分布式的。<br>再次总结相同处：<br>JobTracker一个，TaskTracker多个<br>resourceManager一个,NodeManager多个</p>
+<p>不同点<br>既然他们框架结构是相同的，那么到底是什么原因，淘汰JobTracker机制。<br>这时候我们就需要看看JobTracker到底干了哪些事情。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3451200-3931425771663eb1.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>再看上图：JobTacker概述<br>JobTacker其承担的任务有：接受任务、计算资源、分配资源、与DataNode进行交流。<br>在hadoop中每个应用程序被表示成一个作业，每个作业又被分成多个任务，JobTracker的作业控制模块则负责作业的分解和状态监控。<br>*最重要的是状态监控：主要包括TaskTracker状态监控、作业状态监控和任务状态监控。主要作用：容错和为任务调度提供决策依据。<br>TaskTracker概述<br>TaskTracker是JobTracker和Task之间的桥梁：一方面，从JobTracker接收并执行各种命令：运行任务、提交任务、杀死任务等；另一方面，将本地节点上各个任务的状态通过心跳周期性汇报给JobTracker。TaskTracker与JobTracker和Task之间采用了RPC协议进行通信</p>
+<p>TaskTracker的功能：<br>1.汇报心跳：Tracker周期性将所有节点上各种信息通过心跳机制汇报给JobTracker。这些信息包括两部分：<br>*机器级别信息：节点健康情况、资源使用情况等。<br>*任务级别信息：任务执行进度、任务运行状态等。<br>2.执行命令：JobTracker会给TaskTracker下达各种命令，主要包括：启动任务(LaunchTaskAction)、提交任务(CommitTaskAction)、杀死任务(KillTaskAction)、杀死作业(KillJobAction)和重新初始化(TaskTrackerReinitAction)。</p>
+<p>资源slot概述<br>slot不是CPU的Core，也不是memory chip，它是一个逻辑概念，一个节点的slot的数量用来表示某个节点的资源的容量或者说是能力的大小，因而slot是 Hadoop的资源单位。</p>
+<p>hadoop中什么是slots<br><a target="_blank" rel="noopener" href="http://www.aboutyun.com/thread-7562-1-1.html">http://www.aboutyun.com/forum.php?mod=viewthread&tid=7562</a></p>
+<p>yarn详解<br>Yarn的基本思想是拆分资源管理的功能，作业调度&#x2F;监控到单独的守护进程<br>这里面出现了很多名词：<br>ResourceManager，NodeManager，ApplicationMaster，Container,同样下面亦是yarn结构图。<br>ResourceManager是全局的，负责对于系统中的所有资源有最高的支配权。<br>ApplicationMaster 每一个job有一个ApplicationMaster 。<br>NodeManager，NodeManager是基本的计算框架。<br>NodeManager 是客户端框架负责 containers, 监控他们的资源使用 (cpu, 内存, 磁盘, 网络) 和上报给 ResourceManager&#x2F;Scheduler.<br>ApplicationMaster首先它是一个框架库，它的功能官网说的不够系统，大意，由于NodeManager 执行和监控任务需要资源，所以通过ApplicationMaster与ResourceManager沟通，获取资源。换句话说，ApplicationMaster起着中间人的作用。<br>转换为更专业的术语：AM负责向ResourceManager索要NodeManager执行任务所需要的资源容器，更具体来讲是ApplicationMaster负责从Scheduler申请资源，以及跟踪这些资源的使用情况以及任务进度的监控。</p>
+<p>ResourceManager有两个组件：调度器和应用程序管理器。 <br>调度器（Scheduler）是可插拔的，比如有Fair Scheduler、Capacity Scheduler等，当然调度器也可以自定义。<br>更多相关内容：<br>Hadoop YARN配置参数剖析(4)—Fair Scheduler、Capacity Scheduler相关参数<br><a target="_blank" rel="noopener" href="http://www.aboutyun.com/thread-5864-1-1.html">http://www.aboutyun.com/forum.php?mod=viewthread&tid=5864</a></p>
+<p>应用程序管理器<br>负责接收提交的任务，指定ApplicationMaster申请资源（container） ，协调并提供在ApplicationMaster容器失败时的重启功能。</p>
+<p>而下图也是官网提供内容，大家可以参考下。<br><img src="http://upload-images.jianshu.io/upload_images/3451200-a1be3818f9ef2cd4.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>总结 为了更好的理解，我们就需要跟hadoop1.x比较：<br>为何要使用yarn。<br>我们看到JobTracker的功能被分散到各个进程中包括ResourceManager和NodeManager：<br>比如监控功能，分给了NodeManager，和Application Master。<br>ResourceManager里面又分为了两个组件：调度器及应用程序管理器。<br>也就是说Yarn重构后，JobTracker的功能，被分散到了各个进程中。同时由于这些进程可以被单独部署所以这样就大大减轻了单点故障，及压力。</p>
+<p>同时我们还看到Yarn使用了Container，而hadoop1.x中使用了slot。slot存在的缺点比如只能map或则reduce用。Container则不存在这个问题。这也是Yarn的进步。</p>
+<p>转载  http:&#x2F;&#x2F;</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&text=HADOOP——MapReduce"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&title=HADOOP——MapReduce"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&is_video=false&description=HADOOP——MapReduce"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=HADOOP——MapReduce&body=Check out this article: http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&title=HADOOP——MapReduce"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&title=HADOOP——MapReduce"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&title=HADOOP——MapReduce"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&title=HADOOP——MapReduce"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&name=HADOOP——MapReduce&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-MapReduce/&t=HADOOP——MapReduce"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

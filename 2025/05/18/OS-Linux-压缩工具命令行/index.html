@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="linux压缩工具命令行 Quick Start7z12$ sudo apt-get install p7zip$ brew install p7zip (mac)  123456789$ 7z x manager.7z -r -o &#x2F;home&#x2F;xx  这里大家要注意-o后是没有空格的直接接目录# x 代表解压缩文件，并且是按原始目录解压（还有个参数 e 也是解压缩文件，但其会将所有文件都解压到根">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux压缩工具命令行">
+<meta property="og:url" content="http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="linux压缩工具命令行 Quick Start7z12$ sudo apt-get install p7zip$ brew install p7zip (mac)  123456789$ 7z x manager.7z -r -o &#x2F;home&#x2F;xx  这里大家要注意-o后是没有空格的直接接目录# x 代表解压缩文件，并且是按原始目录解压（还有个参数 e 也是解压缩文件，但其会将所有文件都解压到根">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="7z">
+<meta property="article:tag" content="tar">
+<meta property="article:tag" content="zip">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>linux压缩工具命令行</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/OS-Linux-%E5%85%8D%E5%AF%86%E9%92%A5%E7%99%BB%E9%99%86/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&text=linux压缩工具命令行"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&title=linux压缩工具命令行"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&is_video=false&description=linux压缩工具命令行"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=linux压缩工具命令行&body=Check out this article: http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&title=linux压缩工具命令行"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&title=linux压缩工具命令行"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&title=linux压缩工具命令行"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&title=linux压缩工具命令行"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&name=linux压缩工具命令行&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&t=linux压缩工具命令行"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Quick-Start"><span class="toc-number">1.</span> <span class="toc-text">Quick Start</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7z"><span class="toc-number">1.1.</span> <span class="toc-text">7z</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#zip"><span class="toc-number">1.2.</span> <span class="toc-text">zip</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rar"><span class="toc-number">1.3.</span> <span class="toc-text">rar</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tar"><span class="toc-number">1.4.</span> <span class="toc-text">tar</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        linux压缩工具命令行
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%BE%85%E5%8A%A9%E5%B7%A5%E5%85%B7/">辅助工具</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/7z/" rel="tag">7z</a>, <a class="p-category" href="/tags/linux/" rel="tag">linux</a>, <a class="p-category" href="/tags/tar/" rel="tag">tar</a>, <a class="p-category" href="/tags/zip/" rel="tag">zip</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>linux压缩工具命令行</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="7z"><a href="#7z" class="headerlink" title="7z"></a>7z</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install p7zip</span><br><span class="line">$ brew install p7zip (mac)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ 7z x manager.7z -r -o /home/xx  这里大家要注意-o后是没有空格的直接接目录</span><br><span class="line"># x 代表解压缩文件，并且是按原始目录解压（还有个参数 e 也是解压缩文件，但其会将所有文件都解压到根下，而不是自己原有的文件夹下）manager.7z 是压缩文件，这里大家要换成自己的。如果不在当前目录下要带上完整的目录</span><br><span class="line"># -r 表示递归所有的子文件夹</span><br><span class="line"># -o 是指定解压到的目录，这里大家要注意-o后是没有空格的直接接目录</span><br><span class="line"></span><br><span class="line">$ 7z a -t7z -r manager.7z /home/manager/*</span><br><span class="line"># a 代表添加文件／文件夹到压缩包</span><br><span class="line"># -t 是指定压缩类型 一般我们定为7z</span><br><span class="line"># -r 表示递归所有的子文件夹，manager.7z 是压缩好后的压缩包名，/home/manager/* 是要压缩的目录，＊是表示该目录下所有的文件。</span><br></pre></td></tr></table></figure>
+
+<h3 id="zip"><a href="#zip" class="headerlink" title="zip"></a>zip</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 压缩</span></span><br><span class="line">$ zip -r filename.zip file1 file2 file3 /usr/work/school </span><br><span class="line"></span><br><span class="line"><span class="comment"># 解压</span></span><br><span class="line">unzip filename.zip</span><br></pre></td></tr></table></figure>
+
+<h3 id="rar"><a href="#rar" class="headerlink" title="rar"></a>rar</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 压缩</span></span><br><span class="line">$ rar a fileName</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解压</span></span><br><span class="line">$ rar x fileName</span><br></pre></td></tr></table></figure>
+
+<h3 id="tar"><a href="#tar" class="headerlink" title="tar"></a>tar</h3><ol>
+<li>c-创建-create</li>
+<li>v-复杂输出</li>
+<li>f-文件-file</li>
+<li>x-解压-extract</li>
+<li>z-gz格式</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 解压jdk到指定文件夹：</span><br><span class="line">$ tar -xzvf jdk-8u131-linux-x64.tar.gz -C /usr/local/java</span><br><span class="line"></span><br><span class="line"># 正常打包</span><br><span class="line">$ tar -cvf jpg.tar *.jpg //将目录里所有jpg文件打包成tar.jpg </span><br><span class="line"></span><br><span class="line"># 压缩打包</span><br><span class="line">$ tar -czf jpg.tar.gz *.jpg   //将目录里所有jpg文件打包成jpg.tar后，并且将其用gzip压缩，生成一个gzip压缩过的包，命名为jpg.tar.gz</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Quick-Start"><span class="toc-number">1.</span> <span class="toc-text">Quick Start</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7z"><span class="toc-number">1.1.</span> <span class="toc-text">7z</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#zip"><span class="toc-number">1.2.</span> <span class="toc-text">zip</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rar"><span class="toc-number">1.3.</span> <span class="toc-text">rar</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tar"><span class="toc-number">1.4.</span> <span class="toc-text">tar</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&text=linux压缩工具命令行"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&title=linux压缩工具命令行"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&is_video=false&description=linux压缩工具命令行"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=linux压缩工具命令行&body=Check out this article: http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&title=linux压缩工具命令行"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&title=linux压缩工具命令行"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&title=linux压缩工具命令行"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&title=linux压缩工具命令行"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&name=linux压缩工具命令行&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/&t=linux压缩工具命令行"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

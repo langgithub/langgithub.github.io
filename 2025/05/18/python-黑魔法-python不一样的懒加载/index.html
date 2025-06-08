@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="懒加载一.一般方式懒加载12345678910111213class Singleton(object):    _instance&#x3D;None    @classmethod    def instance(clz):        if clz._instance is None:            clz._instance&#x3D;Singleton()        return clz._i">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python-黑魔法-python不一样的懒加载">
+<meta property="og:url" content="http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="懒加载一.一般方式懒加载12345678910111213class Singleton(object):    _instance&#x3D;None    @classmethod    def instance(clz):        if clz._instance is None:            clz._instance&#x3D;Singleton()        return clz._i">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>python-黑魔法-python不一样的懒加载</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(7)-Cpython%E8%B0%83%E8%AF%95/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&text=python-黑魔法-python不一样的懒加载"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&title=python-黑魔法-python不一样的懒加载"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&is_video=false&description=python-黑魔法-python不一样的懒加载"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-黑魔法-python不一样的懒加载&body=Check out this article: http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&title=python-黑魔法-python不一样的懒加载"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&title=python-黑魔法-python不一样的懒加载"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&title=python-黑魔法-python不一样的懒加载"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&title=python-黑魔法-python不一样的懒加载"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&name=python-黑魔法-python不一样的懒加载&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&t=python-黑魔法-python不一样的懒加载"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%87%92%E5%8A%A0%E8%BD%BD"><span class="toc-number">1.</span> <span class="toc-text">懒加载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80-%E4%B8%80%E8%88%AC%E6%96%B9%E5%BC%8F%E6%87%92%E5%8A%A0%E8%BD%BD"><span class="toc-number">1.0.1.</span> <span class="toc-text">一.一般方式懒加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C-new-%E6%9D%A5%E5%AE%9E%E7%8E%B0%E6%87%92%E5%8A%A0%E8%BD%BD"><span class="toc-number">1.0.2.</span> <span class="toc-text">二.__new__来实现懒加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89-new-mateclass%E5%AE%9E%E7%8E%B0%E6%87%92%E5%8A%A0%E8%BD%BD"><span class="toc-number">1.0.3.</span> <span class="toc-text">三.new + mateclass实现懒加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B-%E9%AB%98%E9%98%B6%E5%86%99%E6%B3%95-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E6%87%92%E5%8A%A0%E8%BD%BD"><span class="toc-number">1.0.4.</span> <span class="toc-text">四.高阶写法 多线程下懒加载</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        python-黑魔法-python不一样的懒加载
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/python/">python</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/python/" rel="tag">python</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="懒加载"><a href="#懒加载" class="headerlink" title="懒加载"></a>懒加载</h1><h3 id="一-一般方式懒加载"><a href="#一-一般方式懒加载" class="headerlink" title="一.一般方式懒加载"></a>一.一般方式懒加载</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">class Singleton(object):</span><br><span class="line">    _instance=None</span><br><span class="line"></span><br><span class="line">    @classmethod</span><br><span class="line">    def instance(clz):</span><br><span class="line">        if clz._instance is None:</span><br><span class="line">            clz._instance=Singleton()</span><br><span class="line">        return clz._instance</span><br><span class="line"></span><br><span class="line">print(Singleton.instance()==Singleton.instance())</span><br><span class="line"></span><br><span class="line"># 弊端是直接Singleton()就不一样</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="二-new-来实现懒加载"><a href="#二-new-来实现懒加载" class="headerlink" title="二.__new__来实现懒加载"></a>二.__new__来实现懒加载</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">class Singleton(object):</span><br><span class="line">    def __new__(clz):</span><br><span class="line">        if not hasattr(clz,&quot;_instance&quot;):</span><br><span class="line">            clz._instance=super(Singleton,clz).__new__(clz)</span><br><span class="line">        return clz._instance</span><br><span class="line"></span><br><span class="line">print(Singleton()==Singleton())</span><br><span class="line"># 注意： __init__ 与 __new__区别与联系 </span><br><span class="line"># 1. 在调用__init__前是先调用__new__方法</span><br><span class="line"># 2. __new__一定会有return</span><br><span class="line"># 3. __new__可以自定义类的实例化</span><br><span class="line">    # 如：</span><br><span class="line">    class PositiveInteger(int):</span><br><span class="line">        def __new__(clz,value):</span><br><span class="line">            return super(PositiveInteger,clz).__new__(clz,abs(value))</span><br><span class="line">    i=PositiveInteger(-3)</span><br><span class="line"># 4.__new__可以实现mateclass</span><br></pre></td></tr></table></figure>
+
+<h3 id="三-new-mateclass实现懒加载"><a href="#三-new-mateclass实现懒加载" class="headerlink" title="三.new + mateclass实现懒加载"></a>三.<strong>new</strong> + mateclass实现懒加载</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class TypeSingleton(type):</span><br><span class="line"></span><br><span class="line">    def __new__(clz, name, base, attrs):</span><br><span class="line">        # 这里可用用super 即object来创建 ，也可以直接tpye创建类</span><br><span class="line">        clz._instance = type.__new__(clz, name, base, attrs)</span><br><span class="line">        return clz._instance</span><br><span class="line"></span><br><span class="line">class Singleton(metaclass=TypeSingleton):</span><br><span class="line">    _instance = None</span><br><span class="line"></span><br><span class="line">    @classmethod</span><br><span class="line">    def instance(clz):</span><br><span class="line">        return clz._instance</span><br><span class="line"></span><br><span class="line">print(Singleton.instance() == Singleton.instance())</span><br><span class="line">#注意：</span><br><span class="line">#1. object类是所有内的父类（包含type类）</span><br><span class="line">#2. type类是所有实例的父类（object也是type类创建）</span><br></pre></td></tr></table></figure>
+
+<h3 id="四-高阶写法-多线程下懒加载"><a href="#四-高阶写法-多线程下懒加载" class="headerlink" title="四.高阶写法 多线程下懒加载"></a>四.高阶写法 多线程下懒加载</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">import threading</span><br><span class="line">lock=threading.Lock()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Singleton(object):</span><br><span class="line"></span><br><span class="line">    def __new__(cls, *args, **kwargs):</span><br><span class="line">        if not hasattr(cls,&quot;_instance&quot;):</span><br><span class="line">            try:</span><br><span class="line">                lock.acquire()</span><br><span class="line">                if not hasattr(cls, &quot;_instance&quot;):</span><br><span class="line">                    cls._instance=super(Singleton,cls).__new__(cls,*args, **kwargs)</span><br><span class="line">            finally:</span><br><span class="line">                lock.release()</span><br><span class="line">        return cls._instance</span><br><span class="line"></span><br><span class="line">print(Singleton() == Singleton())</span><br><span class="line"># 双重检查+单例</span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%87%92%E5%8A%A0%E8%BD%BD"><span class="toc-number">1.</span> <span class="toc-text">懒加载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80-%E4%B8%80%E8%88%AC%E6%96%B9%E5%BC%8F%E6%87%92%E5%8A%A0%E8%BD%BD"><span class="toc-number">1.0.1.</span> <span class="toc-text">一.一般方式懒加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C-new-%E6%9D%A5%E5%AE%9E%E7%8E%B0%E6%87%92%E5%8A%A0%E8%BD%BD"><span class="toc-number">1.0.2.</span> <span class="toc-text">二.__new__来实现懒加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89-new-mateclass%E5%AE%9E%E7%8E%B0%E6%87%92%E5%8A%A0%E8%BD%BD"><span class="toc-number">1.0.3.</span> <span class="toc-text">三.new + mateclass实现懒加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B-%E9%AB%98%E9%98%B6%E5%86%99%E6%B3%95-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E6%87%92%E5%8A%A0%E8%BD%BD"><span class="toc-number">1.0.4.</span> <span class="toc-text">四.高阶写法 多线程下懒加载</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&text=python-黑魔法-python不一样的懒加载"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&title=python-黑魔法-python不一样的懒加载"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&is_video=false&description=python-黑魔法-python不一样的懒加载"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-黑魔法-python不一样的懒加载&body=Check out this article: http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&title=python-黑魔法-python不一样的懒加载"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&title=python-黑魔法-python不一样的懒加载"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&title=python-黑魔法-python不一样的懒加载"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&title=python-黑魔法-python不一样的懒加载"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&name=python-黑魔法-python不一样的懒加载&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/&t=python-黑魔法-python不一样的懒加载"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

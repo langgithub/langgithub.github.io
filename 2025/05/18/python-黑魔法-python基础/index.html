@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="python LEGB原则1所谓LEGB是指 local&lt; enClosed&lt; global&lt; buind in   nonloacl 与 global1nonloacl 处在函数嵌套中 非global对象  实例属性 与 类属性1实例属性 从属于实例  类属性从属于类  python 内存分析123栈：对象引用放入栈堆：类对象（也叫模具 即type）（存放类属性，类方法，静态方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python-黑魔法-python基础">
+<meta property="og:url" content="http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="python LEGB原则1所谓LEGB是指 local&lt; enClosed&lt; global&lt; buind in   nonloacl 与 global1nonloacl 处在函数嵌套中 非global对象  实例属性 与 类属性1实例属性 从属于实例  类属性从属于类  python 内存分析123栈：对象引用放入栈堆：类对象（也叫模具 即type）（存放类属性，类方法，静态方">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>python-黑魔法-python基础</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E4%B8%8D%E4%B8%80%E6%A0%B7%E7%9A%84%E6%87%92%E5%8A%A0%E8%BD%BD/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&text=python-黑魔法-python基础"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&title=python-黑魔法-python基础"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&is_video=false&description=python-黑魔法-python基础"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-黑魔法-python基础&body=Check out this article: http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&title=python-黑魔法-python基础"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&title=python-黑魔法-python基础"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&title=python-黑魔法-python基础"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&title=python-黑魔法-python基础"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&name=python-黑魔法-python基础&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&t=python-黑魔法-python基础"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#python-LEGB%E5%8E%9F%E5%88%99"><span class="toc-number">1.</span> <span class="toc-text">python LEGB原则</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#nonloacl-%E4%B8%8E-global"><span class="toc-number">2.</span> <span class="toc-text">nonloacl 与 global</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B%E5%B1%9E%E6%80%A7-%E4%B8%8E-%E7%B1%BB%E5%B1%9E%E6%80%A7"><span class="toc-number">3.</span> <span class="toc-text">实例属性 与 类属性</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#python-%E5%86%85%E5%AD%98%E5%88%86%E6%9E%90"><span class="toc-number">4.</span> <span class="toc-text">python 内存分析</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%EF%BC%88%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0-del-%EF%BC%89%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8%E8%B0%83%E7%94%A8"><span class="toc-number">5.</span> <span class="toc-text">垃圾回收机制（引用计数 __del__）垃圾回收器调用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A7%81%E6%9C%89%E5%B1%9E%E6%80%A7-%E5%B1%9E%E6%80%A7%E5%92%8C%E6%96%B9%E6%B3%95-dir%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E5%B1%9E%E6%80%A7%EF%BC%88%E6%96%B9%E6%B3%95%E4%B9%9F%E6%98%AF%E5%B1%9E%E6%80%A7%EF%BC%89"><span class="toc-number">6.</span> <span class="toc-text">私有属性 (属性和方法) dir查看所有属性（方法也是属性）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#property"><span class="toc-number">7.</span> <span class="toc-text">@property</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#mro"><span class="toc-number">8.</span> <span class="toc-text">mro()</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        python-黑魔法-python基础
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/python/">python</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/python/" rel="tag">python</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="python-LEGB原则"><a href="#python-LEGB原则" class="headerlink" title="python LEGB原则"></a>python LEGB原则</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">所谓LEGB是指 local&lt; enClosed&lt; global&lt; buind in</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="nonloacl-与-global"><a href="#nonloacl-与-global" class="headerlink" title="nonloacl 与 global"></a>nonloacl 与 global</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nonloacl 处在函数嵌套中 非global对象</span><br></pre></td></tr></table></figure>
+
+<h1 id="实例属性-与-类属性"><a href="#实例属性-与-类属性" class="headerlink" title="实例属性 与 类属性"></a>实例属性 与 类属性</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">实例属性 从属于实例  类属性从属于类</span><br></pre></td></tr></table></figure>
+
+<h1 id="python-内存分析"><a href="#python-内存分析" class="headerlink" title="python 内存分析"></a>python 内存分析</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">栈：对象引用放入栈</span><br><span class="line"></span><br><span class="line">堆：类对象（也叫模具 即type）（存放类属性，类方法，静态方法）和实例对象（存放 id ，type，实例属性 方法地址）</span><br></pre></td></tr></table></figure>
+
+<h1 id="垃圾回收机制（引用计数-del-）垃圾回收器调用"><a href="#垃圾回收机制（引用计数-del-）垃圾回收器调用" class="headerlink" title="垃圾回收机制（引用计数 __del__）垃圾回收器调用"></a>垃圾回收机制（引用计数 __del__）垃圾回收器调用</h1><h1 id="私有属性-属性和方法-dir查看所有属性（方法也是属性）"><a href="#私有属性-属性和方法-dir查看所有属性（方法也是属性）" class="headerlink" title="私有属性 (属性和方法) dir查看所有属性（方法也是属性）"></a>私有属性 (属性和方法) dir查看所有属性（方法也是属性）</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">双下划线： 私有属性</span><br><span class="line">私有属性外部如何访问 实例._类名.__私有属性</span><br></pre></td></tr></table></figure>
+
+<h1 id="property"><a href="#property" class="headerlink" title="@property"></a>@property</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">作用是将方法变属性使用</span><br></pre></td></tr></table></figure>
+
+<h1 id="mro"><a href="#mro" class="headerlink" title="mro()"></a>mro()</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">查看内存结构，类的继承关系</span><br><span class="line">python中继承方法重写安广度优先算法</span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#python-LEGB%E5%8E%9F%E5%88%99"><span class="toc-number">1.</span> <span class="toc-text">python LEGB原则</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#nonloacl-%E4%B8%8E-global"><span class="toc-number">2.</span> <span class="toc-text">nonloacl 与 global</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B%E5%B1%9E%E6%80%A7-%E4%B8%8E-%E7%B1%BB%E5%B1%9E%E6%80%A7"><span class="toc-number">3.</span> <span class="toc-text">实例属性 与 类属性</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#python-%E5%86%85%E5%AD%98%E5%88%86%E6%9E%90"><span class="toc-number">4.</span> <span class="toc-text">python 内存分析</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%EF%BC%88%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0-del-%EF%BC%89%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8%E8%B0%83%E7%94%A8"><span class="toc-number">5.</span> <span class="toc-text">垃圾回收机制（引用计数 __del__）垃圾回收器调用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A7%81%E6%9C%89%E5%B1%9E%E6%80%A7-%E5%B1%9E%E6%80%A7%E5%92%8C%E6%96%B9%E6%B3%95-dir%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E5%B1%9E%E6%80%A7%EF%BC%88%E6%96%B9%E6%B3%95%E4%B9%9F%E6%98%AF%E5%B1%9E%E6%80%A7%EF%BC%89"><span class="toc-number">6.</span> <span class="toc-text">私有属性 (属性和方法) dir查看所有属性（方法也是属性）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#property"><span class="toc-number">7.</span> <span class="toc-text">@property</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#mro"><span class="toc-number">8.</span> <span class="toc-text">mro()</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&text=python-黑魔法-python基础"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&title=python-黑魔法-python基础"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&is_video=false&description=python-黑魔法-python基础"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-黑魔法-python基础&body=Check out this article: http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&title=python-黑魔法-python基础"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&title=python-黑魔法-python基础"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&title=python-黑魔法-python基础"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&title=python-黑魔法-python基础"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&name=python-黑魔法-python基础&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-python%E5%9F%BA%E7%A1%80/&t=python-黑魔法-python基础"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

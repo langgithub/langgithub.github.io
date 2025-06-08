@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="GIL123全局解释器锁(Global Interpreter Lock) 当CPython创建变量时，它会分配内存然后计算对该变量的引用数量，大家通常称之为“引用计数”。 如果引用计数变为0，则从系统中释放该内存。引用 计数变量时需要保护竞争条件，多个线程同时增加 或减少变量引用计数时，可能导致内存泄漏或者错 误的内存释放。 CPython引入了GIL，线程在执行代码时，必须首先 获得解释器的使">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python-源码阅读(5)-python线程">
+<meta property="og:url" content="http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="GIL123全局解释器锁(Global Interpreter Lock) 当CPython创建变量时，它会分配内存然后计算对该变量的引用数量，大家通常称之为“引用计数”。 如果引用计数变为0，则从系统中释放该内存。引用 计数变量时需要保护竞争条件，多个线程同时增加 或减少变量引用计数时，可能导致内存泄漏或者错 误的内存释放。 CPython引入了GIL，线程在执行代码时，必须首先 获得解释器的使">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>python-源码阅读(5)-python线程</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(6)-python%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&text=python-源码阅读(5)-python线程"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&title=python-源码阅读(5)-python线程"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&is_video=false&description=python-源码阅读(5)-python线程"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-源码阅读(5)-python线程&body=Check out this article: http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&title=python-源码阅读(5)-python线程"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&title=python-源码阅读(5)-python线程"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&title=python-源码阅读(5)-python线程"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&title=python-源码阅读(5)-python线程"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&name=python-源码阅读(5)-python线程&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&t=python-源码阅读(5)-python线程"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#GIL"><span class="toc-number">1.</span> <span class="toc-text">GIL</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">线程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%8EGIL%E5%88%B0%E5%AD%97%E8%8A%82%E7%A0%81"><span class="toc-number">3.</span> <span class="toc-text">从GIL到字节码</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        python-源码阅读(5)-python线程
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/python/">python</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/python/" rel="tag">python</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="GIL"><a href="#GIL" class="headerlink" title="GIL"></a>GIL</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">全局解释器锁(Global Interpreter Lock) 当CPython创建变量时，它会分配内存然后计算对</span><br><span class="line">该变量的引用数量，大家通常称之为“引用计数”。 如果引用计数变为0，则从系统中释放该内存。引用 计数变量时需要保护竞争条件，多个线程同时增加 或减少变量引用计数时，可能导致内存泄漏或者错 误的内存释放。 CPython引入了GIL，线程在执行代码时，必须首先 获得解释器的使用权，虽然保证了数据安全，也意 味着单进程下Python多线程的性能没有那么好。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">[ceval_gil.h]</span><br><span class="line">static _Py_atomic_int gil_locked = &#123;-1&#125;;</span><br><span class="line">static _Py_atomic_address gil_last_holder = &#123;0&#125;;</span><br><span class="line">static COND_T gil_cond;</span><br><span class="line">static MUTEX_T gil_mutex;</span><br><span class="line"></span><br><span class="line">static void create_gil(void)</span><br><span class="line">&#123;</span><br><span class="line">    MUTEX_INIT(gil_mutex);</span><br><span class="line">    MUTEX_INIT(switch_mutex);</span><br><span class="line">    COND_INIT(gil_cond);</span><br><span class="line">    COND_INIT(switch_cond);</span><br><span class="line">    _Py_atomic_store_relaxed(&amp;gil_last_holder, 0);</span><br><span class="line">    _Py_ANNOTATE_RWLOCK_CREATE(&amp;gil_locked);</span><br><span class="line">    _Py_atomic_store_explicit(&amp;gil_locked, 0, _Py_memory_order_release);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[ceval_gil.h]</span><br><span class="line">static void take_gil(PyThreadState *tstate)</span><br><span class="line">&#123;</span><br><span class="line">    int err;</span><br><span class="line">    err = errno;</span><br><span class="line">    MUTEX_LOCK(gil_mutex);</span><br><span class="line">    if (!_Py_atomic_load_relaxed(&amp;gil_locked))</span><br><span class="line">        goto _ready;</span><br><span class="line"></span><br><span class="line">    while (_Py_atomic_load_relaxed(&amp;gil_locked)) &#123;</span><br><span class="line">        int timed_out = 0;</span><br><span class="line">        COND_TIMED_WAIT(gil_cond, gil_mutex, INTERVAL, timed_out);</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">_ready:</span><br><span class="line">    ...</span><br><span class="line">    _Py_atomic_store_relaxed(&amp;gil_locked, 1);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">[Modules/_threadmodule.c]</span><br><span class="line">static PyMethodDef thread_methods[] = &#123;</span><br><span class="line">    &#123;&quot;start_new_thread&quot;,        (PyCFunction)thread_PyThread_start_new_thread,</span><br><span class="line">     METH_VARARGS, start_new_doc&#125;,</span><br><span class="line">    &#123;&quot;start_new&quot;,               (PyCFunction)thread_PyThread_start_new_thread,</span><br><span class="line">     METH_VARARGS, start_new_doc&#125;,</span><br><span class="line">    &#123;&quot;allocate_lock&quot;,           (PyCFunction)thread_PyThread_allocate_lock,</span><br><span class="line">     METH_NOARGS, allocate_doc&#125;,</span><br><span class="line">    &#123;&quot;allocate&quot;,                (PyCFunction)thread_PyThread_allocate_lock,</span><br><span class="line">     METH_NOARGS, allocate_doc&#125;,</span><br><span class="line">    ...</span><br><span class="line">    &#123;NULL,                      NULL&#125;           /* sentinel */</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[cveal.c]</span><br><span class="line">static PyThread_type_lock pending_lock = 0; /* for pending calls */</span><br><span class="line">static unsigned long main_thread = 0;</span><br><span class="line">/* Request for dropping the GIL */</span><br><span class="line">static _Py_atomic_int gil_drop_request = &#123;0&#125;;</span><br><span class="line"></span><br><span class="line">void PyEval_InitThreads(void)</span><br><span class="line">&#123;</span><br><span class="line">    if (gil_created())  // 如果初始化过了</span><br><span class="line">        return;</span><br><span class="line">    create_gil();</span><br><span class="line">    take_gil(PyThreadState_GET());</span><br><span class="line">    main_thread = PyThread_get_thread_ident();</span><br><span class="line">    if (!pending_lock)</span><br><span class="line">        pending_lock = PyThread_allocate_lock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="从GIL到字节码"><a href="#从GIL到字节码" class="headerlink" title="从GIL到字节码"></a>从GIL到字节码</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[pystate.c]</span><br><span class="line">PyThreadState * PyThreadState_New(PyInterpreterState *interp)</span><br><span class="line">&#123;</span><br><span class="line">    return new_threadstate(interp, 1);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">static PyThreadState * new_threadstate(PyInterpreterState *interp, int init)</span><br><span class="line">&#123;</span><br><span class="line">    PyThreadState *tstate = (PyThreadState *)PyMem_RawMalloc(sizeof(PyThreadState));</span><br><span class="line"></span><br><span class="line">    if (_PyThreadState_GetFrame == NULL)    // 设置获得线程中函数调用栈的操作</span><br><span class="line">        _PyThreadState_GetFrame = threadstate_getframe;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">    if (init)</span><br><span class="line">        _PyThreadState_Init(tstate);</span><br><span class="line">    ...</span><br><span class="line">    return tstate;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void _PyThreadState_Init(PyThreadState *tstate)</span><br><span class="line">&#123;</span><br><span class="line">#ifdef WITH_THREAD</span><br><span class="line">    _PyGILState_NoteThreadState(tstate);</span><br><span class="line">#endif</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>子线程在创建了自身的线程状态对象后, 通过 _PyGILState_NoteThreadState 将这个线程对象设置到 autoTLSkey 中.</p>
+<p>有意思的是, 这时候当前活动的python线程不一定是获得GIL的线程. 这是因为主线程和子线程都是操作系统原生线程, 所以操作系统可能在主线程和子线程之间切换. 这里要区分的一点是, 系统级别的线程调度与GIL无关. 而python级的线程调度才与GIL有关, 前面也说了, python自己模拟一套线程的调度方式. 所以操作系统级的并不一定意味着GIL的得手, 当所有的线程都完成了初始化的动作之后, 操作系统的线程调度和python的线程调度才会同一. 那时, python的线程调度会强制当前活动线程释放GIL, 而这一操作会触发Event内核对象, 这个触发进而触发操作系统进行线程调度. 这个GIL其实是起到了从python级线程到操作系统级线程调度的桥梁作用.</p>
+<p>真正争夺GIL的是在 t_bootstrap 中, 透过 PyEval_AcquireThread 获得GIL的话语权. 到了这一步, 子线程将自己挂起, 操作系统的线程调度不能唤起它, 只有等待python的线程调度强制主线程放弃GIL后, 子线程才回被唤醒. 而子线程被唤醒后, 主线程又将陷入等待中.</p>
+<p>当子线程被python的线程调度唤醒后, 做的第一件事就是通过 PyThreadState_Swap(tstate) 设置python维护当前线程状态对象, 如操作系统的进程上下文环境恢复一样.</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#GIL"><span class="toc-number">1.</span> <span class="toc-text">GIL</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">线程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%8EGIL%E5%88%B0%E5%AD%97%E8%8A%82%E7%A0%81"><span class="toc-number">3.</span> <span class="toc-text">从GIL到字节码</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&text=python-源码阅读(5)-python线程"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&title=python-源码阅读(5)-python线程"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&is_video=false&description=python-源码阅读(5)-python线程"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-源码阅读(5)-python线程&body=Check out this article: http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&title=python-源码阅读(5)-python线程"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&title=python-源码阅读(5)-python线程"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&title=python-源码阅读(5)-python线程"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&title=python-源码阅读(5)-python线程"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&name=python-源码阅读(5)-python线程&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/&t=python-源码阅读(5)-python线程"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

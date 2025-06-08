@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="android文件-so archives&#x2F;559.html archives&#x2F;849.html 清华大学so文件分析 (https:&#x2F;&#x2F;langgithub.github.io&#x2F;file&#x2F;ELF文件格式分析.pdf)  寄存器接受参数在 R0 - R3 ,返回值在R0so文件结构 header ELF文件头是ELF文件中唯一一个固定位置的文件结构，保存段头表和节头表位置和大小">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android文件-so">
+<meta property="og:url" content="http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="android文件-so archives&#x2F;559.html archives&#x2F;849.html 清华大学so文件分析 (https:&#x2F;&#x2F;langgithub.github.io&#x2F;file&#x2F;ELF文件格式分析.pdf)  寄存器接受参数在 R0 - R3 ,返回值在R0so文件结构 header ELF文件头是ELF文件中唯一一个固定位置的文件结构，保存段头表和节头表位置和大小">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="so">
+<meta property="article:tag" content="文件结构">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>android文件-so</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&text=android文件-so"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&title=android文件-so"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&is_video=false&description=android文件-so"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=android文件-so&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&title=android文件-so"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&title=android文件-so"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&title=android文件-so"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&title=android文件-so"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&name=android文件-so&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&t=android文件-so"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#android%E6%96%87%E4%BB%B6-so"><span class="toc-number">1.</span> <span class="toc-text">android文件-so</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8%E6%8E%A5%E5%8F%97%E5%8F%82%E6%95%B0%E5%9C%A8-R0-R3-%E8%BF%94%E5%9B%9E%E5%80%BC%E5%9C%A8R0"><span class="toc-number">1.0.1.</span> <span class="toc-text">寄存器接受参数在 R0 - R3 ,返回值在R0</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#so%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="toc-number">1.0.2.</span> <span class="toc-text">so文件结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#readelf-%E4%BD%BF%E7%94%A8"><span class="toc-number">1.0.3.</span> <span class="toc-text">readelf 使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#010-Editor-%E8%BF%90%E7%94%A8"><span class="toc-number">1.0.4.</span> <span class="toc-text">010 Editor 运用</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        android文件-so
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.429Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E7%88%AC%E8%99%AB-Android%E9%80%86%E5%90%91/">爬虫-Android逆向</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/so/" rel="tag">so</a>, <a class="p-category" href="/tags/%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/" rel="tag">文件结构</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="android文件-so"><a href="#android文件-so" class="headerlink" title="android文件-so"></a>android文件-so</h1><ul>
+<li>archives&#x2F;559.html</li>
+<li>archives&#x2F;849.html</li>
+<li>清华大学so文件分析 (<a target="_blank" rel="noopener" href="https://langgithub.github.io/file/ELF%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%E5%88%86%E6%9E%90.pdf">https://langgithub.github.io/file/ELF文件格式分析.pdf</a>)</li>
+</ul>
+<h3 id="寄存器接受参数在-R0-R3-返回值在R0"><a href="#寄存器接受参数在-R0-R3-返回值在R0" class="headerlink" title="寄存器接受参数在 R0 - R3 ,返回值在R0"></a>寄存器接受参数在 R0 - R3 ,返回值在R0</h3><h3 id="so文件结构"><a href="#so文件结构" class="headerlink" title="so文件结构"></a>so文件结构</h3><ol>
+<li>header<br> ELF文件头是ELF文件中唯一一个固定位置的文件结构，保存段头表和节头表位置和大小信息</li>
+<li>section</li>
+<li>program<ul>
+<li>段头表保存了ELF文件的加载过程中各节头表的内存映射，依赖库等信息</li>
+<li>.dynstr .text .dynamic<br>相同flg section 放在一起组成program load 段才会被加载到内存</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">1、.text段</span><br><span class="line"></span><br><span class="line">一般C语言编译后的执行语句都编译成机器代码，保存在.text段。</span><br><span class="line"></span><br><span class="line">2、.data段</span><br><span class="line">已经初始化的全局变量和局部静态变量（虽然默认会初始化为0,或者手动初始化为0，都没有必要在数据段分配空间，直接放在.bss段，就默认值为0了）都保存在.data段。</span><br><span class="line">大体来说，该section包含了在内存中的程序的初始化数据；data段包含三个部分：heap(堆)、stack(栈)和静态数据区。即.data还会存放其他类型的数据，比如局部变量。</span><br><span class="line">数据段只是存放数据，变量名存放在字符串表中。</span><br><span class="line"></span><br><span class="line">3、.bss段</span><br><span class="line">未初始化的全局变量和局部静态变量都保存在.bss段。</span><br><span class="line">大体来说该section包含了在内存中的程序的未初始化的数据。</span><br><span class="line">由于程序加载（一般是指main之前）时，bss会被操作系统清零，所以未赋初值或初值为0的全局变量都在bss。.bss段只是为未初始化的全局变量和局部静态变量预留位置而已，它并没有内容，所以它在文件中也不占据空间，这样可减少目标文件体积。</span><br><span class="line">但程序运行时需为变量分配内存空间，故目标文件必须记录所有未初始化的静态分配变量大小总和(通过start_bss和end_bss地址写入机器代码)。当加载器(loader)加载程序时，将为BSS段分配的内存初始化为0。</span><br><span class="line"></span><br><span class="line">4、.rodata段</span><br><span class="line">存放只读数据，一般是程序里面的只读变量（如const修饰的变量），以及字符串常量（不一定，也可能放在.data中）。</span><br><span class="line"></span><br><span class="line">5、.got段</span><br><span class="line"></span><br><span class="line">GOT（Global Offset Table）表中每一项都是本运行模块要引用的一个全局变量或函数的地址。可以用GOT表来间接引用全局变量、函数，也可以把GOT表的首地址作为一个基 准，用相对于该基准的偏移量来引用静态变量、静态函数。由于加载器不会把运行模块加载到固定地址，在不同进程的地址空间中，各运行模块的绝对地址、相对位 置都不同。这种不同反映到GOT表上，就是每个进程的每个运行模块都有独立的GOT表，所以进程间不能共享GOT表。</span><br><span class="line"></span><br><span class="line">6、.plt段</span><br><span class="line"></span><br><span class="line">过程链接表用于把位置独立的函数调用重定向到绝对位置。通过 PLT 动态链接的程序支持惰性绑定模式。每个动态链接的程序和共享库都有一个 PLT，PLT 表的每一项都是一小段代码，对应于本运行模块要引用的一个全局函数。程序对某个函数的访问都被调整为对 PLT 入口的访问。</span><br><span class="line">每个 PLT 入口项对应一个 GOT 项，执行函数实际上就是跳转到相应 GOT 项存储的地址，该 GOT 项初始值为 PLTn项中的 push 指令地址(即 jmp 的下一条指令，所以第 1 次跳转没有任何作用)，待符号解析完成后存放符号的真正地址。动态链接器在装载映射共享库时在 GOT 里设置 2 个特殊值：在 GOT+4( 即 GOT[1]) 设置动态库映射信息数据结构link_map 地址；在 GOT+8(即 GOT[2])设置动态链接器符号解析函数的地址_dl_runtime_resolve。</span><br><span class="line"></span><br><span class="line">每一个外部定义的符号在全局偏移表 (Global Offset Table GOT)中有相应的条目,如果符号是函数则在过程连接表(Procedure Linkage Table PLT)中也有相应的条目</span><br><span class="line"></span><br><span class="line">下面来看张图就了解了.got段和.plt段的关系：</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">这个在我们之前说到Hook技术就是用着两个段来实现的。只要修改需要hook的函数地址，插入我们hook的函数，执行之后，再回来就可以了，这里只要修改.got和.plt表就可以了，相关知识大家去网上搜一下吧。这里就不在解释了。</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="readelf-使用"><a href="#readelf-使用" class="headerlink" title="readelf 使用"></a>readelf 使用</h3><ol>
+<li>readelf -h xxx.so (查看so文件的头部信息)</li>
+<li>readelf -S xxx.so (查看so文件的节(Section)头的信息)</li>
+<li>readelf -l xxx.so (查看so文件的程序段头信息(Program))</li>
+<li>readelf -a xxx.so (查看so文件所有信息)</li>
+</ol>
+<h3 id="010-Editor-运用"><a href="#010-Editor-运用" class="headerlink" title="010 Editor 运用"></a>010 Editor 运用</h3>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#android%E6%96%87%E4%BB%B6-so"><span class="toc-number">1.</span> <span class="toc-text">android文件-so</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8%E6%8E%A5%E5%8F%97%E5%8F%82%E6%95%B0%E5%9C%A8-R0-R3-%E8%BF%94%E5%9B%9E%E5%80%BC%E5%9C%A8R0"><span class="toc-number">1.0.1.</span> <span class="toc-text">寄存器接受参数在 R0 - R3 ,返回值在R0</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#so%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="toc-number">1.0.2.</span> <span class="toc-text">so文件结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#readelf-%E4%BD%BF%E7%94%A8"><span class="toc-number">1.0.3.</span> <span class="toc-text">readelf 使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#010-Editor-%E8%BF%90%E7%94%A8"><span class="toc-number">1.0.4.</span> <span class="toc-text">010 Editor 运用</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&text=android文件-so"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&title=android文件-so"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&is_video=false&description=android文件-so"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=android文件-so&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&title=android文件-so"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&title=android文件-so"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&title=android文件-so"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&title=android文件-so"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&name=android文件-so&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/&t=android文件-so"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

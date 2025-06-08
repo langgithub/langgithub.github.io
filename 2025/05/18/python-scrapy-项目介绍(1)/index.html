@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="scrapy项目介绍    General    项目基本使用    scrapy整体介绍   3.1. scrapy组件 3.2. scrapy组件总结    scrapy启动   4.1. Crawler-命令执行入口 4.2. Crawler.crawl 分析 4.3. ExecutionEngine.open_spider分析    总结      1. General scrapy是底层">
+<meta property="og:type" content="article">
+<meta property="og:title" content="scrapy-项目介绍(1)">
+<meta property="og:url" content="http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="scrapy项目介绍    General    项目基本使用    scrapy整体介绍   3.1. scrapy组件 3.2. scrapy组件总结    scrapy启动   4.1. Crawler-命令执行入口 4.2. Crawler.crawl 分析 4.3. ExecutionEngine.open_spider分析    总结      1. General scrapy是底层">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/scrapy%E6%9E%B6%E6%9E%84%E5%9B%BE.png">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="scrapy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/scrapy%E6%9E%B6%E6%9E%84%E5%9B%BE.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>scrapy-项目介绍(1)</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/python-scrapy-%E4%BF%A1%E5%8F%B7(5)/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&text=scrapy-项目介绍(1)"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&title=scrapy-项目介绍(1)"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&is_video=false&description=scrapy-项目介绍(1)"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=scrapy-项目介绍(1)&body=Check out this article: http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&title=scrapy-项目介绍(1)"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&title=scrapy-项目介绍(1)"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&title=scrapy-项目介绍(1)"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&title=scrapy-项目介绍(1)"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&name=scrapy-项目介绍(1)&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&t=scrapy-项目介绍(1)"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#scrapy%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">scrapy项目介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-General"><span class="toc-number">1.1.</span> <span class="toc-text">1. General</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%A1%B9%E7%9B%AE%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"><span class="toc-number">1.2.</span> <span class="toc-text">2. 项目基本使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-scrapy%E6%95%B4%E4%BD%93%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.3.</span> <span class="toc-text">3. scrapy整体介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-scrapy%E7%BB%84%E4%BB%B6"><span class="toc-number">1.3.1.</span> <span class="toc-text">3.1. scrapy组件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-scrapy%E7%BB%84%E4%BB%B6%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.2.</span> <span class="toc-text">3.2. scrapy组件总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-scrapy%E5%90%AF%E5%8A%A8"><span class="toc-number">1.4.</span> <span class="toc-text">4. scrapy启动</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-Crawler-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E5%85%A5%E5%8F%A3"><span class="toc-number">1.4.1.</span> <span class="toc-text">4.1. Crawler-命令执行入口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-Crawler-crawl-%E5%88%86%E6%9E%90"><span class="toc-number">1.4.2.</span> <span class="toc-text">4.2. Crawler.crawl 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-ExecutionEngine-open-spider%E5%88%86%E6%9E%90"><span class="toc-number">1.4.3.</span> <span class="toc-text">4.3. ExecutionEngine.open_spider分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%80%BB%E7%BB%93"><span class="toc-number">1.5.</span> <span class="toc-text">5. 总结</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        scrapy-项目介绍(1)
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E7%88%AC%E8%99%AB-scrapy/">爬虫-scrapy</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/scrapy/" rel="tag">scrapy</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="scrapy项目介绍"><a href="#scrapy项目介绍" class="headerlink" title="scrapy项目介绍"></a>scrapy项目介绍</h1><!-- TOC -->
+
+<ul>
+<li><ol>
+<li>General</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>项目基本使用</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>scrapy整体介绍</li>
+</ol>
+<ul>
+<li>3.1. scrapy组件</li>
+<li>3.2. scrapy组件总结</li>
+</ul>
+</li>
+<li><ol start="4">
+<li>scrapy启动</li>
+</ol>
+<ul>
+<li>4.1. Crawler-命令执行入口</li>
+<li>4.2. Crawler.crawl 分析</li>
+<li>4.3. ExecutionEngine.open_spider分析</li>
+</ul>
+</li>
+<li><ol start="5">
+<li>总结</li>
+</ol>
+</li>
+</ul>
+<!-- /TOC -->
+
+<h2 id="1-General"><a href="#1-General" class="headerlink" title="1. General"></a>1. General</h2><blockquote>
+<p>scrapy是底层采用twsited基于事件驱动模型的通讯框架来实现，包含Engine，Scheduler，Spider，Downloader，Pipline五大部分组成</p>
+</blockquote>
+<h2 id="2-项目基本使用"><a href="#2-项目基本使用" class="headerlink" title="2. 项目基本使用"></a>2. 项目基本使用</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">api: https://scrapy-chs.readthedocs.io/zh_CN/0.24/intro/tutorial.html</span><br><span class="line">scrapy startproject doubanmovie</span><br><span class="line">cd doubanmovie</span><br><span class="line">scrapy genspider movie duoban.com</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-scrapy整体介绍"><a href="#3-scrapy整体介绍" class="headerlink" title="3. scrapy整体介绍"></a>3. scrapy整体介绍</h2><blockquote>
+<p><img src="/img/scrapy%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="scrapy架构图"></p>
+</blockquote>
+<h3 id="3-1-scrapy组件"><a href="#3-1-scrapy组件" class="headerlink" title="3.1. scrapy组件"></a>3.1. scrapy组件</h3><blockquote>
+<ol>
+<li>Spiders -&gt; 用户自己编写的爬虫脚本，可自定义抓取意图</li>
+<li>pipline -&gt; 负责输出结构化数据，可自定义输出位置</li>
+<li>Scheduler -&gt; 负责管理任务、过滤任务、输出任务的调度器，存储、去重任务都在此控制</li>
+<li>Downloader -&gt; 下载器，负责在网络上下载网页数据，输入待下载URL，输出下载结果</li>
+<li>Scrapy Engine -&gt; 核心引擎，负责控制和调度各个组件，保证数据流转</li>
+<li>Downloader middlewares -&gt; 介于引擎和下载器之间，可以在网页在下载前、后进行逻辑处理</li>
+<li>Spider middlewares -&gt; 介于引擎和爬虫之间，可以在调用爬虫输入下载结果和输出请求&#x2F;数据时进行逻辑</li>
+</ol>
+</blockquote>
+<h3 id="3-2-scrapy组件总结"><a href="#3-2-scrapy组件总结" class="headerlink" title="3.2. scrapy组件总结"></a>3.2. scrapy组件总结</h3><blockquote>
+<ol>
+<li>scrapy Engine启动调度Scheduler获取url种子</li>
+<li>Engine将种子传递给download下载返回response</li>
+<li>Engine将response传递给spider解析</li>
+<li>Engine将解析回来的scrapy Item传递给pipline<br>其中在2中种子传递用Downloader middlewares进一步封装。</li>
+</ol>
+</blockquote>
+<h2 id="4-scrapy启动"><a href="#4-scrapy启动" class="headerlink" title="4. scrapy启动"></a>4. scrapy启动</h2><h3 id="4-1-Crawler-命令执行入口"><a href="#4-1-Crawler-命令执行入口" class="headerlink" title="4.1. Crawler-命令执行入口"></a>4.1. Crawler-命令执行入口</h3><blockquote>
+<ol>
+<li>位于.&#x2F;python3.6&#x2F;site-packages&#x2F;scrapy&#x2F;commands&#x2F;crawl.py 中Command(ScrapyCommand) 是对scrapy命令解析执行. 调用逻辑run-&gt;self.crawler_process.crawl(spname, **opts.spargs)-&gt;self.crawler_process.start()。我们来看下crawler_process，该对象是在.&#x2F;python3.6&#x2F;site-packages&#x2F;scrapy&#x2F;cmdline.py 中144行创建cmd.crawler_process &#x3D; CrawlerProcess(settings)</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2">
+<li>接着看CrawlerProcess, 这理解之前先看下CrawlerProcess CrawlerRunner Crawler 三者的关系；首先从这里 class CrawlerProcess(CrawlerRunner) 看出CrawlerProcess继承CrawlerRunner，CrawlerRunner中的_create_crawler可以创建Crawler对象。而Crawler对象是加载全局配置文件Setting.py和爬虫文件的。   总结：.&#x2F;python3.6&#x2F;site-packages&#x2F;scrapy&#x2F;commands&#x2F;crawl.py 是解析scrapy命令的，第一步self.crawler_process.crawl(spname, **opts.spargs) 返回延迟对象，等待reactor轮询。第二部self.crawler_process.start() 启动轮询</li>
+</ol>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># CrawlerProcess函数说明</span><br><span class="line">class CrawlerProcess(CrawlerRunner):</span><br><span class="line">    # 操作系统信号量回调函数注册（也就是ctrl+c 后调用的函数）</span><br><span class="line">    def __init__(self, settings=None, install_root_handler=True):...</span><br><span class="line">    # 信号量回调函数，ctrl+c结束当前进程，优雅的退出进程</span><br><span class="line">    def _signal_shutdown(self, signum, _):...</span><br><span class="line">    # 如果一次ctrl+c没有退出，则会触发当前操作，强制退出</span><br><span class="line">    def _signal_kill(self, signum, _):...</span><br><span class="line">    # 进程启动(thradpool配置，操作系统事件注册)</span><br><span class="line">    def start(self, stop_after_crawl=True):...</span><br><span class="line">    # 优雅退出，将退出添加到callback调用链条</span><br><span class="line">    def _graceful_stop_reactor(self):...</span><br><span class="line">    # 强制退出，直接退出reactor.stop()</span><br><span class="line">    def _stop_reactor(self, _=None):...</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-Crawler-crawl-分析"><a href="#4-2-Crawler-crawl-分析" class="headerlink" title="4.2. Crawler.crawl 分析"></a>4.2. Crawler.crawl 分析</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">@defer.inlineCallbacks</span><br><span class="line">def crawl(self, *args, **kwargs):</span><br><span class="line">    assert not self.crawling, &quot;Crawling already taking place&quot;</span><br><span class="line">    self.crawling = True</span><br><span class="line"></span><br><span class="line">    try:</span><br><span class="line">        # 加载自己写的Spieder</span><br><span class="line">        self.spider = self._create_spider(*args, **kwargs)</span><br><span class="line">        # 加载 ExecutionEngine 引擎</span><br><span class="line">        self.engine = self._create_engine()</span><br><span class="line">        # 自己写的start_requests会被执行，没有就走父类默认的start_requests </span><br><span class="line">        # 位于./python3.6/site-packages/scrapy/spiders/__init__.py</span><br><span class="line">        start_requests = iter(self.spider.start_requests())</span><br><span class="line">        # 启动引擎</span><br><span class="line">        yield self.engine.open_spider(self.spider, start_requests)</span><br><span class="line">        # 启动接受控制台命令</span><br><span class="line">        yield defer.maybeDeferred(self.engine.start)</span><br><span class="line">    except Exception:</span><br><span class="line">        self.crawling = False</span><br><span class="line">        if self.engine is not None:</span><br><span class="line">            yield self.engine.close()</span><br><span class="line">        raise</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-ExecutionEngine-open-spider分析"><a href="#4-3-ExecutionEngine-open-spider分析" class="headerlink" title="4.3. ExecutionEngine.open_spider分析"></a>4.3. ExecutionEngine.open_spider分析</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">@defer.inlineCallbacks</span><br><span class="line">def open_spider(self, spider, start_requests=(), close_if_idle=True):</span><br><span class="line">  assert self.has_capacity(), &quot;No free spider slot when opening %r&quot; % \</span><br><span class="line">      spider.name</span><br><span class="line">  logger.info(&quot;Spider opened&quot;, extra=&#123;&#x27;spider&#x27;: spider&#125;)</span><br><span class="line">  # 调度要在下一个reactor循环中调用的函数，但前提是该函数自上次运行以来尚未被调度</span><br><span class="line">  nextcall = CallLaterOnce(self._next_request, spider)</span><br><span class="line">  # 调度器加载</span><br><span class="line">  scheduler = self.scheduler_cls.from_crawler(self.crawler)</span><br><span class="line">  # 中间件处理MiddleWare</span><br><span class="line">  start_requests = yield self.scraper.spidermw.process_start_requests(start_requests, spider)</span><br><span class="line">  # engine核心</span><br><span class="line">  slot = Slot(start_requests, close_if_idle, nextcall, scheduler)</span><br><span class="line">  self.slot = slot</span><br><span class="line">  self.spider = spider</span><br><span class="line">  # 打开调度器</span><br><span class="line">  yield scheduler.open(spider)</span><br><span class="line">  yield self.scraper.open_spider(spider)</span><br><span class="line">  self.crawler.stats.open_spider(spider)</span><br><span class="line">  # 发送信号，spider可以启动了</span><br><span class="line">  yield self.signals.send_catch_log_deferred(signals.spider_opened, spider=spider)</span><br><span class="line">  # reactor调度开始</span><br><span class="line">  slot.nextcall.schedule()</span><br><span class="line">  # 官网解释：Start running function every interval seconds. 也即是nextcall.schedule</span><br><span class="line">  slot.heartbeat.start(5)</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><blockquote>
+<p>看完以上代码流程，心中肯定会有如下一些疑问？</p>
+</blockquote>
+<ul>
+<li>@defer.inlineCallbacks 的作用是什么？reactor又是如何异步轮询？</li>
+<li>self.scraper.spidermw.process_start_requests 中间件是如何加载起作用的？</li>
+<li>yield self.signals.send_catch_log_deferred 的运作原理是什么，究竟是如何启动爬虫的？</li>
+<li>scheduler 调度器倒是如何被调度的？</li>
+<li>scrapy middelware 又是如何起作用的？</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#scrapy%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">scrapy项目介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-General"><span class="toc-number">1.1.</span> <span class="toc-text">1. General</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%A1%B9%E7%9B%AE%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"><span class="toc-number">1.2.</span> <span class="toc-text">2. 项目基本使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-scrapy%E6%95%B4%E4%BD%93%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.3.</span> <span class="toc-text">3. scrapy整体介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-scrapy%E7%BB%84%E4%BB%B6"><span class="toc-number">1.3.1.</span> <span class="toc-text">3.1. scrapy组件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-scrapy%E7%BB%84%E4%BB%B6%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.2.</span> <span class="toc-text">3.2. scrapy组件总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-scrapy%E5%90%AF%E5%8A%A8"><span class="toc-number">1.4.</span> <span class="toc-text">4. scrapy启动</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-Crawler-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E5%85%A5%E5%8F%A3"><span class="toc-number">1.4.1.</span> <span class="toc-text">4.1. Crawler-命令执行入口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-Crawler-crawl-%E5%88%86%E6%9E%90"><span class="toc-number">1.4.2.</span> <span class="toc-text">4.2. Crawler.crawl 分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-ExecutionEngine-open-spider%E5%88%86%E6%9E%90"><span class="toc-number">1.4.3.</span> <span class="toc-text">4.3. ExecutionEngine.open_spider分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%80%BB%E7%BB%93"><span class="toc-number">1.5.</span> <span class="toc-text">5. 总结</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&text=scrapy-项目介绍(1)"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&title=scrapy-项目介绍(1)"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&is_video=false&description=scrapy-项目介绍(1)"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=scrapy-项目介绍(1)&body=Check out this article: http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&title=scrapy-项目介绍(1)"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&title=scrapy-项目介绍(1)"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&title=scrapy-项目介绍(1)"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&title=scrapy-项目介绍(1)"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&name=scrapy-项目介绍(1)&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/&t=scrapy-项目介绍(1)"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

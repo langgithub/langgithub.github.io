@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="本文介绍Android的消息机制。 一、引言假设现在我们有这样的需求，点一下图中的button，然后去获取一些数据（假设这个步骤是一个耗时的操作），然后获取完后将得到的数据返回显示到屏幕上。为了避免产生ANR(Application Not Response)问题，通常我们会在新的线程去做耗时的操作，然后在UI线程里面更新组件，所以Handler就是类似这样子一个机制。  那么我们会怎么去实现呢？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android源码(6)-Android消息机制">
+<meta property="og:url" content="http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="本文介绍Android的消息机制。 一、引言假设现在我们有这样的需求，点一下图中的button，然后去获取一些数据（假设这个步骤是一个耗时的操作），然后获取完后将得到的数据返回显示到屏幕上。为了避免产生ANR(Application Not Response)问题，通常我们会在新的线程去做耗时的操作，然后在UI线程里面更新组件，所以Handler就是类似这样子一个机制。  那么我们会怎么去实现呢？">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/android-looper-handler-message-01.png">
+<meta property="og:image" content="http://example.com/img/android-looper-prepare.png">
+<meta property="og:image" content="http://example.com/img/android-looper-loop.png">
+<meta property="og:image" content="http://example.com/img/android-looper-handler-2.png">
+<meta property="og:image" content="http://example.com/img/android-handler-send-handle-msg.png">
+<meta property="og:image" content="http://example.com/img/android-ui-thread-handler.png">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="Android源码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/android-looper-handler-message-01.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Android源码(6)-Android消息机制</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/Android-%E6%BA%90%E7%A0%81(5)-ActivityManagerService%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/Android-%E7%BC%96%E8%AF%91-%E6%BA%90%E7%A0%81%E5%88%B7%E6%9C%BA/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&text=Android源码(6)-Android消息机制"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&title=Android源码(6)-Android消息机制"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&is_video=false&description=Android源码(6)-Android消息机制"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Android源码(6)-Android消息机制&body=Check out this article: http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&title=Android源码(6)-Android消息机制"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&title=Android源码(6)-Android消息机制"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&title=Android源码(6)-Android消息机制"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&title=Android源码(6)-Android消息机制"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&name=Android源码(6)-Android消息机制&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&t=Android源码(6)-Android消息机制"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Android源码(6)-Android消息机制
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/code-Android/">code-Android</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Android%E6%BA%90%E7%A0%81/" rel="tag">Android源码</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>本文介绍Android的消息机制。</p>
+<p>一、引言<br>假设现在我们有这样的需求，点一下图中的button，然后去获取一些数据（假设这个步骤是一个耗时的操作），然后获取完后将得到的数据返回显示到屏幕上。<br>为了避免产生ANR(Application Not Response)问题，通常我们会在新的线程去做耗时的操作，然后在UI线程里面更新组件，所以Handler就是类似这样子一个机制。</p>
+<p><img src="/img/android-looper-handler-message-01.png" alt="1"></p>
+<p>那么我们会怎么去实现呢？可以参考如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">public class TestDriverActivity extends Activity &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void onCreate(Bundle savedInstanceState)&#123;</span><br><span class="line">        super.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line">        tv = (TextView)findViewById(R.id.tv);</span><br><span class="line">        btn = (Button)findViewById(R.id.btn);</span><br><span class="line">        // 接收并处理消息</span><br><span class="line">        mHandler = new Handler()&#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void handleMessage(Message msg)&#123;</span><br><span class="line">                if (message.what == 0x11)&#123;</span><br><span class="line">                    Toast.makeText(getApplicationContext(), &quot;mHandler handleMessage&quot; );</span><br><span class="line">                    tv.setText(&quot;mHandler is receive message&quot;)</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        // 监听</span><br><span class="line">        btn.setOnClickListener(new View.onClickListener()&#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void onClick(View v)&#123;</span><br><span class="line">                MyThread t = new MyThread(mHandler);</span><br><span class="line">                t.start();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class MyThread extends Thread&#123;</span><br><span class="line">    Handler handler;</span><br><span class="line">    public MyThread(Handler handler) &#123;</span><br><span class="line">        super();</span><br><span class="line">        this.handler = handler;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void run()&#123;</span><br><span class="line">        super.run();</span><br><span class="line">        mHandler.sendEmptyMessage(0x11);  //发送消息</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这只是一种实现的方式，如果在子线程而不是ui线程去初始化handler，则需要初始化handler前调用Looper.prepare()，初始化结束后调用Looper.loop()。</p>
+<p>二、相关概念<br>学习Android的消息处理机制，有几个概念（类）必须了解：</p>
+<ol>
+<li>Message<br>消息，理解为线程间通讯的数据单元。例如后台线程在处理数据完毕后需要更新UI，则可发送一条包含更新信息的Message给UI线程。</li>
+<li>Message Queue<br>消息队列，用来存放通过Handler发布的消息，按照先进先出执行。</li>
+<li>Handler<br>Handler是Message的主要处理者，负责将Message添加到消息队列以及对消息队列中的Message进行处理。</li>
+<li>Looper<br>循环器，扮演Message Queue和Handler之间桥梁的角色，循环取出Message Queue里面的Message，并交付给相应的Handler进行处理。<br>Thread<br>5.UI thread 通常就是main thread，而Android启动程序时会替它建立一个Message Queue。<br>每一个线程里可含有一个Looper对象以及一个MessageQueue数据结构。在你的应用程序里，可以定义Handler的子类别来接收Looper所送出的消息。<br>三、Looper<br>Looper被设计用来使一个普通线程变成Looper线程。所谓Looper线程就是循环工作的线程。在程序开发中（尤其是GUI开发中），我们经常会需要一个线程不断循环，一旦有新任务则执行，执行完继续等待下一个任务，这就是Looper线程。使用Looper类创建Looper线程很简单：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class LooperThread extends Thread &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        // 将当前线程初始化为Looper线程</span><br><span class="line">        Looper.prepare();</span><br><span class="line">        </span><br><span class="line">        // ...其他处理，如实例化handler</span><br><span class="line">        </span><br><span class="line">        // 开始循环处理消息队列</span><br><span class="line">        Looper.loop();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3.1 Looper.prepare()<br>当执行了Looper.prepare()后，当前线程就会升级为Looper线程：</p>
+<p><img src="/img/android-looper-prepare.png" alt="2"></p>
+<p>一个Thread只能有一个Looper对象<br>线程中有一个Looper对象，它的内部维护了一个消息队列MessageQueue<br>3.2 Looper.loop()<br>当调用loop方法后，Looper线程就开始真正工作了，它不断从自己的MQ中取出队头的消息(也叫任务)执行。</p>
+<p><img src="/img/android-looper-loop.png" alt="3"></p>
+<p>那么，我们如何往MQ上添加消息呢？下面有请Handler</p>
+<p>四、Handler<br>Handler扮演了往MQ上添加消息和处理消息的角色（只处理由自己发出的消息），即往MQ上添加消息的时候执行sendMessage，并在loop到自己的时候处理消息执行handleMessage，整个过程是异步的。</p>
+<p>Handler创建时会关联一个looper，默认关联当前线程的looper。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class LooperThread extends Thread &#123;</span><br><span class="line">    private Handler handler1;</span><br><span class="line">    private Handler handler2;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        // 将当前线程初始化为Looper线程</span><br><span class="line">        Looper.prepare();</span><br><span class="line"></span><br><span class="line">        // 实例化两个handler</span><br><span class="line">        handler1 = new Handler(); </span><br><span class="line">        handler2 = new Handler();</span><br><span class="line"></span><br><span class="line">        // 开始循环处理消息队列</span><br><span class="line">        Looper.loop();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>加入Handler后结构图如下：</p>
+<p><img src="/img/android-looper-handler-2.png" alt="4"></p>
+<p>一个线程可以有多个Handler，但是只能有一个Looper。</p>
+<p>4.1 Handler发送消息和处理消息<br>大致流程：</p>
+<p>mHandler.sendMessage()发送消息到MQ<br>Looper.loop()将message不断从MQ从取出来交给handler处理<br>mHandler.handleMessage()处理消息</p>
+<p><img src="/img/android-handler-send-handle-msg.png" alt="5"></p>
+<p>五、回顾<br>那么回到一开始我们举的例子，在非UI线程去做耗时的操作，然后完成后在UI线程更新UI信息。那么这种case下，我们的结构图是这样的：</p>
+<p><img src="/img/android-ui-thread-handler.png" alt="6"></p>
+<p>至此，本文介绍的内容已经完成，本文内容大部分非原创，更多的是基于其他博客的和自己理解的总结，好记性不如烂笔头。如果需要了解源码的同学，可以继续深入阅读研究，包括Java层Looper，Handler，Message，MessageQueue的源码和Native层Looper，NativeMessageQueue的源码实现。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&text=Android源码(6)-Android消息机制"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&title=Android源码(6)-Android消息机制"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&is_video=false&description=Android源码(6)-Android消息机制"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Android源码(6)-Android消息机制&body=Check out this article: http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&title=Android源码(6)-Android消息机制"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&title=Android源码(6)-Android消息机制"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&title=Android源码(6)-Android消息机制"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&title=Android源码(6)-Android消息机制"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&name=Android源码(6)-Android消息机制&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(6)-Android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/&t=Android源码(6)-Android消息机制"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

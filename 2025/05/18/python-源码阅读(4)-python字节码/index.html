@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="PyCodeObject (虚拟机运行时，常量，环境，字节码信息)12345678910111213141516171819202122&#x2F;* code.h *&#x2F;&#x2F;* Bytecode object *&#x2F;typedef struct &#123;    PyObject_HEAD    int co_argcount;        &#x2F;* #arguments, except *args *&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python-源码阅读(4)-python字节码">
+<meta property="og:url" content="http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="PyCodeObject (虚拟机运行时，常量，环境，字节码信息)12345678910111213141516171819202122&#x2F;* code.h *&#x2F;&#x2F;* Bytecode object *&#x2F;typedef struct &#123;    PyObject_HEAD    int co_argcount;        &#x2F;* #arguments, except *args *&#x2F;">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wx3.sinaimg.cn/mw690/005EpKr8ly1g4dftzrftnj30jw0l1jw2.jpg">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wx3.sinaimg.cn/mw690/005EpKr8ly1g4dftzrftnj30jw0l1jw2.jpg">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>python-源码阅读(4)-python字节码</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(3)-python%E4%B8%AD%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(5)-python%E7%BA%BF%E7%A8%8B/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&text=python-源码阅读(4)-python字节码"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&title=python-源码阅读(4)-python字节码"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&is_video=false&description=python-源码阅读(4)-python字节码"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-源码阅读(4)-python字节码&body=Check out this article: http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&title=python-源码阅读(4)-python字节码"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&title=python-源码阅读(4)-python字节码"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&title=python-源码阅读(4)-python字节码"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&title=python-源码阅读(4)-python字节码"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&name=python-源码阅读(4)-python字节码&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&t=python-源码阅读(4)-python字节码"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#PyCodeObject-%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%90%E8%A1%8C%E6%97%B6%EF%BC%8C%E5%B8%B8%E9%87%8F%EF%BC%8C%E7%8E%AF%E5%A2%83%EF%BC%8C%E5%AD%97%E8%8A%82%E7%A0%81%E4%BF%A1%E6%81%AF"><span class="toc-number">1.</span> <span class="toc-text">PyCodeObject (虚拟机运行时，常量，环境，字节码信息)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#pyc%E6%96%87%E4%BB%B6%EF%BC%88PyCodeObject%E6%8C%81%E4%B9%85%E5%8C%96%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">pyc文件（PyCodeObject持久化）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E7%A0%81"><span class="toc-number">3.</span> <span class="toc-text">字节码</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#PyFrameObject"><span class="toc-number">4.</span> <span class="toc-text">PyFrameObject</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        python-源码阅读(4)-python字节码
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/python/">python</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/python/" rel="tag">python</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="PyCodeObject-虚拟机运行时，常量，环境，字节码信息"><a href="#PyCodeObject-虚拟机运行时，常量，环境，字节码信息" class="headerlink" title="PyCodeObject (虚拟机运行时，常量，环境，字节码信息)"></a>PyCodeObject (虚拟机运行时，常量，环境，字节码信息)</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">/* code.h */</span><br><span class="line">/* Bytecode object */</span><br><span class="line">typedef struct &#123;</span><br><span class="line">    PyObject_HEAD</span><br><span class="line">    int co_argcount;        /* #arguments, except *args */</span><br><span class="line">    int co_nlocals;     /* #local variables */</span><br><span class="line">    int co_stacksize;       /* #entries needed for evaluation stack */</span><br><span class="line">    int co_flags;       /* CO_..., see below */</span><br><span class="line">    PyObject *co_code;      /* instruction opcodes */</span><br><span class="line">    PyObject *co_consts;    /* list (constants used) */</span><br><span class="line">    PyObject *co_names;     /* list of strings (names used) */</span><br><span class="line">    PyObject *co_varnames;  /* tuple of strings (local variable names) */</span><br><span class="line">    PyObject *co_freevars;  /* tuple of strings (free variable names) */</span><br><span class="line">    PyObject *co_cellvars;      /* tuple of strings (cell variable names) */</span><br><span class="line">    /* The rest doesn&#x27;t count for hash/cmp */</span><br><span class="line">    PyObject *co_filename;  /* string (where it was loaded from) */</span><br><span class="line">    PyObject *co_name;      /* string (name, for reference) */</span><br><span class="line">    int co_firstlineno;     /* first source line number */</span><br><span class="line">    PyObject *co_lnotab;    /* string (encoding addr&lt;-&gt;lineno mapping) See Objects/lnotab_notes.txt for details. */</span><br><span class="line">    void *co_zombieframe;     /* for optimization only (see frameobject.c) */</span><br><span class="line">    PyObject *co_weakreflist;   /* to support weakrefs to code objects */</span><br><span class="line">&#125; PyCodeObject;</span><br></pre></td></tr></table></figure>
+
+<h1 id="pyc文件（PyCodeObject持久化）"><a href="#pyc文件（PyCodeObject持久化）" class="headerlink" title="pyc文件（PyCodeObject持久化）"></a>pyc文件（PyCodeObject持久化）</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/*import.c*/</span><br><span class="line">static void write_compiled_module(PyCodeObject *co, char *cpathname, struct stat *srcstat, time_t mtime)</span><br><span class="line">&#123;</span><br><span class="line">    PyMarshal_WriteLongToFile(pyc_magic, fp, Py_MARSHAL_VERSION);</span><br><span class="line">    /* First write a 0 for mtime */</span><br><span class="line">    PyMarshal_WriteLongToFile(0L, fp, Py_MARSHAL_VERSION);</span><br><span class="line">    PyMarshal_WriteObjectToFile((PyObject *)co, fp, Py_MARSHAL_VERSION);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="字节码"><a href="#字节码" class="headerlink" title="字节码"></a>字节码</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">1           0 LOAD_CONST               0 (&#x27;A&#x27;)</span><br><span class="line">              3 LOAD_NAME                0 (object)</span><br><span class="line">              6 BUILD_TUPLE              1</span><br><span class="line">              9 LOAD_CONST               1 (&lt;code object A at 0x7f993a73adb0, file &quot;demo.py&quot;, line 1&gt;)</span><br><span class="line">             12 MAKE_FUNCTION            0</span><br><span class="line">             15 CALL_FUNCTION            0</span><br><span class="line">             18 BUILD_CLASS         </span><br><span class="line">             19 STORE_NAME               1 (A)</span><br><span class="line"></span><br><span class="line">  4          22 LOAD_CONST               2 (&lt;code object func at 0x7f993a662a30, file &quot;demo.py&quot;, line 4&gt;)</span><br><span class="line">             25 MAKE_FUNCTION            0</span><br><span class="line">             28 STORE_NAME               2 (func)</span><br><span class="line"></span><br><span class="line">  9          31 LOAD_NAME                1 (A)</span><br><span class="line">             34 CALL_FUNCTION            0</span><br><span class="line">             37 STORE_NAME               3 (a)</span><br><span class="line"></span><br><span class="line"> 10          40 LOAD_NAME                2 (func)</span><br><span class="line">             43 CALL_FUNCTION            0</span><br><span class="line">             46 POP_TOP             </span><br><span class="line">             47 LOAD_CONST               3 (None)</span><br><span class="line">             50 RETURN_VALUE  </span><br><span class="line"></span><br><span class="line">注：左边第一列代表指令对应源码中的行号. 第二列代表当前字节码再co_code中的偏移量, 第三列是当前的字节码指令, 最后一列是当前字节码指令的参数.</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>pyc文件是对PyCodeObject的持久化，存放在硬盘，包含了除字节码意外的其他参数。每次执行后会将pyCodeObject持久化下来 使用 python demo.py启动脚步，若demo.py中无import 不会持久化</li>
+</ol>
+<h1 id="PyFrameObject"><a href="#PyFrameObject" class="headerlink" title="PyFrameObject"></a>PyFrameObject</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[frameobject.h]</span><br><span class="line">typedef struct _frame &#123;</span><br><span class="line">    PyObject_VAR_HEAD</span><br><span class="line">    struct _frame *f_back;      // 执行环境链的上一个frame</span><br><span class="line">    PyCodeObject *f_code;       // PyCodeObject对象</span><br><span class="line">    PyObject *f_builtins;       // builtin名字空间</span><br><span class="line">    PyObject *f_globals;        // global 名字空间</span><br><span class="line">    PyObject *f_locals;         // local 名字空间</span><br><span class="line">    PyObject **f_valuestack;    // 运行栈的栈底</span><br><span class="line">    PyObject **f_stacktop;      // 运行栈的栈顶</span><br><span class="line">    PyObject *f_trace;          // 异常时调用的句柄</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    int f_lasti;                // 上一条字节码指令在f_code中的偏移位置</span><br><span class="line">    int f_lineno;               // 当前字节码对应的源代码行</span><br><span class="line">    int f_iblock;               // 当前指令在栈f_blockstack中的索引</span><br><span class="line">    ...</span><br><span class="line">    PyObject *f_localsplus[1];  // locals+stack, 动态内存, 维护(局部变量+运行时栈)所需要的空间 */</span><br><span class="line">&#125; PyFrameObject;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<ol>
+<li>python只有一个interpreter, 其中维护了一个或多个PyThreadState对象, 这些对象对应的线程轮流使用一个字节码执行引擎. 为了实现线程同步, python通过一个全局解释器锁GIL.</li>
+<li>线程执行栈帧（PyFrameObject）,PyFrameObject 对象也是一个变长对象, 每次创建PyFrameObject对象的大小可能是不一样的. 每个栈帧对象都维护了一个PyCodeObject对象,f_builtins, f_globals 和 f_locals 是3个独立的名字空间,</li>
+<li>LOAD_NAME 将以此从local, global, builtin 3个名字空间顺序查找, 如果都没找到说明名字未定义, 抛出异常, 终止python虚拟机的运行. 搜索规则也就是 LGB 规则.<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">// 有删改</span><br><span class="line">TARGET(LOAD_NAME) &#123;</span><br><span class="line">    PyObject *name = GETITEM(names, oparg);</span><br><span class="line">    PyObject *locals = f-&gt;f_locals;</span><br><span class="line">    PyObject *v;</span><br><span class="line"></span><br><span class="line">    v = PyDict_GetItem(locals, name);</span><br><span class="line">    Py_XINCREF(v);</span><br><span class="line"></span><br><span class="line">    if (v == NULL) &#123;</span><br><span class="line">        v = PyDict_GetItem(f-&gt;f_globals, name);</span><br><span class="line">        Py_XINCREF(v);</span><br><span class="line">        if (v == NULL) &#123;</span><br><span class="line">            v = PyDict_GetItem(f-&gt;f_builtins, name);</span><br><span class="line">            if (v == NULL) &#123;</span><br><span class="line">                format_exc_check_arg(</span><br><span class="line">                            PyExc_NameError,</span><br><span class="line">                            NAME_ERROR_MSG, name);</span><br><span class="line">                goto error;</span><br><span class="line">            &#125;</span><br><span class="line">            Py_INCREF(v);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    PUSH(v);</span><br><span class="line">    DISPATCH();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>python的异常机制处理中, 最重要的是why所表示的虚拟机状态及PyFrameObject对象中f_blockstack里存放的PyTryBlock对象. 变量why将指明python虚拟机当前是否发生了异常, 而PyTryBlock对象则指示程序员是否为异常设置了 except 代码块和 finally 代码块. python虚拟机处理异常的过程就是 why 和 PyTryBlock 的共同作用下完成的.<br><img src="https://wx3.sinaimg.cn/mw690/005EpKr8ly1g4dftzrftnj30jw0l1jw2.jpg" alt="except"></li>
+</ol>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#PyCodeObject-%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%90%E8%A1%8C%E6%97%B6%EF%BC%8C%E5%B8%B8%E9%87%8F%EF%BC%8C%E7%8E%AF%E5%A2%83%EF%BC%8C%E5%AD%97%E8%8A%82%E7%A0%81%E4%BF%A1%E6%81%AF"><span class="toc-number">1.</span> <span class="toc-text">PyCodeObject (虚拟机运行时，常量，环境，字节码信息)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#pyc%E6%96%87%E4%BB%B6%EF%BC%88PyCodeObject%E6%8C%81%E4%B9%85%E5%8C%96%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">pyc文件（PyCodeObject持久化）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E7%A0%81"><span class="toc-number">3.</span> <span class="toc-text">字节码</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#PyFrameObject"><span class="toc-number">4.</span> <span class="toc-text">PyFrameObject</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&text=python-源码阅读(4)-python字节码"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&title=python-源码阅读(4)-python字节码"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&is_video=false&description=python-源码阅读(4)-python字节码"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-源码阅读(4)-python字节码&body=Check out this article: http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&title=python-源码阅读(4)-python字节码"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&title=python-源码阅读(4)-python字节码"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&title=python-源码阅读(4)-python字节码"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&title=python-源码阅读(4)-python字节码"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&name=python-源码阅读(4)-python字节码&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(4)-python%E5%AD%97%E8%8A%82%E7%A0%81/&t=python-源码阅读(4)-python字节码"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Linux-进程间通信 管道 消息队列 信号 共享内存模型和信号量  管道a. 匿名管道 1234567891011121314151617181920212223242526272829303132333435&#x2F;&#x2F; 1. 管道是父子进程间的通信&#x2F;&#x2F; 2. fd[0] 代表读；fd[1] 代表写。一般是子进程写，即：先关闭fd[0]，在写入fd[1]。父进程读，即：先关闭fd[1],读取fd[0]">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux-进程间通信">
+<meta property="og:url" content="http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="Linux-进程间通信 管道 消息队列 信号 共享内存模型和信号量  管道a. 匿名管道 1234567891011121314151617181920212223242526272829303132333435&#x2F;&#x2F; 1. 管道是父子进程间的通信&#x2F;&#x2F; 2. fd[0] 代表读；fd[1] 代表写。一般是子进程写，即：先关闭fd[0]，在写入fd[1]。父进程读，即：先关闭fd[1],读取fd[0]">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E7%AE%A1%E9%81%931.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E7%AE%A1%E9%81%932.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E4%BF%A1%E5%8F%B7%E6%B3%A8%E5%86%8C%E4%B8%8E%E4%BD%BF%E7%94%A8.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98%E5%8E%9F%E7%90%86.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%8E%9F%E7%90%86.png">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-06-06T06:41:34.984Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E7%AE%A1%E9%81%931.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Linux-进程间通信</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/python-asyncio%E2%80%94Task%E4%BD%9C%E7%94%A8(%E4%BA%8C)%20copy/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/python-asyncio%E2%80%94Task%E4%BD%9C%E7%94%A8(%E4%BA%8C)/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&text=Linux-进程间通信"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&title=Linux-进程间通信"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&is_video=false&description=Linux-进程间通信"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linux-进程间通信&body=Check out this article: http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&title=Linux-进程间通信"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&title=Linux-进程间通信"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&title=Linux-进程间通信"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&title=Linux-进程间通信"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&name=Linux-进程间通信&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&t=Linux-进程间通信"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1"><span class="toc-number">1.</span> <span class="toc-text">Linux-进程间通信</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%A1%E9%81%93"><span class="toc-number">1.0.1.</span> <span class="toc-text">管道</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="toc-number">1.0.2.</span> <span class="toc-text">消息队列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7"><span class="toc-number">1.0.3.</span> <span class="toc-text">信号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E5%92%8C%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="toc-number">1.0.4.</span> <span class="toc-text">共享内存模型和信号量</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Linux-进程间通信
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/Linux/">Linux</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Linux/" rel="tag">Linux</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="Linux-进程间通信"><a href="#Linux-进程间通信" class="headerlink" title="Linux-进程间通信"></a>Linux-进程间通信</h1><ol>
+<li>管道</li>
+<li>消息队列</li>
+<li>信号</li>
+<li>共享内存模型和信号量</li>
+</ol>
+<h3 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h3><p>a. 匿名管道</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">// 1. 管道是父子进程间的通信</span><br><span class="line">// 2. fd[0] 代表读；fd[1] 代表写。一般是子进程写，即：先关闭fd[0]，在写入fd[1]。父进程读，即：先关闭fd[1],读取fd[0]</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;errno.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[])</span><br><span class="line">&#123;</span><br><span class="line">  int fds[2];</span><br><span class="line">  if (pipe(fds) == -1)</span><br><span class="line">    perror(&quot;pipe error&quot;);</span><br><span class="line"></span><br><span class="line">  pid_t pid;</span><br><span class="line">  pid = fork();</span><br><span class="line">  if (pid == -1)</span><br><span class="line">    perror(&quot;fork error&quot;);</span><br><span class="line"></span><br><span class="line">  if (pid == 0)&#123;</span><br><span class="line">    close(fds[0]);</span><br><span class="line">    char msg[] = &quot;hello world&quot;;</span><br><span class="line">    write(fds[1], msg, strlen(msg) + 1);</span><br><span class="line">    close(fds[1]);</span><br><span class="line">    exit(0);</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    close(fds[1]);</span><br><span class="line">    char msg[128];</span><br><span class="line">    read(fds[0], msg, 128);</span><br><span class="line">    close(fds[0]);</span><br><span class="line">    printf(&quot;message : %s\n&quot;, msg);</span><br><span class="line">    return 0;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E7%AE%A1%E9%81%931.png" alt="管道1"></p>
+<p>b. linux 管道原理  (ps -ef|grep 进程|awk ‘{print $2}’|xargs kill -9)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">// 控制台标准输入转化成标准输出 写入到fd[1]端，另一个进程标准输入来自fd[0]端</span><br><span class="line"></span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;errno.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[])</span><br><span class="line">&#123;</span><br><span class="line">  int fds[2];</span><br><span class="line">  if (pipe(fds) == -1)</span><br><span class="line">    perror(&quot;pipe error&quot;);</span><br><span class="line"></span><br><span class="line">  pid_t pid;</span><br><span class="line">  pid = fork();</span><br><span class="line">  if (pid == -1)</span><br><span class="line">    perror(&quot;fork error&quot;);</span><br><span class="line"></span><br><span class="line">  if (pid == 0)&#123;</span><br><span class="line">    dup2(fds[1], STDOUT_FILENO);</span><br><span class="line">    close(fds[1]);</span><br><span class="line">    close(fds[0]);</span><br><span class="line">    execlp(&quot;ps&quot;, &quot;ps&quot;, &quot;-ef&quot;, NULL);</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    dup2(fds[0], STDIN_FILENO);</span><br><span class="line">    close(fds[0]);</span><br><span class="line">    close(fds[1]);</span><br><span class="line">    execlp(&quot;grep&quot;, &quot;grep&quot;, &quot;systemd&quot;, NULL);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E7%AE%A1%E9%81%932.png" alt="管道1"></p>
+<h3 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h3><p>a. ipcs -q 就能看到上面我们创建的消息队列对象。<br>b. msgget 函数创建消息队列</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;sys/msg.h&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">  int messagequeueid;</span><br><span class="line">  key_t key;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  if((key = ftok(&quot;/root/messagequeue/messagequeuekey&quot;, 1024)) &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">      perror(&quot;ftok error&quot;);</span><br><span class="line">      exit(1);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  printf(&quot;Message Queue key: %d.\n&quot;, key);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  if ((messagequeueid = msgget(key, IPC_CREAT|0777)) == -1)</span><br><span class="line">  &#123;</span><br><span class="line">      perror(&quot;msgget error&quot;);</span><br><span class="line">      exit(1);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  printf(&quot;Message queue id: %d.\n&quot;, messagequeueid);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>c. msgsnd发送msg到消息队列</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;sys/msg.h&gt;</span><br><span class="line">#include &lt;getopt.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">struct msg_buffer &#123;</span><br><span class="line">    long mtype;</span><br><span class="line">    char mtext[1024];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">  int next_option;</span><br><span class="line">  const char* const short_options = &quot;i:t:m:&quot;;</span><br><span class="line">  const struct option long_options[] = &#123;</span><br><span class="line">    &#123; &quot;id&quot;, 1, NULL, &#x27;i&#x27;&#125;,</span><br><span class="line">    &#123; &quot;type&quot;, 1, NULL, &#x27;t&#x27;&#125;,</span><br><span class="line">    &#123; &quot;message&quot;, 1, NULL, &#x27;m&#x27;&#125;,</span><br><span class="line">    &#123; NULL, 0, NULL, 0 &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">  </span><br><span class="line">  int messagequeueid = -1;</span><br><span class="line">  struct msg_buffer buffer;</span><br><span class="line">  buffer.mtype = -1;</span><br><span class="line">  int len = -1;</span><br><span class="line">  char * message = NULL;</span><br><span class="line">  do &#123;</span><br><span class="line">    next_option = getopt_long (argc, argv, short_options, long_options, NULL);</span><br><span class="line">    switch (next_option)</span><br><span class="line">    &#123;</span><br><span class="line">      case &#x27;i&#x27;:</span><br><span class="line">        messagequeueid = atoi(optarg);</span><br><span class="line">        break;</span><br><span class="line">      case &#x27;t&#x27;:</span><br><span class="line">        buffer.mtype = atol(optarg);</span><br><span class="line">        break;</span><br><span class="line">      case &#x27;m&#x27;:</span><br><span class="line">        message = optarg;</span><br><span class="line">        len = strlen(message) + 1;</span><br><span class="line">        if (len &gt; 1024) &#123;</span><br><span class="line">          perror(&quot;message too long.&quot;);</span><br><span class="line">          exit(1);</span><br><span class="line">        &#125;</span><br><span class="line">        memcpy(buffer.mtext, message, len);</span><br><span class="line">        break;</span><br><span class="line">      default:</span><br><span class="line">        break;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;while(next_option != -1);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  if(messagequeueid != -1 &amp;&amp; buffer.mtype != -1 &amp;&amp; len != -1 &amp;&amp; message != NULL)&#123;</span><br><span class="line">    if(msgsnd(messagequeueid, &amp;buffer, len, IPC_NOWAIT) == -1)&#123;</span><br><span class="line">      perror(&quot;fail to send message.&quot;);</span><br><span class="line">      exit(1);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    perror(&quot;arguments error&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>d.  msgrcv接受消息队列消息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;sys/msg.h&gt;</span><br><span class="line">#include &lt;getopt.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">struct msg_buffer &#123;</span><br><span class="line">    long mtype;</span><br><span class="line">    char mtext[1024];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">  int next_option;</span><br><span class="line">  const char* const short_options = &quot;i:t:&quot;;</span><br><span class="line">  const struct option long_options[] = &#123;</span><br><span class="line">    &#123; &quot;id&quot;, 1, NULL, &#x27;i&#x27;&#125;,</span><br><span class="line">    &#123; &quot;type&quot;, 1, NULL, &#x27;t&#x27;&#125;,</span><br><span class="line">    &#123; NULL, 0, NULL, 0 &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">  </span><br><span class="line">  int messagequeueid = -1;</span><br><span class="line">  struct msg_buffer buffer;</span><br><span class="line">  long type = -1;</span><br><span class="line">  do &#123;</span><br><span class="line">    next_option = getopt_long (argc, argv, short_options, long_options, NULL);</span><br><span class="line">    switch (next_option)</span><br><span class="line">    &#123;</span><br><span class="line">      case &#x27;i&#x27;:</span><br><span class="line">        messagequeueid = atoi(optarg);</span><br><span class="line">        break;</span><br><span class="line">      case &#x27;t&#x27;:</span><br><span class="line">        type = atol(optarg);</span><br><span class="line">        break;</span><br><span class="line">      default:</span><br><span class="line">        break;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;while(next_option != -1);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  if(messagequeueid != -1 &amp;&amp; type != -1)&#123;</span><br><span class="line">    if(msgrcv(messagequeueid, &amp;buffer, 1024, type, IPC_NOWAIT) == -1)&#123;</span><br><span class="line">      perror(&quot;fail to recv message.&quot;);</span><br><span class="line">      exit(1);</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;received message type : %d, text: %s.&quot;, buffer.mtype, buffer.mtext);</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    perror(&quot;arguments error&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="信号"><a href="#信号" class="headerlink" title="信号"></a>信号</h3><p>a. 信号值位于SIGRTMIN(&#x3D;32)和SIGRTMAX(&#x3D;63)之间的信号都是可靠信号,其他为不可靠信号<br>b. 信号注册与使用<br><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E4%BF%A1%E5%8F%B7%E6%B3%A8%E5%86%8C%E4%B8%8E%E4%BD%BF%E7%94%A8.png" alt="信号"></p>
+<p>c. <a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux信号处理.png" style="">信号在操作系统中处理流程</a><br><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86.png" alt="信号在操作系统中处理流程"></p>
+<h3 id="共享内存模型和信号量"><a href="#共享内存模型和信号量" class="headerlink" title="共享内存模型和信号量"></a>共享内存模型和信号量</h3><p>a. 通过程序创建的共享内存和信号量集合，我们可以通过命令 ipcs 查看。当然，我们也可以通过 ipcrm 进行删除。<br>b. 共享内存与信号量初始化</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;sys/ipc.h&gt;</span><br><span class="line">#include &lt;sys/shm.h&gt;</span><br><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;sys/ipc.h&gt;</span><br><span class="line">#include &lt;sys/sem.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"></span><br><span class="line">#define MAX_NUM 128</span><br><span class="line"></span><br><span class="line">struct shm_data &#123;</span><br><span class="line">  int data[MAX_NUM];</span><br><span class="line">  int datalength;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">union semun &#123;</span><br><span class="line">  int val; </span><br><span class="line">  struct semid_ds *buf; </span><br><span class="line">  unsigned short int *array; </span><br><span class="line">  struct seminfo *__buf; </span><br><span class="line">&#125;; </span><br><span class="line"></span><br><span class="line">int get_shmid()&#123;</span><br><span class="line">  int shmid;</span><br><span class="line">  key_t key;</span><br><span class="line">  </span><br><span class="line">  if((key = ftok(&quot;/root/sharememory/sharememorykey&quot;, 1024)) &lt; 0)&#123;</span><br><span class="line">      perror(&quot;ftok error&quot;);</span><br><span class="line">          return -1;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  shmid = shmget(key, sizeof(struct shm_data), IPC_CREAT|0777);</span><br><span class="line">  return shmid;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int get_semaphoreid()&#123;</span><br><span class="line">  int semid;</span><br><span class="line">  key_t key;</span><br><span class="line">  </span><br><span class="line">  if((key = ftok(&quot;/root/sharememory/semaphorekey&quot;, 1024)) &lt; 0)&#123;</span><br><span class="line">      perror(&quot;ftok error&quot;);</span><br><span class="line">          return -1;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  semid = semget(key, 1, IPC_CREAT|0777);</span><br><span class="line">  return semid;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int semaphore_init (int semid) &#123;</span><br><span class="line">  union semun argument; </span><br><span class="line">  unsigned short values[1]; </span><br><span class="line">  values[0] = 1; </span><br><span class="line">  argument.array = values; </span><br><span class="line">  return semctl (semid, 0, SETALL, argument); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int semaphore_p (int semid) &#123;</span><br><span class="line">  struct sembuf operations[1]; </span><br><span class="line">  operations[0].sem_num = 0; </span><br><span class="line">  operations[0].sem_op = -1; </span><br><span class="line">  operations[0].sem_flg = SEM_UNDO; </span><br><span class="line">  return semop (semid, operations, 1); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int semaphore_v (int semid) &#123;</span><br><span class="line">  struct sembuf operations[1]; </span><br><span class="line">  operations[0].sem_num = 0; </span><br><span class="line">  operations[0].sem_op = 1; </span><br><span class="line">  operations[0].sem_flg = SEM_UNDO; </span><br><span class="line">  return semop (semid, operations, 1); </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p>c. 生成者</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;share.h&quot;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">  void *shm = NULL;</span><br><span class="line">  struct shm_data *shared = NULL;</span><br><span class="line">  int shmid = get_shmid();</span><br><span class="line">  int semid = get_semaphoreid();</span><br><span class="line">  int i;</span><br><span class="line">  </span><br><span class="line">  shm = shmat(shmid, (void*)0, 0);</span><br><span class="line">  if(shm == (void*)-1)&#123;</span><br><span class="line">    exit(0);</span><br><span class="line">  &#125;</span><br><span class="line">  shared = (struct shm_data*)shm;</span><br><span class="line">  memset(shared, 0, sizeof(struct shm_data));</span><br><span class="line">  semaphore_init(semid);</span><br><span class="line">  while(1)&#123;</span><br><span class="line">    semaphore_p(semid);</span><br><span class="line">    if(shared-&gt;datalength &gt; 0)&#123;</span><br><span class="line">      semaphore_v(semid);</span><br><span class="line">      sleep(1);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      printf(&quot;how many integers to caculate : &quot;);</span><br><span class="line">      scanf(&quot;%d&quot;,&amp;shared-&gt;datalength);</span><br><span class="line">      if(shared-&gt;datalength &gt; MAX_NUM)&#123;</span><br><span class="line">        perror(&quot;too many integers.&quot;);</span><br><span class="line">        shared-&gt;datalength = 0;</span><br><span class="line">        semaphore_v(semid);</span><br><span class="line">        exit(1);</span><br><span class="line">      &#125;</span><br><span class="line">      for(i=0;i&lt;shared-&gt;datalength;i++)&#123;</span><br><span class="line">        printf(&quot;Input the %d integer : &quot;, i);</span><br><span class="line">        scanf(&quot;%d&quot;,&amp;shared-&gt;data[i]);</span><br><span class="line">      &#125;</span><br><span class="line">      semaphore_v(semid);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>d. 消费者</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#include &quot;share.h&quot;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">  void *shm = NULL;</span><br><span class="line">  struct shm_data *shared = NULL;</span><br><span class="line">  int shmid = get_shmid();</span><br><span class="line">  int semid = get_semaphoreid();</span><br><span class="line">  int i;</span><br><span class="line">  </span><br><span class="line">  shm = shmat(shmid, (void*)0, 0);</span><br><span class="line">  if(shm == (void*)-1)&#123;</span><br><span class="line">    exit(0);</span><br><span class="line">  &#125;</span><br><span class="line">  shared = (struct shm_data*)shm;</span><br><span class="line">  while(1)&#123;</span><br><span class="line">    semaphore_p(semid);</span><br><span class="line">    if(shared-&gt;datalength &gt; 0)&#123;</span><br><span class="line">      int sum = 0;</span><br><span class="line">      for(i=0;i&lt;shared-&gt;datalength-1;i++)&#123;</span><br><span class="line">        printf(&quot;%d+&quot;,shared-&gt;data[i]);</span><br><span class="line">        sum += shared-&gt;data[i];</span><br><span class="line">      &#125;</span><br><span class="line">      printf(&quot;%d&quot;,shared-&gt;data[shared-&gt;datalength-1]);</span><br><span class="line">      sum += shared-&gt;data[shared-&gt;datalength-1];</span><br><span class="line">      printf(&quot;=%d\n&quot;,sum);</span><br><span class="line">      memset(shared, 0, sizeof(struct shm_data));</span><br><span class="line">      semaphore_v(semid);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      semaphore_v(semid);</span><br><span class="line">      printf(&quot;no tasks, waiting.\n&quot;);</span><br><span class="line">      sleep(1);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>e. 消费者与生成者结果图<br><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98.png" alt="消费者与生成者结果图"></p>
+<p>f. <a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux共享内存原理.png">共享内存原理</a><br><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98%E5%8E%9F%E7%90%86.png" alt="共享内存原理"></p>
+<p>g. <a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux信号量原理.png">信号量的本质</a><br><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%8E%9F%E7%90%86.png" alt="信号量的本质"></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1"><span class="toc-number">1.</span> <span class="toc-text">Linux-进程间通信</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%A1%E9%81%93"><span class="toc-number">1.0.1.</span> <span class="toc-text">管道</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="toc-number">1.0.2.</span> <span class="toc-text">消息队列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7"><span class="toc-number">1.0.3.</span> <span class="toc-text">信号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E5%92%8C%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="toc-number">1.0.4.</span> <span class="toc-text">共享内存模型和信号量</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&text=Linux-进程间通信"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&title=Linux-进程间通信"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&is_video=false&description=Linux-进程间通信"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linux-进程间通信&body=Check out this article: http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&title=Linux-进程间通信"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&title=Linux-进程间通信"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&title=Linux-进程间通信"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&title=Linux-进程间通信"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&name=Linux-进程间通信&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/OS-Linux-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/&t=Linux-进程间通信"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

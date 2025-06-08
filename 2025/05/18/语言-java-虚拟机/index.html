@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="JVM 虚拟机    General    jvm架构   2.1. 类装载流程 2.2. 安全性 2.2.1. 双亲委派机制 2.2.2. 沙箱机制   2.3. 栈 2.3.1. 方法栈 2.3.2. 本地方法栈   2.4. 堆 （重GC&#x2F;fullGC;发生在新生区和年老区） 2.4.1. 新生代 （轻GC&#x2F;minorGC） 2.4.1.1. Eden区 2.4.1.2.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM 虚拟机">
+<meta property="og:url" content="http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="JVM 虚拟机    General    jvm架构   2.1. 类装载流程 2.2. 安全性 2.2.1. 双亲委派机制 2.2.2. 沙箱机制   2.3. 栈 2.3.1. 方法栈 2.3.2. 本地方法栈   2.4. 堆 （重GC&#x2F;fullGC;发生在新生区和年老区） 2.4.1. 新生代 （轻GC&#x2F;minorGC） 2.4.1.1. Eden区 2.4.1.2.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wx3.sinaimg.cn/mw690/005EpKr8ly1g3w3bn8f69j30gs0bpq47.jpg">
+<meta property="article:published_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wx3.sinaimg.cn/mw690/005EpKr8ly1g3w3bn8f69j30gs0bpq47.jpg">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>JVM 虚拟机</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E5%86%85%E5%AD%98%E8%B0%83%E4%BC%98/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E9%94%81/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&text=JVM 虚拟机"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&title=JVM 虚拟机"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&is_video=false&description=JVM 虚拟机"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JVM 虚拟机&body=Check out this article: http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&title=JVM 虚拟机"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&title=JVM 虚拟机"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&title=JVM 虚拟机"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&title=JVM 虚拟机"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&name=JVM 虚拟机&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&t=JVM 虚拟机"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JVM-%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">JVM 虚拟机</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-General"><span class="toc-number">1.1.</span> <span class="toc-text">1. General</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-jvm%E6%9E%B6%E6%9E%84"><span class="toc-number">1.2.</span> <span class="toc-text">2. jvm架构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E7%B1%BB%E8%A3%85%E8%BD%BD%E6%B5%81%E7%A8%8B"><span class="toc-number">1.2.1.</span> <span class="toc-text">2.1. 类装载流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E5%AE%89%E5%85%A8%E6%80%A7"><span class="toc-number">1.2.2.</span> <span class="toc-text">2.2. 安全性</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-1-%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">2.2.1. 双亲委派机制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-2-%E6%B2%99%E7%AE%B1%E6%9C%BA%E5%88%B6"><span class="toc-number">1.2.2.2.</span> <span class="toc-text">2.2.2. 沙箱机制</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E6%A0%88"><span class="toc-number">1.2.3.</span> <span class="toc-text">2.3. 栈</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-1-%E6%96%B9%E6%B3%95%E6%A0%88"><span class="toc-number">1.2.3.1.</span> <span class="toc-text">2.3.1. 方法栈</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-2-%E6%9C%AC%E5%9C%B0%E6%96%B9%E6%B3%95%E6%A0%88"><span class="toc-number">1.2.3.2.</span> <span class="toc-text">2.3.2. 本地方法栈</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E5%A0%86-%EF%BC%88%E9%87%8DGC-fullGC-%E5%8F%91%E7%94%9F%E5%9C%A8%E6%96%B0%E7%94%9F%E5%8C%BA%E5%92%8C%E5%B9%B4%E8%80%81%E5%8C%BA%EF%BC%89"><span class="toc-number">1.2.4.</span> <span class="toc-text">2.4. 堆 （重GC&#x2F;fullGC;发生在新生区和年老区）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-1-%E6%96%B0%E7%94%9F%E4%BB%A3-%EF%BC%88%E8%BD%BBGC-minorGC%EF%BC%89"><span class="toc-number">1.2.4.1.</span> <span class="toc-text">2.4.1. 新生代 （轻GC&#x2F;minorGC）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#2-4-1-1-Eden%E5%8C%BA"><span class="toc-number">1.2.4.1.1.</span> <span class="toc-text">2.4.1.1. Eden区</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-4-1-2-%E5%AD%98%E6%B4%BB%E5%8C%BA"><span class="toc-number">1.2.4.1.2.</span> <span class="toc-text">2.4.1.2. 存活区</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-2-%E5%B9%B4%E8%80%81%E4%BB%A3-%EF%BC%88MojorGC%EF%BC%89"><span class="toc-number">1.2.4.2.</span> <span class="toc-text">2.4.2. 年老代 （MojorGC）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-3-%E5%85%83%E7%A9%BA%E9%97%B4"><span class="toc-number">1.2.4.3.</span> <span class="toc-text">2.4.3. 元空间</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-jvm%E8%B0%83%E4%BC%98"><span class="toc-number">1.2.5.</span> <span class="toc-text">2.5. jvm调优</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-5-1-%E8%B0%83%E4%BC%98%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-number">1.2.5.1.</span> <span class="toc-text">2.5.1. 调优基础知识</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E5%BC%82%E5%B8%B8"><span class="toc-number">1.2.6.</span> <span class="toc-text">2.6. 内存溢出异常</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86"><span class="toc-number">1.3.</span> <span class="toc-text">3. 垃圾收集</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E5%9E%83%E5%9C%BE%E5%88%A4%E6%96%AD%E6%96%B9%E6%B3%95"><span class="toc-number">1.3.1.</span> <span class="toc-text">3.1. 垃圾判断方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-1-%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95"><span class="toc-number">1.3.1.1.</span> <span class="toc-text">3.1.1. 引用计数法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-2-%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90"><span class="toc-number">1.3.1.2.</span> <span class="toc-text">3.1.2. 可达性分析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95"><span class="toc-number">1.3.2.</span> <span class="toc-text">3.2. 垃圾回收算法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-1-%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">3.2.1. 复制算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-2-%E6%A0%87%E8%AE%B0%E6%B8%85%E9%99%A4%E6%B3%95"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">3.2.2. 标记清除法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-3-%E6%A0%87%E8%AE%B0%E6%95%B4%E7%90%86"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">3.2.3. 标记整理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.3. 垃圾回收算法总结</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        JVM 虚拟机
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.429Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/code-java/">code-java</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/java/" rel="tag">java</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="JVM-虚拟机"><a href="#JVM-虚拟机" class="headerlink" title="JVM 虚拟机"></a>JVM 虚拟机</h1><!-- TOC -->
+
+<ul>
+<li><ol>
+<li>General</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>jvm架构</li>
+</ol>
+<ul>
+<li>2.1. 类装载流程</li>
+<li>2.2. 安全性<ul>
+<li>2.2.1. 双亲委派机制</li>
+<li>2.2.2. 沙箱机制</li>
+</ul>
+</li>
+<li>2.3. 栈<ul>
+<li>2.3.1. 方法栈</li>
+<li>2.3.2. 本地方法栈</li>
+</ul>
+</li>
+<li>2.4. 堆 （重GC&#x2F;fullGC;发生在新生区和年老区）<ul>
+<li>2.4.1. 新生代 （轻GC&#x2F;minorGC）<ul>
+<li>2.4.1.1. Eden区</li>
+<li>2.4.1.2. 存活区</li>
+</ul>
+</li>
+<li>2.4.2. 年老代 （MojorGC）</li>
+<li>2.4.3. 元空间</li>
+</ul>
+</li>
+<li>2.5. jvm调优<ul>
+<li>2.5.1. 调优基础知识</li>
+</ul>
+</li>
+<li>2.6. 内存溢出异常</li>
+</ul>
+</li>
+<li><ol start="3">
+<li>垃圾收集</li>
+</ol>
+<ul>
+<li>3.1. 垃圾判断方法<ul>
+<li>3.1.1. 引用计数法</li>
+<li>3.1.2. 可达性分析</li>
+</ul>
+</li>
+<li>3.2. 垃圾回收算法<ul>
+<li>3.2.1. 复制算法</li>
+<li>3.2.2. 标记清除法</li>
+<li>3.2.3. 标记整理</li>
+</ul>
+</li>
+<li>3.3. 垃圾回收算法总结</li>
+</ul>
+</li>
+</ul>
+<!-- /TOC -->
+
+<h2 id="1-General"><a href="#1-General" class="headerlink" title="1. General"></a>1. General</h2><ul>
+<li>双亲委派机制</li>
+<li>jvm体系结构</li>
+<li>堆的组成</li>
+<li>垃圾回收机制</li>
+<li>jvm调优</li>
+</ul>
+<h2 id="2-jvm架构"><a href="#2-jvm架构" class="headerlink" title="2. jvm架构"></a>2. jvm架构</h2><p>processon jvm架构图 <a target="_blank" rel="noopener" href="https://www.processon.com/view/5ea7a1b9e401fd21c196eb17">https://www.processon.com/view/5ea7a1b9e401fd21c196eb17</a></p>
+<h3 id="2-1-类装载流程"><a href="#2-1-类装载流程" class="headerlink" title="2.1. 类装载流程"></a>2.1. 类装载流程</h3><blockquote>
+<ul>
+<li>核心：加载 &gt; 链接 &gt; 初始化</li>
+</ul>
+</blockquote>
+<h3 id="2-2-安全性"><a href="#2-2-安全性" class="headerlink" title="2.2. 安全性"></a>2.2. 安全性</h3><h4 id="2-2-1-双亲委派机制"><a href="#2-2-1-双亲委派机制" class="headerlink" title="2.2.1. 双亲委派机制"></a>2.2.1. 双亲委派机制</h4><p><img src="https://wx3.sinaimg.cn/mw690/005EpKr8ly1g3w3bn8f69j30gs0bpq47.jpg" alt="类加载器"></p>
+<blockquote>
+<ol>
+<li>引导类加载器 rt.jar</li>
+<li>扩展类加载器 ext目录下</li>
+<li>应用程序类加载器 classpath</li>
+<li>自定义类加载器 extend classloader</li>
+</ol>
+</blockquote>
+<h4 id="2-2-2-沙箱机制"><a href="#2-2-2-沙箱机制" class="headerlink" title="2.2.2. 沙箱机制"></a>2.2.2. 沙箱机制</h4><blockquote>
+<ul>
+<li>字节码校验：确保java类文件准守java语言规范</li>
+<li>类加载器：双亲委派机制 （虚拟机为不同的类加载器载入的类提供不同的命名空间，每个空间都是独立的）</li>
+<li>存取控制器： 控制核心api对操作系统的存取权限</li>
+<li>安全管理器： 是核心api和操作系统之间的主要接口</li>
+<li>完全软件包： 包含安全提供者，消息摘要，数字签名，加密，鉴别</li>
+</ul>
+</blockquote>
+<h3 id="2-3-栈"><a href="#2-3-栈" class="headerlink" title="2.3. 栈"></a>2.3. 栈</h3><h4 id="2-3-1-方法栈"><a href="#2-3-1-方法栈" class="headerlink" title="2.3.1. 方法栈"></a>2.3.1. 方法栈</h4><blockquote>
+<ul>
+<li>栈是由栈帧构成，每一个栈帧就可以看作一个函数</li>
+<li>栈帧里主要包含里引用，8大基本类型，父栈引用，子栈引用</li>
+</ul>
+</blockquote>
+<h4 id="2-3-2-本地方法栈"><a href="#2-3-2-本地方法栈" class="headerlink" title="2.3.2. 本地方法栈"></a>2.3.2. 本地方法栈</h4><blockquote>
+<ul>
+<li>本地方法栈指native修饰的方法，它直接调用本地方法接口，接着调用本地方法库</li>
+</ul>
+</blockquote>
+<h3 id="2-4-堆-（重GC-fullGC-发生在新生区和年老区）"><a href="#2-4-堆-（重GC-fullGC-发生在新生区和年老区）" class="headerlink" title="2.4. 堆 （重GC&#x2F;fullGC;发生在新生区和年老区）"></a>2.4. 堆 （重GC&#x2F;fullGC;发生在新生区和年老区）</h3><p>年轻代：年老代 &#x3D; 1:2<br>Eden : from: to &#x3D; 8: 1: 1</p>
+<h4 id="2-4-1-新生代-（轻GC-minorGC）"><a href="#2-4-1-新生代-（轻GC-minorGC）" class="headerlink" title="2.4.1. 新生代 （轻GC&#x2F;minorGC）"></a>2.4.1. 新生代 （轻GC&#x2F;minorGC）</h4><h5 id="2-4-1-1-Eden区"><a href="#2-4-1-1-Eden区" class="headerlink" title="2.4.1.1. Eden区"></a>2.4.1.1. Eden区</h5><blockquote>
+<ul>
+<li>Eden区是创建对象最开始存放的区间 如：new Student()</li>
+</ul>
+</blockquote>
+<h5 id="2-4-1-2-存活区"><a href="#2-4-1-2-存活区" class="headerlink" title="2.4.1.2. 存活区"></a>2.4.1.2. 存活区</h5><blockquote>
+<ul>
+<li>存活区有两个，一个0和1区</li>
+<li>这两个区的大小比例&#x3D;1:1</li>
+</ul>
+</blockquote>
+<h4 id="2-4-2-年老代-（MojorGC）"><a href="#2-4-2-年老代-（MojorGC）" class="headerlink" title="2.4.2. 年老代 （MojorGC）"></a>2.4.2. 年老代 （MojorGC）</h4><h4 id="2-4-3-元空间"><a href="#2-4-3-元空间" class="headerlink" title="2.4.3. 元空间"></a>2.4.3. 元空间</h4><blockquote>
+<ul>
+<li>1.8以前都叫永久代，存放的java运行时的环境等等</li>
+<li>存放的是方法区（方法区里有常量池）</li>
+</ul>
+</blockquote>
+<h3 id="2-5-jvm调优"><a href="#2-5-jvm调优" class="headerlink" title="2.5. jvm调优"></a>2.5. jvm调优</h3><p>jvm调优发生在堆中，只有堆中才存在垃圾</p>
+<h4 id="2-5-1-调优基础知识"><a href="#2-5-1-调优基础知识" class="headerlink" title="2.5.1. 调优基础知识"></a>2.5.1. 调优基础知识</h4><blockquote>
+<ol>
+<li>总分配的内存是电脑内存（Xmx） &#x3D; 1:4 （默认）</li>
+<li>初始化内存是电脑内存（Xms） &#x3D; 1:64 （默认）</li>
+<li>OOM解决思路（尝试扩大堆大小，其次分析代码）或 （-Xms8m -Xmx8m -XX:+printGCDetails）</li>
+<li>初始化堆 &#x3D; 新生代 + 年老代 + （元空间?:逻辑上存在，物理上不存在,也叫非堆）</li>
+</ol>
+</blockquote>
+<h3 id="2-6-内存溢出异常"><a href="#2-6-内存溢出异常" class="headerlink" title="2.6. 内存溢出异常"></a>2.6. 内存溢出异常</h3><blockquote>
+<ol>
+<li>线程请求的最大深度 &gt; 虚拟机中所允许的最大深度 StackOverflowError（包含虚拟机栈，本地方法栈）</li>
+<li>方法区和运行常量池溢出 java.lang.OutOfMemoryError: PermGen space </li>
+<li>Java堆溢出 java.lang.OutOfMemoryError: Java heap space </li>
+<li>本机直接内存溢出  java.lang.OutOfMemoryError</li>
+</ol>
+</blockquote>
+<h2 id="3-垃圾收集"><a href="#3-垃圾收集" class="headerlink" title="3. 垃圾收集"></a>3. 垃圾收集</h2><h3 id="3-1-垃圾判断方法"><a href="#3-1-垃圾判断方法" class="headerlink" title="3.1. 垃圾判断方法"></a>3.1. 垃圾判断方法</h3><h4 id="3-1-1-引用计数法"><a href="#3-1-1-引用计数法" class="headerlink" title="3.1.1. 引用计数法"></a>3.1.1. 引用计数法</h4><h4 id="3-1-2-可达性分析"><a href="#3-1-2-可达性分析" class="headerlink" title="3.1.2. 可达性分析"></a>3.1.2. 可达性分析</h4><h3 id="3-2-垃圾回收算法"><a href="#3-2-垃圾回收算法" class="headerlink" title="3.2. 垃圾回收算法"></a>3.2. 垃圾回收算法</h3><h4 id="3-2-1-复制算法"><a href="#3-2-1-复制算法" class="headerlink" title="3.2.1. 复制算法"></a>3.2.1. 复制算法</h4><blockquote>
+<ul>
+<li>Eden区进过GC后，对象会移动到存活to区</li>
+<li>jvm复制算法主要指存活from区将对象移动复制到to区</li>
+<li>经过15次GC都没有被回收的对象会进入到年老区</li>
+</ul>
+</blockquote>
+<h4 id="3-2-2-标记清除法"><a href="#3-2-2-标记清除法" class="headerlink" title="3.2.2. 标记清除法"></a>3.2.2. 标记清除法</h4><blockquote>
+<ol>
+<li>循环每一块内存，对象在使用设个标志</li>
+<li>循环每一块内存，清空没有使用的对象</li>
+</ol>
+</blockquote>
+<h4 id="3-2-3-标记整理"><a href="#3-2-3-标记整理" class="headerlink" title="3.2.3. 标记整理"></a>3.2.3. 标记整理</h4><blockquote>
+<ol>
+<li>循环每一块内存，对象在使用设个标志</li>
+<li>循环每一块内存，清空没有使用的对象</li>
+<li>将内存对象移动到一起，空的内存也整理到一起</li>
+</ol>
+</blockquote>
+<h3 id="3-3-垃圾回收算法总结"><a href="#3-3-垃圾回收算法总结" class="headerlink" title="3.3. 垃圾回收算法总结"></a>3.3. 垃圾回收算法总结</h3><p>时间复杂度：复制算法 &gt; 标记清除法 &gt; 标记整理<br>空间复杂度：标记清除法 &#x3D; 标记整理 &gt; 复制算法</p>
+<p>垃圾回收目前是采用分代回收最合适，年轻代采用复制算法，年老代采用标记整理</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JVM-%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">JVM 虚拟机</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-General"><span class="toc-number">1.1.</span> <span class="toc-text">1. General</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-jvm%E6%9E%B6%E6%9E%84"><span class="toc-number">1.2.</span> <span class="toc-text">2. jvm架构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E7%B1%BB%E8%A3%85%E8%BD%BD%E6%B5%81%E7%A8%8B"><span class="toc-number">1.2.1.</span> <span class="toc-text">2.1. 类装载流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E5%AE%89%E5%85%A8%E6%80%A7"><span class="toc-number">1.2.2.</span> <span class="toc-text">2.2. 安全性</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-1-%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">2.2.1. 双亲委派机制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-2-%E6%B2%99%E7%AE%B1%E6%9C%BA%E5%88%B6"><span class="toc-number">1.2.2.2.</span> <span class="toc-text">2.2.2. 沙箱机制</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E6%A0%88"><span class="toc-number">1.2.3.</span> <span class="toc-text">2.3. 栈</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-1-%E6%96%B9%E6%B3%95%E6%A0%88"><span class="toc-number">1.2.3.1.</span> <span class="toc-text">2.3.1. 方法栈</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-2-%E6%9C%AC%E5%9C%B0%E6%96%B9%E6%B3%95%E6%A0%88"><span class="toc-number">1.2.3.2.</span> <span class="toc-text">2.3.2. 本地方法栈</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E5%A0%86-%EF%BC%88%E9%87%8DGC-fullGC-%E5%8F%91%E7%94%9F%E5%9C%A8%E6%96%B0%E7%94%9F%E5%8C%BA%E5%92%8C%E5%B9%B4%E8%80%81%E5%8C%BA%EF%BC%89"><span class="toc-number">1.2.4.</span> <span class="toc-text">2.4. 堆 （重GC&#x2F;fullGC;发生在新生区和年老区）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-1-%E6%96%B0%E7%94%9F%E4%BB%A3-%EF%BC%88%E8%BD%BBGC-minorGC%EF%BC%89"><span class="toc-number">1.2.4.1.</span> <span class="toc-text">2.4.1. 新生代 （轻GC&#x2F;minorGC）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#2-4-1-1-Eden%E5%8C%BA"><span class="toc-number">1.2.4.1.1.</span> <span class="toc-text">2.4.1.1. Eden区</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-4-1-2-%E5%AD%98%E6%B4%BB%E5%8C%BA"><span class="toc-number">1.2.4.1.2.</span> <span class="toc-text">2.4.1.2. 存活区</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-2-%E5%B9%B4%E8%80%81%E4%BB%A3-%EF%BC%88MojorGC%EF%BC%89"><span class="toc-number">1.2.4.2.</span> <span class="toc-text">2.4.2. 年老代 （MojorGC）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-3-%E5%85%83%E7%A9%BA%E9%97%B4"><span class="toc-number">1.2.4.3.</span> <span class="toc-text">2.4.3. 元空间</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-jvm%E8%B0%83%E4%BC%98"><span class="toc-number">1.2.5.</span> <span class="toc-text">2.5. jvm调优</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-5-1-%E8%B0%83%E4%BC%98%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-number">1.2.5.1.</span> <span class="toc-text">2.5.1. 调优基础知识</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E5%BC%82%E5%B8%B8"><span class="toc-number">1.2.6.</span> <span class="toc-text">2.6. 内存溢出异常</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86"><span class="toc-number">1.3.</span> <span class="toc-text">3. 垃圾收集</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E5%9E%83%E5%9C%BE%E5%88%A4%E6%96%AD%E6%96%B9%E6%B3%95"><span class="toc-number">1.3.1.</span> <span class="toc-text">3.1. 垃圾判断方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-1-%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95"><span class="toc-number">1.3.1.1.</span> <span class="toc-text">3.1.1. 引用计数法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-2-%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90"><span class="toc-number">1.3.1.2.</span> <span class="toc-text">3.1.2. 可达性分析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95"><span class="toc-number">1.3.2.</span> <span class="toc-text">3.2. 垃圾回收算法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-1-%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">3.2.1. 复制算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-2-%E6%A0%87%E8%AE%B0%E6%B8%85%E9%99%A4%E6%B3%95"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">3.2.2. 标记清除法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-3-%E6%A0%87%E8%AE%B0%E6%95%B4%E7%90%86"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">3.2.3. 标记整理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.3. 垃圾回收算法总结</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&text=JVM 虚拟机"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&title=JVM 虚拟机"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&is_video=false&description=JVM 虚拟机"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JVM 虚拟机&body=Check out this article: http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&title=JVM 虚拟机"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&title=JVM 虚拟机"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&title=JVM 虚拟机"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&title=JVM 虚拟机"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&name=JVM 虚拟机&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E8%AF%AD%E8%A8%80-java-%E8%99%9A%E6%8B%9F%E6%9C%BA/&t=JVM 虚拟机"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Linux-系统调用 什么是系统调用? 系统调用流程  什么是系统调用系统调用是操作系统提供给程序开发人员使用系统服务接口 系统调用流程Linux 提供了 glibc 库, 它封装了系统调用接口, 对上层更友好的提供服务, 系统调用最终都会通过 DO_CALL 发起, 这是一个宏定义, 其 32 位和 64 位的定义是不同的 32位系统调用用户态a. 将请求参数保存到寄存器b. 将系统调用名称转换">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux-系统调用">
+<meta property="og:url" content="http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="Linux-系统调用 什么是系统调用? 系统调用流程  什么是系统调用系统调用是操作系统提供给程序开发人员使用系统服务接口 系统调用流程Linux 提供了 glibc 库, 它封装了系统调用接口, 对上层更友好的提供服务, 系统调用最终都会通过 DO_CALL 发起, 这是一个宏定义, 其 32 位和 64 位的定义是不同的 32位系统调用用户态a. 将请求参数保存到寄存器b. 将系统调用名称转换">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Linux-系统调用</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E5%88%9D%E5%A7%8B%E5%8C%96/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/OS-Linux-%E7%BA%BF%E7%A8%8B%E5%92%8C%E8%BF%9B%E7%A8%8B/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&text=Linux-系统调用"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&title=Linux-系统调用"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&is_video=false&description=Linux-系统调用"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linux-系统调用&body=Check out this article: http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&title=Linux-系统调用"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&title=Linux-系统调用"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&title=Linux-系统调用"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&title=Linux-系统调用"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&name=Linux-系统调用&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&t=Linux-系统调用"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">Linux-系统调用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="toc-number">1.0.1.</span> <span class="toc-text">什么是系统调用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B"><span class="toc-number">1.0.2.</span> <span class="toc-text">系统调用流程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#32%E4%BD%8D%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="toc-number">1.0.2.0.1.</span> <span class="toc-text">32位系统调用</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E6%80%81"><span class="toc-number">1.0.2.0.1.1.</span> <span class="toc-text">用户态</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E6%80%81"><span class="toc-number">1.0.2.0.1.2.</span> <span class="toc-text">内核态</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#64%E4%BD%8D%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="toc-number">1.0.2.0.2.</span> <span class="toc-text">64位系统调用</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E6%80%81-1"><span class="toc-number">1.0.2.0.2.1.</span> <span class="toc-text">用户态</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E6%80%81-1"><span class="toc-number">1.0.2.0.2.2.</span> <span class="toc-text">内核态</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Linux-系统调用
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/Linux/">Linux</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Linux/" rel="tag">Linux</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="Linux-系统调用"><a href="#Linux-系统调用" class="headerlink" title="Linux-系统调用"></a>Linux-系统调用</h1><ol>
+<li>什么是系统调用?</li>
+<li>系统调用流程</li>
+</ol>
+<h3 id="什么是系统调用"><a href="#什么是系统调用" class="headerlink" title="什么是系统调用"></a>什么是系统调用</h3><p>系统调用是操作系统提供给程序开发人员使用系统服务接口</p>
+<h3 id="系统调用流程"><a href="#系统调用流程" class="headerlink" title="系统调用流程"></a>系统调用流程</h3><p>Linux 提供了 glibc 库, 它封装了系统调用接口, 对上层更友好的提供服务, 系统调用最终都会通过 DO_CALL 发起, 这是一个宏定义, 其 32 位和 64 位的定义是不同的</p>
+<h5 id="32位系统调用"><a href="#32位系统调用" class="headerlink" title="32位系统调用"></a>32位系统调用</h5><h6 id="用户态"><a href="#用户态" class="headerlink" title="用户态"></a>用户态</h6><p>a. 将请求参数保存到寄存器<br>b. 将系统调用名称转换为调用号保存到eax中<br>c. 通过软中断ENTER_RETURN 进入内核态</p>
+<h6 id="内核态"><a href="#内核态" class="headerlink" title="内核态"></a>内核态</h6><p>a. 将用户态的寄存器保存到pt_regs中<br>b. 在系统调用表 sys_call_table中根据调用号找到响应函数<br>c. 执行函数，将返回值写入pt_regs中ax位置<br>d. 通过INTERRUPT_RETURN 根据pt_regs恢复用户态进程</p>
+<h5 id="64位系统调用"><a href="#64位系统调用" class="headerlink" title="64位系统调用"></a>64位系统调用</h5><h6 id="用户态-1"><a href="#用户态-1" class="headerlink" title="用户态"></a>用户态</h6><p>a. 将请求参数保存到寄存器<br>b. 将系统调用名称转换为系统调用号保存到寄存器rax中<br>c. 通过syscall进入内核态</p>
+<h6 id="内核态-1"><a href="#内核态-1" class="headerlink" title="内核态"></a>内核态</h6><p>a. 将用户态寄存器保存到pt_regs中<br>b. 在系统调用表sys_call_table 中根据调用号查找对于函数<br>c. 执行函数，将返回值写入pt_regs中的ax位置<br>d. 通过sysretq返回用户态</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">Linux-系统调用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="toc-number">1.0.1.</span> <span class="toc-text">什么是系统调用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B"><span class="toc-number">1.0.2.</span> <span class="toc-text">系统调用流程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#32%E4%BD%8D%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="toc-number">1.0.2.0.1.</span> <span class="toc-text">32位系统调用</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E6%80%81"><span class="toc-number">1.0.2.0.1.1.</span> <span class="toc-text">用户态</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E6%80%81"><span class="toc-number">1.0.2.0.1.2.</span> <span class="toc-text">内核态</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#64%E4%BD%8D%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="toc-number">1.0.2.0.2.</span> <span class="toc-text">64位系统调用</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E6%80%81-1"><span class="toc-number">1.0.2.0.2.1.</span> <span class="toc-text">用户态</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E6%80%81-1"><span class="toc-number">1.0.2.0.2.2.</span> <span class="toc-text">内核态</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&text=Linux-系统调用"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&title=Linux-系统调用"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&is_video=false&description=Linux-系统调用"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linux-系统调用&body=Check out this article: http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&title=Linux-系统调用"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&title=Linux-系统调用"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&title=Linux-系统调用"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&title=Linux-系统调用"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&name=Linux-系统调用&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/&t=Linux-系统调用"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

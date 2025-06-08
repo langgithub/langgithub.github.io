@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="这是关于Android Binder机制的一篇文章，Binder是Android里面非常重要的组成，也是最难理解的一块知识点，学习Binder最好的方法是深入源码阅读，因为Binder相关的知识错综复杂，一般初学者也很容易迷失在源码的汪洋里，本文旨在梳理Binder的架构和流程，并且试着以实用的角度来看待Binder。 一、为什么需要Binder机制？Android系统中，每个应用程序是由Andr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android源码(8)-Binder">
+<meta property="og:url" content="http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="这是关于Android Binder机制的一篇文章，Binder是Android里面非常重要的组成，也是最难理解的一块知识点，学习Binder最好的方法是深入源码阅读，因为Binder相关的知识错综复杂，一般初学者也很容易迷失在源码的汪洋里，本文旨在梳理Binder的架构和流程，并且试着以实用的角度来看待Binder。 一、为什么需要Binder机制？Android系统中，每个应用程序是由Andr">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder-01.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder-02.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder-04.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder-05.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/create_servicemanager.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/get_servicemanager.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/add-service.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder_native_class.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/class_ServiceManager.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder_relationship.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder-proc-relation.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder_data.jpg">
+<meta property="article:published_time" content="2025-05-18T13:06:24.920Z">
+<meta property="article:modified_time" content="2025-05-18T13:08:20.603Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="Binder">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder-01.jpg">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Android源码(8)-Binder</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E7%AE%97%E6%B3%95-%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E2%80%94%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80%E4%B8%80%EF%BC%88%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B8%8E%E6%A6%82%E7%8E%87%E8%AE%BA%EF%BC%89/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&text=Android源码(8)-Binder"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&title=Android源码(8)-Binder"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&is_video=false&description=Android源码(8)-Binder"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Android源码(8)-Binder&body=Check out this article: http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&title=Android源码(8)-Binder"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&title=Android源码(8)-Binder"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&title=Android源码(8)-Binder"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&title=Android源码(8)-Binder"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&name=Android源码(8)-Binder&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&t=Android源码(8)-Binder"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81Binder%E6%9C%BA%E5%88%B6%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">一、为什么需要Binder机制？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-Binder%E8%83%BD%E5%BE%88%E5%A5%BD%E7%9A%84%E5%AE%9E%E7%8E%B0C-S%E6%9E%B6%E6%9E%84"><span class="toc-number">1.0.1.</span> <span class="toc-text">1.1 Binder能很好的实现C&#x2F;S架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-Binder%E4%BC%A0%E8%BE%93%E6%95%88%E7%8E%87%E9%AB%98"><span class="toc-number">1.0.2.</span> <span class="toc-text">1.2 Binder传输效率高</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-Binder%E5%AE%89%E5%85%A8%E6%80%A7%E6%9E%81%E9%AB%98"><span class="toc-number">1.0.3.</span> <span class="toc-text">1.3 Binder安全性极高</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E3%80%81Binder%E5%8E%9F%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">二、Binder原理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E3%80%81Binder%E9%A9%B1%E5%8A%A8%E5%B1%82"><span class="toc-number">3.</span> <span class="toc-text">三、Binder驱动层</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-binder-init"><span class="toc-number">3.0.0.1.</span> <span class="toc-text">3.1 binder_init</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-binder-open"><span class="toc-number">3.0.0.2.</span> <span class="toc-text">3.2 binder_open</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-binder-mmap"><span class="toc-number">3.0.0.3.</span> <span class="toc-text">3.3 binder_mmap</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4-binder-ioctl"><span class="toc-number">3.0.0.4.</span> <span class="toc-text">3.4 binder_ioctl</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#binder-thread-write-%E5%A4%84%E7%90%86binder%E8%AF%B7%E6%B1%82%E7%A0%81%EF%BC%8C%E4%BB%A5%E2%80%9CBC-%E2%80%9D%E5%BC%80%E5%A4%B4%EF%BC%8C%E5%BB%BA%E6%88%90%E5%90%8Ebc%E7%A0%81%EF%BC%8C%E7%94%A8%E4%BA%8EIPC%E5%B1%82%E4%BC%A0%E9%80%92%E5%88%B0Binder-Driver%E5%B1%82%EF%BC%9B"><span class="toc-number">3.0.0.4.1.</span> <span class="toc-text">binder_thread_write(): 处理binder请求码，以“BC_”开头，建成后bc码，用于IPC层传递到Binder Driver层；</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#binder-thread-read-%E7%94%9F%E6%88%90Binder%E5%93%8D%E5%BA%94%E5%90%97%EF%BC%8C%E4%BB%A5%E2%80%9CBR-%E2%80%9D%E5%BC%80%E5%A4%B4%EF%BC%8C%E7%AE%80%E7%A7%B0BR%E7%A0%81%EF%BC%8C%E7%94%A8%E4%BA%8EBinder-Driver%E5%B1%82%E4%BC%A0%E9%80%92%E5%88%B0IPC%E5%B1%82"><span class="toc-number">3.0.0.4.2.</span> <span class="toc-text">binder_thread_read(): 生成Binder响应吗，以“BR_”开头，简称BR码，用于Binder Driver层传递到IPC层</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B-Binder%E9%80%9A%E4%BF%A1%E6%B5%81%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">四. Binder通信流程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%90%AF%E5%8A%A8ServiceManager"><span class="toc-number">5.</span> <span class="toc-text">五、启动ServiceManager</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E8%8E%B7%E5%8F%96ServiceManager"><span class="toc-number">6.</span> <span class="toc-text">六、获取ServiceManager</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%83%E3%80%81addService"><span class="toc-number">7.</span> <span class="toc-text">七、addService</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AB%E3%80%81Binder%E6%9E%B6%E6%9E%84"><span class="toc-number">8.</span> <span class="toc-text">八、Binder架构</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%AF%94%E5%A6%82addService%E6%B5%81%E7%A8%8B%EF%BC%9A"><span class="toc-number">8.0.0.0.1.</span> <span class="toc-text">比如addService流程：</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B9%9D%E3%80%81Binder%E7%B1%BB%E5%9B%BE"><span class="toc-number">9.</span> <span class="toc-text">九、Binder类图</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#9-1-Native-Binder%E7%B1%BB%E5%9B%BE"><span class="toc-number">9.0.0.0.1.</span> <span class="toc-text">9.1 Native Binder类图</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#9-2-Framework-Binder%E7%B1%BB%E5%9B%BE"><span class="toc-number">9.0.0.0.2.</span> <span class="toc-text">9.2 Framework Binder类图</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8D%81%E3%80%81Binder%E5%85%B6%E4%BB%96"><span class="toc-number">10.</span> <span class="toc-text">十、Binder其他</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#10-1-Binder%E4%B8%AD%E5%90%84%E4%B8%AA%E8%A7%92%E8%89%B2%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">10.0.0.1.</span> <span class="toc-text">10.1 Binder中各个角色的关系</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-Binder%E5%AE%9E%E4%BD%93-binder-node"><span class="toc-number">10.0.0.1.1.</span> <span class="toc-text">1. Binder实体 : binder_node</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-Binder%E5%BC%95%E7%94%A8-binder-ref"><span class="toc-number">10.0.0.1.2.</span> <span class="toc-text">2. Binder引用 : binder_ref</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1"><span class="toc-number">10.0.0.1.3.</span> <span class="toc-text">3. 远程服务</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#10-2-%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">10.0.0.2.</span> <span class="toc-text">10.2 进程和线程的关系</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Binder%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%9A"><span class="toc-number">10.0.0.2.1.</span> <span class="toc-text">Binder线程池：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#10-3-Binder%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="toc-number">10.0.0.3.</span> <span class="toc-text">10.3 Binder数据传输</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E6%BA%90%E7%A0%81%E7%9B%AE%E5%BD%95"><span class="toc-number">11.</span> <span class="toc-text">十一、源码目录</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Android源码(8)-Binder
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T13:06:24.920Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/code-Android/">code-Android</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Binder/" rel="tag">Binder</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>这是关于Android Binder机制的一篇文章，Binder是Android里面非常重要的组成，也是最难理解的一块知识点，学习Binder最好的方法是深入源码阅读，因为Binder相关的知识错综复杂，一般初学者也很容易迷失在源码的汪洋里，本文旨在梳理Binder的架构和流程，并且试着以实用的角度来看待Binder。</p>
+<h1 id="一、为什么需要Binder机制？"><a href="#一、为什么需要Binder机制？" class="headerlink" title="一、为什么需要Binder机制？"></a>一、为什么需要Binder机制？</h1><p>Android系统中，每个应用程序是由Android的Activity，Service，Broadcast，ContentProvider这四剑客的中一个或多个组合而成，这四剑客所涉及的多进程间的通信底层都是依赖于Binder IPC机制。例如当进程A中的Activity要向进程B中的Service通信，这便需要依赖于Binder IPC。<br>如果熟悉Android源码，其实可以知道整个Android系统架构中，也大量采用了Binder机制作为IPC（进程间通信）方案。<br>Android是在Linux内核的基础上设计的。而在Linux中，已经拥有”管道&#x2F;消息队列&#x2F;共享内存&#x2F;信号量&#x2F;Socket等等”众多的IPC通信手段；但是，Google为什么单单选择了Binder，可见Binder肯定有自己独特的优势：</p>
+<h3 id="1-1-Binder能很好的实现C-S架构"><a href="#1-1-Binder能很好的实现C-S架构" class="headerlink" title="1.1 Binder能很好的实现C&#x2F;S架构"></a>1.1 Binder能很好的实现C&#x2F;S架构</h3><p>Android系统，很大一部分都是居于Client-Server架构的设计。Client端有什么需求，直接发送给Server端去完成，Server处理完毕再将反馈内容发送给Client。Server端与Client端相对独立，稳定性较好。传统的CS架构只有Socket，但是Socket通信效率相对于其他IPC来说又太低效，而Binder正是基于C&#x2F;S架构设计的。</p>
+<h3 id="1-2-Binder传输效率高"><a href="#1-2-Binder传输效率高" class="headerlink" title="1.2 Binder传输效率高"></a>1.2 Binder传输效率高</h3><p>Binder只需要进行一次拷贝，把Client端的用户空间的数据即copy_from_user()到内核空间，然后将内核空间的数据映射到Server端的用户空间。<br>Binder性能上仅仅次于Linux 共享内存的方式，但是共享内存的方式，进程间同步又是一个难题。</p>
+<h3 id="1-3-Binder安全性极高"><a href="#1-3-Binder安全性极高" class="headerlink" title="1.3 Binder安全性极高"></a>1.3 Binder安全性极高</h3><p>Android为每个安装好的应用程序分配了自己的UID，故进程的UID是鉴别进程身份的重要标志，Client端将任务发送给Server端，Server端会根据权限控制策略，判断UID&#x2F;PID是否满足访问权限。<br>Client-Server通信过程中，Binder内核会为每个Client进程分配了UID&#x2F;PID来作为鉴别身份的标示，并且在Binder通信时会根据UID&#x2F;PID进行有效性检测。<br>而如果是传统的IPC只能由在数据包当中填入UID&#x2F;PID，这个并不是一个可靠的方法。</p>
+<p>知乎上有一位答主讲得很好，可以看看:</p>
+<p>为什么 Android 要采用 Binder 作为 IPC 机制?(<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/39440766">https://www.zhihu.com/question/39440766</a>)</p>
+<h1 id="二、Binder原理"><a href="#二、Binder原理" class="headerlink" title="二、Binder原理"></a>二、Binder原理</h1><p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder-01.jpg" alt="binder1"></p>
+<ol>
+<li>Binder采用Client-Server架构，包含Client,Server,ServiceManager,Binder驱动四个组件</li>
+<li>应用程序都运行在用户控件，每个应用程序都有它自己独立的内存空间，若不同的应用程序之间涉及到通讯，需要通过内核进行中转，因为要用到内核的copy_from_user()和copy_to_user()等函数</li>
+<li>Server进程要先注册Service 到ServiceManager,Client进程使用Server的Service前，需先向ServiceManager中获取相应的Service,然后使用Service</li>
+</ol>
+<h1 id="三、Binder驱动层"><a href="#三、Binder驱动层" class="headerlink" title="三、Binder驱动层"></a>三、Binder驱动层</h1><p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder-02.png" alt="binder2"></p>
+<p>当用户空间调用open()方法，最终会调用binder驱动的binder_open()方法；mmap()&#x2F;ioctl()方法也是同理，从用户态进入内核态，都依赖于系统调用过程。</p>
+<h4 id="3-1-binder-init"><a href="#3-1-binder-init" class="headerlink" title="3.1 binder_init"></a>3.1 binder_init</h4><p>注册misc设备，指定相应文件操作方法</p>
+<h4 id="3-2-binder-open"><a href="#3-2-binder-open" class="headerlink" title="3.2 binder_open"></a>3.2 binder_open</h4><p>创建binder_proc对象，并把当前进程等信息保存bind_proc对象，改对象管理IPC所需的各种信息并拥有其他结构体的根结构体，再把bind_proc对象保存到文件filp,以及把bind_proc加入到全局链表binder_procs</p>
+<h4 id="3-3-binder-mmap"><a href="#3-3-binder-mmap" class="headerlink" title="3.3 binder_mmap"></a>3.3 binder_mmap</h4><p>在内核虚拟地址空间，申请一块于用户虚拟内存相同大小的内存；然后再申请1个page大小的物理内存，再将同一块物理内存映射到内核虚拟地址空间和用户虚拟内存空间，从而实现了用户空间的buffer和内核空间的buffer同步操作的功能</p>
+<h4 id="3-4-binder-ioctl"><a href="#3-4-binder-ioctl" class="headerlink" title="3.4 binder_ioctl"></a>3.4 binder_ioctl</h4><p>负责在两个进程间收发IPC数据和IPC reply数据，调用流程：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">//step 1:</span><br><span class="line">binder_write_read bwr;</span><br><span class="line">ioctl(mProcess-&gt;mDriverFD, BINDER_WRITE_READ, &amp;bwr) </span><br><span class="line">    // step 2:</span><br><span class="line">    binder_ioctl(filp, BINDER_WRITE_READ, &amp;bwr)</span><br><span class="line">        // step 3:</span><br><span class="line">        binder_ioctl_write_read(filp, BINDER_WRITE_READ, &amp;bwr, thread)</span><br><span class="line">            // step 4:</span><br><span class="line">            copy_from_user(&amp;bwr, ubuf, sizeof(bwr))</span><br><span class="line">            binder_thread_write(proc, thread, bwr.write_buffer, bwr.write_size, &amp;bwr.write_consumed);</span><br><span class="line">            binder_thread_read(proc, thread, bwr.read_buffer, bwr.read_size, &amp;bwr.read_consumed, filp-&gt;f_flags &amp; O_NONBLOCK);</span><br><span class="line">            copy_to_user(...)</span><br></pre></td></tr></table></figure>
+
+
+<h5 id="binder-thread-write-处理binder请求码，以“BC-”开头，建成后bc码，用于IPC层传递到Binder-Driver层；"><a href="#binder-thread-write-处理binder请求码，以“BC-”开头，建成后bc码，用于IPC层传递到Binder-Driver层；" class="headerlink" title="binder_thread_write(): 处理binder请求码，以“BC_”开头，建成后bc码，用于IPC层传递到Binder Driver层；"></a>binder_thread_write(): 处理binder请求码，以“BC_”开头，建成后bc码，用于IPC层传递到Binder Driver层；</h5><h5 id="binder-thread-read-生成Binder响应吗，以“BR-”开头，简称BR码，用于Binder-Driver层传递到IPC层"><a href="#binder-thread-read-生成Binder响应吗，以“BR-”开头，简称BR码，用于Binder-Driver层传递到IPC层" class="headerlink" title="binder_thread_read(): 生成Binder响应吗，以“BR_”开头，简称BR码，用于Binder Driver层传递到IPC层"></a>binder_thread_read(): 生成Binder响应吗，以“BR_”开头，简称BR码，用于Binder Driver层传递到IPC层</h5><p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder-04.jpg" alt="binder4"></p>
+<h1 id="四-Binder通信流程"><a href="#四-Binder通信流程" class="headerlink" title="四. Binder通信流程"></a>四. Binder通信流程</h1><p>例如当名为BatteryStatsService的Client向ServiceManager注册服务的过程中，IPC层的数据组成为：<br>Handle&#x3D;0，RPC代码为ADD_SERVICE_TRANSACTION，RPC数据为BatteryStatsService，Binder协议为BC_TRANSACTION。<br>整个流程图大致如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder-05.png" alt="binder5"></p>
+<p>handle为0正是指向ServiceManager。</p>
+<h1 id="五、启动ServiceManager"><a href="#五、启动ServiceManager" class="headerlink" title="五、启动ServiceManager"></a>五、启动ServiceManager</h1><p>ServiceManager启动时序图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/create_servicemanager.jpg" alt="binder5"></p>
+<ol>
+<li>打开binder驱动，并调用mmap()方法分配128k内存映射空间: binder_open()</li>
+<li>通知binder驱动使其成为守护进程: binder_become_context_manager()</li>
+<li>验证selinux权限，判断进程是否有注册或查看指定服务</li>
+<li>进入循环状态，等待client端的请求：binder_loop()</li>
+</ol>
+<h1 id="六、获取ServiceManager"><a href="#六、获取ServiceManager" class="headerlink" title="六、获取ServiceManager"></a>六、获取ServiceManager</h1><p>获取Service Manager是通过defaultServiceManager()方法来完成，当进程注册服务(addService)或 获取服务(getService)的过程之前，都需要先调用defaultServiceManager()方法来获取gDefaultServiceManager对象。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/get_servicemanager.jpg" alt="binder5"></p>
+<ol>
+<li>获取ProcessState对象，在其构造函数中调用open_driver函数打开binder驱动，并将句柄保存到mDriverFD;</li>
+<li>调用gProcess-&gt;getContextObject函数来获得一个句柄值为0得binder引用，即BpBinder</li>
+<li>通过interface_cast构造一个BpServiceManger对象，所以gDefaultServiceManager最终为new BpServicemanager(new BpBinder(0))</li>
+</ol>
+<h1 id="七、addService"><a href="#七、addService" class="headerlink" title="七、addService"></a>七、addService</h1><p>以Native层的服务以media服务为例，注册MediaPlayerService的时序图如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/add-service.jpg" alt="binder5"></p>
+<ol>
+<li>defaultServiceManager()返回的是BpServiceManager，会调用BpServiceManager.addService方法</li>
+<li>addService()通过remote()中保存的BpBinder调用到IPCThreadState的transact方法；</li>
+<li>IPCThreadState::transact会调用writeTransactionData()传输数据传输数据，然后和驱动交互，驱动把请求转发给ServiceManager执行真正的注册服务；</li>
+<li>得到驱动的返回后，调用BBinder，最终调用到BnMediaPlayerService的onTransact方法；</li>
+<li>开启两个线程不断和Binder进行交互，获取Client请求。</li>
+</ol>
+<p>获取服务的流程基本也是差不多的，不再累述。</p>
+<h1 id="八、Binder架构"><a href="#八、Binder架构" class="headerlink" title="八、Binder架构"></a>八、Binder架构</h1><p>binder在framework层，采用JNI技术来调用native(C&#x2F;C++)层的binder架构，从而为上层应用程序提供服务。 我们知道native层中，binder是C&#x2F;S架构，分为Bn端(Server)和Bp端(Client)。对于java层在命名与架构上非常相近，同样实现了一套IPC通信架构。</p>
+<ol>
+<li>BinderProxy类代表Client端，Binder类代表Server端</li>
+<li>framework层的Binder逻辑是建立在Native层架构基础之上的，核心逻辑是交予Native层方法来处理</li>
+</ol>
+<h5 id="比如addService流程："><a href="#比如addService流程：" class="headerlink" title="比如addService流程："></a>比如addService流程：</h5><ol>
+<li>java层通过getIServiceManager获得ServiceManagerProxy对象，通过该对象BinderProxy,最终会调用BpBinder对象，由BpBinder来完成通讯。</li>
+<li>Binder驱动将Client端的请求转发给BBinder的transact方法，然后由其子类JavaBBinder调用。后者调用指定Service的方法，并返回给驱动</li>
+</ol>
+<h1 id="九、Binder类图"><a href="#九、Binder类图" class="headerlink" title="九、Binder类图"></a>九、Binder类图</h1><h5 id="9-1-Native-Binder类图"><a href="#9-1-Native-Binder类图" class="headerlink" title="9.1 Native Binder类图"></a>9.1 Native Binder类图</h5><p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder_native_class.jpg" alt="binder5"></p>
+<h5 id="9-2-Framework-Binder类图"><a href="#9-2-Framework-Binder类图" class="headerlink" title="9.2 Framework Binder类图"></a>9.2 Framework Binder类图</h5><p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/class_ServiceManager.jpg" alt="binder5"></p>
+<h1 id="十、Binder其他"><a href="#十、Binder其他" class="headerlink" title="十、Binder其他"></a>十、Binder其他</h1><p>介绍一些Binder其他比较重要的点，方便理清Binder的一些疑问。比如Binder实体和引用，比如ProcessState和IPCThreadState，比如数据结构怎么传递等。</p>
+<h4 id="10-1-Binder中各个角色的关系"><a href="#10-1-Binder中各个角色的关系" class="headerlink" title="10.1 Binder中各个角色的关系"></a>10.1 Binder中各个角色的关系</h4><p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder_relationship.jpg" alt="binder5"></p>
+<h5 id="1-Binder实体-binder-node"><a href="#1-Binder实体-binder-node" class="headerlink" title="1. Binder实体 : binder_node"></a>1. Binder实体 : binder_node</h5><p>Binder实体，是各个Server以及ServiceManager在内核中的存在形式。<br>Binder实体实际上是内核中 binder_node 结构体的对象，它的作用是在内核中保存Server和ServiceManager的信息(例如，Binder实体中保存了Server对象在用户空间的地址)。简言之，Binder实体是Server在Binder驱动中的存在形式，内核通过Binder实体可以找到用户空间的Server对象。<br>在上图中，Server和ServiceManager在Binder驱动中都对应的存在一个Binder实体。</p>
+<h5 id="2-Binder引用-binder-ref"><a href="#2-Binder引用-binder-ref" class="headerlink" title="2. Binder引用 : binder_ref"></a>2. Binder引用 : binder_ref</h5><p>所谓Binder引用，实际上是内核中binder_ref结构体的对象，它的作用是在表示”Binder实体”的引用。换句话说，每一个Binder引用都是某一个Binder实体的引用，通过Binder引用可以在内核中找到它对应的Binder实体。<br>如果将Server看作是Binder实体的话，那么Client就好比Binder引用。Client要和Server通信，它就是通过保存一个Server对象的Binder引用，再通过该Binder引用在内核中找到对应的Binder实体，进而找到Server对象，然后将通信内容发送给Server对象。<br>Binder实体和Binder引用都是内核(即Binder驱动)中的数据结构。每一个Server在内核中就表现为一个Binder实体，而每一个Client则表现为一个Binder引用。这样，每个Binder引用都对应一个Binder实体，而每个Binder实体则可以多个Binder引用。</p>
+<h5 id="3-远程服务"><a href="#3-远程服务" class="headerlink" title="3. 远程服务"></a>3. 远程服务</h5><p>Server都是以服务的形式注册到ServiceManager中进行管理的。如果将Server本身看作是”本地服务”的话，那么Client中的”远程服务”就是本地服务的代理。如果你对代理模式比较熟悉的话，就很容易理解了，远程服务就是本地服务的一个代理，通过该远程服务Client就能和Server进行通信。</p>
+<h4 id="10-2-进程和线程的关系"><a href="#10-2-进程和线程的关系" class="headerlink" title="10.2 进程和线程的关系"></a>10.2 进程和线程的关系</h4><p>图解：<br><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder-proc-relation.png" alt="binder5"></p>
+<ol>
+<li>Binder驱动通过binder_procs链表记录所有创建的binder_proc结构体，binder驱动层的每一个binder_proc结构体都与用户空间的一个用于binder通信的进程一一对应。</li>
+<li>每个进程有且只有一个ProcessState对象，这是通过单例模式来保证的。</li>
+<li>每个进程中可以有很多个线程，每个线程对应一个IPCThreadState对象，IPCThreadState对象也是单例模式，即一个线程对应一个IPCThreadState对象，在Binder驱动层也有与之相对应的结构，那就是Binder_thread结构体。在binder_proc结构体中通过成员变量rb_root threads，来记录当前进程内所有的binder_thread。</li>
+</ol>
+<h5 id="Binder线程池："><a href="#Binder线程池：" class="headerlink" title="Binder线程池："></a>Binder线程池：</h5><p>每个Server进程在启动时会创建一个binder线程池，并向其中注册一个Binder线程；之后Server进程也可以向binder线程池注册新的线程，或者Binder驱动在探测到没有空闲binder线程时会主动向Server进程注册新的的binder线程。对于一个Server进程有一个最大Binder线程数限制，默认为16个binder线程，例如Android的system_server进程就存在16个线程。对于所有Client端进程的binder请求都是交由Server端进程的binder线程来处理的。</p>
+<h4 id="10-3-Binder数据传输"><a href="#10-3-Binder数据传输" class="headerlink" title="10.3 Binder数据传输"></a>10.3 Binder数据传输</h4><p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/binder_data.jpg" alt="binder5"></p>
+<ol>
+<li>用户空间的进程调用ioctl(fd,BINDER_WRITE_READ,&amp;bwr)时传递给Binder驱动的信息。fd是Binder驱动的文件句柄，BINDER_WRITE_READ是ioctl()的一个标识，而bwr是传递的数据，write_buffer是请求数据的内容，而write_consumed是用来记录请求数据中已经被Binder驱动处理过的数据的大小。</li>
+<li>ioctl会走到binder_thread_write和binder_thread_read。这层的数据是”事务指令”+”binder_transaction_data结构体”组成的。data是保存事务中具体数据的内存地址。具体调用流程可以参考#3.4章节</li>
+<li>这层是有效数据。如果该请求是传递给ServiceManager进行处理的，则有效数据是：消息头+”Server的相关信息”。消息头是用来进行有效性检查的，而”Server的相关信息”则是请求要处理的信息。</li>
+</ol>
+<h1 id="十一、源码目录"><a href="#十一、源码目录" class="headerlink" title="十一、源码目录"></a>十一、源码目录</h1><p>从上之下, 整个Binder架构所涉及的总共有以下5个目录:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/framework/base/core/java/               (Java)</span><br><span class="line">/framework/base/core/jni/                (JNI)</span><br><span class="line">/framework/native/libs/binder            (Native)</span><br><span class="line">/framework/native/cmds/servicemanager/   (Native)</span><br><span class="line">/kernel/drivers/staging/android          (Driver)</span><br></pre></td></tr></table></figure>
+
+<p>11.1 Java framework</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/framework/base/core/java/android/os/  </span><br><span class="line">    - IInterface.java</span><br><span class="line">    - IBinder.java</span><br><span class="line">    - Parcel.java</span><br><span class="line">    - IServiceManager.java</span><br><span class="line">    - ServiceManager.java</span><br><span class="line">    - ServiceManagerNative.java</span><br><span class="line">    - Binder.java  </span><br><span class="line">    </span><br><span class="line">/framework/base/core/jni/    </span><br><span class="line">    - android_os_Parcel.cpp</span><br><span class="line">    - AndroidRuntime.cpp</span><br><span class="line">    - android_util_Binder.cpp (核心类)</span><br></pre></td></tr></table></figure>
+
+<p>11.2 Native framework</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">/framework/native/libs/binder         </span><br><span class="line">    - IServiceManager.cpp</span><br><span class="line">    - BpBinder.cpp</span><br><span class="line">    - Binder.cpp</span><br><span class="line">    - IPCThreadState.cpp (核心类)</span><br><span class="line">    - ProcessState.cpp  (核心类)</span><br><span class="line">/framework/native/include/binder/ </span><br><span class="line">    - IServiceManager.h</span><br><span class="line">    - IInterface.h</span><br><span class="line">/framework/native/cmds/servicemanager/ </span><br><span class="line">    - service_manager.c</span><br><span class="line">    - binder.c</span><br></pre></td></tr></table></figure>
+
+<p>11.3 Kernel</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/kernel/drivers/staging/android/</span><br><span class="line">    - binder.c</span><br><span class="line">    - uapi/binder.h</span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81Binder%E6%9C%BA%E5%88%B6%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">一、为什么需要Binder机制？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-Binder%E8%83%BD%E5%BE%88%E5%A5%BD%E7%9A%84%E5%AE%9E%E7%8E%B0C-S%E6%9E%B6%E6%9E%84"><span class="toc-number">1.0.1.</span> <span class="toc-text">1.1 Binder能很好的实现C&#x2F;S架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-Binder%E4%BC%A0%E8%BE%93%E6%95%88%E7%8E%87%E9%AB%98"><span class="toc-number">1.0.2.</span> <span class="toc-text">1.2 Binder传输效率高</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-Binder%E5%AE%89%E5%85%A8%E6%80%A7%E6%9E%81%E9%AB%98"><span class="toc-number">1.0.3.</span> <span class="toc-text">1.3 Binder安全性极高</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E3%80%81Binder%E5%8E%9F%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">二、Binder原理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E3%80%81Binder%E9%A9%B1%E5%8A%A8%E5%B1%82"><span class="toc-number">3.</span> <span class="toc-text">三、Binder驱动层</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-binder-init"><span class="toc-number">3.0.0.1.</span> <span class="toc-text">3.1 binder_init</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-binder-open"><span class="toc-number">3.0.0.2.</span> <span class="toc-text">3.2 binder_open</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-binder-mmap"><span class="toc-number">3.0.0.3.</span> <span class="toc-text">3.3 binder_mmap</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4-binder-ioctl"><span class="toc-number">3.0.0.4.</span> <span class="toc-text">3.4 binder_ioctl</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#binder-thread-write-%E5%A4%84%E7%90%86binder%E8%AF%B7%E6%B1%82%E7%A0%81%EF%BC%8C%E4%BB%A5%E2%80%9CBC-%E2%80%9D%E5%BC%80%E5%A4%B4%EF%BC%8C%E5%BB%BA%E6%88%90%E5%90%8Ebc%E7%A0%81%EF%BC%8C%E7%94%A8%E4%BA%8EIPC%E5%B1%82%E4%BC%A0%E9%80%92%E5%88%B0Binder-Driver%E5%B1%82%EF%BC%9B"><span class="toc-number">3.0.0.4.1.</span> <span class="toc-text">binder_thread_write(): 处理binder请求码，以“BC_”开头，建成后bc码，用于IPC层传递到Binder Driver层；</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#binder-thread-read-%E7%94%9F%E6%88%90Binder%E5%93%8D%E5%BA%94%E5%90%97%EF%BC%8C%E4%BB%A5%E2%80%9CBR-%E2%80%9D%E5%BC%80%E5%A4%B4%EF%BC%8C%E7%AE%80%E7%A7%B0BR%E7%A0%81%EF%BC%8C%E7%94%A8%E4%BA%8EBinder-Driver%E5%B1%82%E4%BC%A0%E9%80%92%E5%88%B0IPC%E5%B1%82"><span class="toc-number">3.0.0.4.2.</span> <span class="toc-text">binder_thread_read(): 生成Binder响应吗，以“BR_”开头，简称BR码，用于Binder Driver层传递到IPC层</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B-Binder%E9%80%9A%E4%BF%A1%E6%B5%81%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">四. Binder通信流程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%90%AF%E5%8A%A8ServiceManager"><span class="toc-number">5.</span> <span class="toc-text">五、启动ServiceManager</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E8%8E%B7%E5%8F%96ServiceManager"><span class="toc-number">6.</span> <span class="toc-text">六、获取ServiceManager</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%83%E3%80%81addService"><span class="toc-number">7.</span> <span class="toc-text">七、addService</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AB%E3%80%81Binder%E6%9E%B6%E6%9E%84"><span class="toc-number">8.</span> <span class="toc-text">八、Binder架构</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%AF%94%E5%A6%82addService%E6%B5%81%E7%A8%8B%EF%BC%9A"><span class="toc-number">8.0.0.0.1.</span> <span class="toc-text">比如addService流程：</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B9%9D%E3%80%81Binder%E7%B1%BB%E5%9B%BE"><span class="toc-number">9.</span> <span class="toc-text">九、Binder类图</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#9-1-Native-Binder%E7%B1%BB%E5%9B%BE"><span class="toc-number">9.0.0.0.1.</span> <span class="toc-text">9.1 Native Binder类图</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#9-2-Framework-Binder%E7%B1%BB%E5%9B%BE"><span class="toc-number">9.0.0.0.2.</span> <span class="toc-text">9.2 Framework Binder类图</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8D%81%E3%80%81Binder%E5%85%B6%E4%BB%96"><span class="toc-number">10.</span> <span class="toc-text">十、Binder其他</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#10-1-Binder%E4%B8%AD%E5%90%84%E4%B8%AA%E8%A7%92%E8%89%B2%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">10.0.0.1.</span> <span class="toc-text">10.1 Binder中各个角色的关系</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-Binder%E5%AE%9E%E4%BD%93-binder-node"><span class="toc-number">10.0.0.1.1.</span> <span class="toc-text">1. Binder实体 : binder_node</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-Binder%E5%BC%95%E7%94%A8-binder-ref"><span class="toc-number">10.0.0.1.2.</span> <span class="toc-text">2. Binder引用 : binder_ref</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1"><span class="toc-number">10.0.0.1.3.</span> <span class="toc-text">3. 远程服务</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#10-2-%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">10.0.0.2.</span> <span class="toc-text">10.2 进程和线程的关系</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Binder%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%9A"><span class="toc-number">10.0.0.2.1.</span> <span class="toc-text">Binder线程池：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#10-3-Binder%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="toc-number">10.0.0.3.</span> <span class="toc-text">10.3 Binder数据传输</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E6%BA%90%E7%A0%81%E7%9B%AE%E5%BD%95"><span class="toc-number">11.</span> <span class="toc-text">十一、源码目录</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&text=Android源码(8)-Binder"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&title=Android源码(8)-Binder"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&is_video=false&description=Android源码(8)-Binder"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Android源码(8)-Binder&body=Check out this article: http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&title=Android源码(8)-Binder"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&title=Android源码(8)-Binder"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&title=Android源码(8)-Binder"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&title=Android源码(8)-Binder"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&name=Android源码(8)-Binder&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/&t=Android源码(8)-Binder"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="一. 提供接口文档信息（swagger地址），需包含接口-参数-请求示例  BIO（同步）接口: &#x2F;invoke参数：group（自定义的分组）,action（自定义的接口名称）,bindClient（指定手机id）,invoke_timeOut（设置超时时间）案例： http:&#x2F;&#x2F;sekiro.virjar.com&#x2F;invoke?group&#x3D;sekiro-demo&amp;action">
+<meta property="og:type" content="article">
+<meta property="og:title" content="yuan lang">
+<meta property="og:url" content="http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="一. 提供接口文档信息（swagger地址），需包含接口-参数-请求示例  BIO（同步）接口: &#x2F;invoke参数：group（自定义的分组）,action（自定义的接口名称）,bindClient（指定手机id）,invoke_timeOut（设置超时时间）案例： http:&#x2F;&#x2F;sekiro.virjar.com&#x2F;invoke?group&#x3D;sekiro-demo&amp;action">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>yuan lang</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/%E9%80%86%E5%90%91-netty-learn/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&text="><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&title="><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&is_video=false&description="><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&title="><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&title="><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&title="><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&title="><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&name=&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&t="><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.429Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>一. 提供接口文档信息（swagger地址），需包含接口-参数-请求示例</p>
+<ol>
+<li><p>BIO（同步）接口: &#x2F;invoke<br>参数：group（自定义的分组）,action（自定义的接口名称）,bindClient（指定手机id）,invoke_timeOut（设置超时时间）<br>案例： <a target="_blank" rel="noopener" href="http://sekiro.virjar.com/invoke?group=sekiro-demo&action=clientTime&param1=%E5%8F%82%E6%95%B0">http://sekiro.virjar.com/invoke?group=sekiro-demo&amp;action=clientTime&amp;param1=参数</a></p>
+</li>
+<li><p>NIO（异步）接口：&#x2F;asyncInvoke<br>参数：group（自定义的分组）,action（自定义的接口名称）,bindClient（指定手机id）,invoke_timeOut（设置超时时间）<br>案例：<a target="_blank" rel="noopener" href="http://sekiro.virjar.com/asyncInvoke?group=sekiro-demo&action=clientTime&param1=%E5%8F%82%E6%95%B0">http://sekiro.virjar.com/asyncInvoke?group=sekiro-demo&amp;action=clientTime&amp;param1=参数</a></p>
+</li>
+<li><p>分组枚举接口：&#x2F;groupList<br>参数：无<br>案例：<a target="_blank" rel="noopener" href="http://sekiro.virjar.com/groupList">http://sekiro.virjar.com/groupList</a></p>
+</li>
+<li><p>设备枚举接口：&#x2F;natChannelStatus<br>参数：无<br>案例：<a target="_blank" rel="noopener" href="https://sekiro.virjar.com/natChannelStatus?group=xingxing">https://sekiro.virjar.com/natChannelStatus?group=xingxing</a></p>
+</li>
+</ol>
+<p>二. 版本更新内容：（列出涉及的功能内容，如果比较复杂，可以在附件中补充下需求文档，接口文档，或其他文档）</p>
+<ol>
+<li>以tcp为底层协议提供一套客户端，服务器通信的交互协议</li>
+<li>提供接口解析映射成sekiro通讯协议，完成与客户端的交互</li>
+<li>这里的客户端指Android，ios,python,java等夸语言实现一套sekiro协议通讯的终端</li>
+<li>sekiro主要是接口信息转发，统一管理终端</li>
+<li>sekiro协议报文字段说明<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">struct SekiroPacket &#123;</span><br><span class="line">    //数据包长度，</span><br><span class="line">    __int32_t packet_length;</span><br><span class="line">    //消息类型，</span><br><span class="line">    int8_t message_type;</span><br><span class="line">    //消息id，每次递增，作为请求和响应关联使用。这个id是服务器端产生，客户端只需要使用</span><br><span class="line">    int64_t serial_number;</span><br><span class="line">    //扩展数据长度</span><br><span class="line">    int8_t ext_length;</span><br><span class="line">    //扩展数据,UTF8的字符串编码</span><br><span class="line">    char *ext;</span><br><span class="line">    //body,</span><br><span class="line">    char *payload;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>三. 基础信息：（脚步语言的类型，服务器的类型，目录的结构，使用的开源软件，数据库类型，所有的连接页面，用到的框架等）</p>
+<ol>
+<li>开发语言： java</li>
+<li>开发用到的框架： springBoot(版本： 2.2.2.RELEASE) + netty（版本：4.1.43.Final）</li>
+<li>数据库： 无</li>
+<li>服务器： Linux操作系统</li>
+</ol>
+<p>四. 安全评审证明：如涉及框架变更，数据安全（敏感信息展示）的业务需求实现，请提供安全评审通过的附件证明</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&text="><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&title="><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&is_video=false&description="><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&title="><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&title="><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&title="><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&title="><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&name=&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/&t="><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

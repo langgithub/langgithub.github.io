@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="装饰器剖析 不带参数的装饰器 带参数的装饰器 类装饰器 利用functools.wrap 将wapped 的属性赋值给wapper  1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python-黑魔法-装饰器">
+<meta property="og:url" content="http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="装饰器剖析 不带参数的装饰器 带参数的装饰器 类装饰器 利用functools.wrap 将wapped 的属性赋值给wapper  1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>python-黑魔法-装饰器</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&text=python-黑魔法-装饰器"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&title=python-黑魔法-装饰器"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&is_video=false&description=python-黑魔法-装饰器"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-黑魔法-装饰器&body=Check out this article: http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&title=python-黑魔法-装饰器"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&title=python-黑魔法-装饰器"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&title=python-黑魔法-装饰器"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&title=python-黑魔法-装饰器"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&name=python-黑魔法-装饰器&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&t=python-黑魔法-装饰器"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A3%85%E9%A5%B0%E5%99%A8%E5%89%96%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">装饰器剖析</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        python-黑魔法-装饰器
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/python/">python</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/python/" rel="tag">python</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="装饰器剖析"><a href="#装饰器剖析" class="headerlink" title="装饰器剖析"></a>装饰器剖析</h1><ol>
+<li>不带参数的装饰器</li>
+<li>带参数的装饰器</li>
+<li>类装饰器</li>
+<li>利用functools.wrap 将wapped 的属性赋值给wapper</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br></pre></td><td class="code"><pre><span class="line"># encoding: utf-8</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">--------------------------------------</span><br><span class="line">@describe </span><br><span class="line">@version: 1.0</span><br><span class="line">@project: websockets</span><br><span class="line">@file: test.py</span><br><span class="line">@author: yuanlang </span><br><span class="line">@time: 2019-03-18 14:29</span><br><span class="line">---------------------------------------</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line"># 先看看函数复制</span><br><span class="line">def a():</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(a)</span><br><span class="line">x = a</span><br><span class="line">print(x)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 结论</span><br><span class="line"># a方法地址给了 x</span><br><span class="line"># 两个地址都是 a方法</span><br><span class="line">print(&quot;---------------------------------------&quot;)</span><br><span class="line"></span><br><span class="line">def log_track(func):</span><br><span class="line">    def wapper(*args, **kwargs):</span><br><span class="line">        print(func.__name__)</span><br><span class="line">        func(*args, **kwargs)</span><br><span class="line"></span><br><span class="line">    return wapper</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def hello2():</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@log_track</span><br><span class="line">def hello():</span><br><span class="line">    print(&quot;hello&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(hello)</span><br><span class="line">hello = wapper = log_track(hello)  # 和 @log_track效果一样</span><br><span class="line">print(hello)</span><br><span class="line">print(hello2.__name__)</span><br><span class="line">print(hello.__name__)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 结论</span><br><span class="line"># hello指针指向的hello函数地址进入到wapper作用域中，返回的wapper函数地址给 hello</span><br><span class="line">print(&quot;---------------------------------------&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 带参数的装饰器</span><br><span class="line">def user_loggin(level):</span><br><span class="line">    print(level)</span><br><span class="line"></span><br><span class="line">    def decoration(func):</span><br><span class="line">        print(func.__name__)</span><br><span class="line"></span><br><span class="line">        def wrapper(*args,**kwargs):</span><br><span class="line">            print(func.__name__)</span><br><span class="line">            func(*args,**kwargs)</span><br><span class="line">        print(&quot;return wrapper&quot;)</span><br><span class="line">        return wrapper</span><br><span class="line">    print(&quot;return decoration&quot;)</span><br><span class="line">    return decoration</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def foo():</span><br><span class="line">    return &quot;foo&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">func = decoration = user_loggin(level=&quot;debug&quot;)</span><br><span class="line">print(func)</span><br><span class="line">print(&quot;func.__name__ &gt;&gt;&gt;&gt;&gt; &quot;,func.__name__)</span><br><span class="line">print(&quot;######################&quot;)</span><br><span class="line">func = wrapper = user_loggin(level=&quot;debug&quot;)(foo)</span><br><span class="line">print(func)</span><br><span class="line">print(&quot;func.__name__  &gt;&gt;&gt;&gt;&gt;&quot;,func.__name__)</span><br><span class="line">print(&quot;######################&quot;)</span><br><span class="line"></span><br><span class="line">@user_loggin(level=&quot;debug&quot;)</span><br><span class="line">def foo2():</span><br><span class="line">    print(&quot;fool&quot;)</span><br><span class="line"># 总结</span><br><span class="line"># 带参数的装饰器比不带参数的装饰器多一层，需先解压出装饰器</span><br><span class="line">print(&quot;---------------------------------------&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 类装饰器</span><br><span class="line">class Foo():</span><br><span class="line"></span><br><span class="line">    def __init__(self,func):</span><br><span class="line">        self.__func=func</span><br><span class="line"></span><br><span class="line">    def __call__(self, *args, **kwargs):</span><br><span class="line">        print(&quot;before call&quot;)</span><br><span class="line">        self.__func(*args,**kwargs)</span><br><span class="line">        print(&quot;after call&quot;)</span><br><span class="line">        return self.__func</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def test():</span><br><span class="line">    print(&quot;test&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">foo_obj=Foo(test)</span><br><span class="line">print(foo_obj)</span><br><span class="line">print(&quot;__call__&quot;,foo_obj())</span><br><span class="line">print(&quot;######################&quot;)</span><br><span class="line"></span><br><span class="line">print(&quot;__call__&quot;,foo_obj.__call__())</span><br><span class="line">print(&quot;######################&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@Foo</span><br><span class="line">def test1():</span><br><span class="line">    print(&quot;test1&quot;)</span><br><span class="line"></span><br><span class="line">test1()</span><br><span class="line"># 总结</span><br><span class="line"># 类装饰器 实质是将 类的__call__地址 负值给要装饰的函数  test1=Foo(test1).__call__</span><br><span class="line">print(&quot;---------------------------------------&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">##</span><br><span class="line">##  可以发现 需要被装饰的函数的 docstring、__name__ 被装饰器替代了</span><br><span class="line">##  所以引出 functools.wraps，wraps本身也是一个装饰器，它能把原函数的元信息拷贝到装饰器函数中</span><br><span class="line">##</span><br><span class="line">from functools import wraps</span><br><span class="line"></span><br><span class="line">def logged(func):</span><br><span class="line"></span><br><span class="line">    #func=decoration=wraps(func)(with_logging)</span><br><span class="line">    #wraps(func)解压并调用类装饰器</span><br><span class="line">    #func=partial().__call__</span><br><span class="line">    #update_wapper 将with_loggin 的某些参数负值给f return 的 with_logging 变为 f</span><br><span class="line">    @wraps(func)</span><br><span class="line">    def with_logging(*args, **kwargs):</span><br><span class="line">        print(func.__name__ + &quot; was called&quot;)</span><br><span class="line">        return func(*args, **kwargs)</span><br><span class="line"></span><br><span class="line">    return with_logging</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@logged</span><br><span class="line">def f(x):</span><br><span class="line">    &quot;&quot;&quot;does some math&quot;&quot;&quot;</span><br><span class="line">    return x + x * x</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(f.__name__ ) # prints &#x27;f&#x27;</span><br><span class="line">print(f.__doc__ ) # prints &#x27;does some math1&#x27;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A3%85%E9%A5%B0%E5%99%A8%E5%89%96%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">装饰器剖析</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&text=python-黑魔法-装饰器"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&title=python-黑魔法-装饰器"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&is_video=false&description=python-黑魔法-装饰器"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-黑魔法-装饰器&body=Check out this article: http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&title=python-黑魔法-装饰器"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&title=python-黑魔法-装饰器"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&title=python-黑魔法-装饰器"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&title=python-黑魔法-装饰器"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&name=python-黑魔法-装饰器&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/&t=python-黑魔法-装饰器"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

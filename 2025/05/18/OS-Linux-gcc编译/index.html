@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Linux-gcc编译 gcc编译流程 ELF文件分类 总结  gcc编译流程a. 头文件.h和.c源文件 通过gcc 编译成.o可重定位文件目标文件（如：gcc -c -fPIC process.c）b. 可重定位文件.o 通过ar归档生成静态链接库.a文件（如：ar cr libstaticprocess.a process.o）。可执行程序编译： gcc -o staticcreatepro">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux-gcc编译">
+<meta property="og:url" content="http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="Linux-gcc编译 gcc编译流程 ELF文件分类 总结  gcc编译流程a. 头文件.h和.c源文件 通过gcc 编译成.o可重定位文件目标文件（如：gcc -c -fPIC process.c）b. 可重定位文件.o 通过ar归档生成静态链接库.a文件（如：ar cr libstaticprocess.a process.o）。可执行程序编译： gcc -o staticcreatepro">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/gcc%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B.jpeg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/%E5%8F%AF%E9%87%8D%E5%AE%9A%E4%BD%8D%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6.jpeg">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-06-06T06:37:51.680Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/gcc%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B.jpeg">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Linux-gcc编译</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/Javascript-%E7%9F%A5%E8%AF%86%E7%82%B9-Ajax/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/OS-Linux-%E5%85%8D%E5%AF%86%E9%92%A5%E7%99%BB%E9%99%86/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&text=Linux-gcc编译"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&title=Linux-gcc编译"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&is_video=false&description=Linux-gcc编译"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linux-gcc编译&body=Check out this article: http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&title=Linux-gcc编译"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&title=Linux-gcc编译"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&title=Linux-gcc编译"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&title=Linux-gcc编译"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&name=Linux-gcc编译&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&t=Linux-gcc编译"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux-gcc%E7%BC%96%E8%AF%91"><span class="toc-number">1.</span> <span class="toc-text">Linux-gcc编译</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#gcc%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B"><span class="toc-number">1.0.1.</span> <span class="toc-text">gcc编译流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ELF%E6%96%87%E4%BB%B6%E5%88%86%E7%B1%BB"><span class="toc-number">1.0.2.</span> <span class="toc-text">ELF文件分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.0.3.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Linux-gcc编译
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/Linux/">Linux</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Linux/" rel="tag">Linux</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="Linux-gcc编译"><a href="#Linux-gcc编译" class="headerlink" title="Linux-gcc编译"></a>Linux-gcc编译</h1><ol>
+<li>gcc编译流程</li>
+<li>ELF文件分类</li>
+<li>总结</li>
+</ol>
+<h3 id="gcc编译流程"><a href="#gcc编译流程" class="headerlink" title="gcc编译流程"></a>gcc编译流程</h3><p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/gcc%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B.jpeg" alt="编译"><br>a. 头文件.h和.c源文件 通过gcc 编译成.o可重定位文件目标文件（如：gcc -c -fPIC process.c）<br>b. 可重定位文件.o 通过ar归档生成静态链接库.a文件（如：ar cr libstaticprocess.a process.o）。可执行程序编译： gcc -o staticcreateprocess createprocess.o -L. -lstaticprocess<br>c. 或者将.o文件编译成动态链接库.so文件 （如：gcc -shared -fPIC -o libdynamicprocess.so process.o）。可执行程序编译 （gcc -o dynamiccreateprocess createprocess.o -L. -ldynamicprocess）。执行需要添加环境变量 export LD_LIBRARY_PATH&#x3D;.<br>d. 静态链接库.a 在编译过程就将函数调用情况链接。动态链接库.so在运行工作中动态链接函数</p>
+<h3 id="ELF文件分类"><a href="#ELF文件分类" class="headerlink" title="ELF文件分类"></a>ELF文件分类</h3><p>a. 第一种.o可重定位目标文件<br>    * .text 放编译好的二进制可执行代码<br>    * .data  已经初始化好的全局变量<br>    * .rodata 只读数据，例如字符串常量、const 的变量<br>    * .bss 未初始化全局变量，运行时会置 0<br>    * .symtab 符号表，记录的则是函数和变量<br>    * .strtab 字符串表、字符串常量和变量名<br>    * .rel .text 与重定位相关<br>    * .rel .data 与重定位相关</p>
+<p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/%E5%8F%AF%E9%87%8D%E5%AE%9A%E4%BD%8D%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.jpg" alt="first"></p>
+<p>b. 第二种可执行文件 section节被分成了需要加载到内存里面的代码段、数据段和不需要加载到内存里面的部分，将小的 section 合成了大的段 segment，并且在最前面加一个段头表（Segment Header Table）。在 ELF 头里面，有一项 e_entry，也是个虚拟地址，是这个程序运行的入口。<br>c. 第三种动态链接库，也就是共享对象文件<br>    * 首先，多了一个.interp 的 Segment，这里面是 ld-linux.so，这是动态链接器，也就是说，运行时的链接动作都是它做的。<br>    * ELF 文件中还多了两个 section，一个是.plt，过程链接表（Procedure Linkage Table，PLT），一个是.got.plt，全局偏移量表（Global Offset Table，GOT）</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/linux%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6.jpeg" alt="总结"></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux-gcc%E7%BC%96%E8%AF%91"><span class="toc-number">1.</span> <span class="toc-text">Linux-gcc编译</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#gcc%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B"><span class="toc-number">1.0.1.</span> <span class="toc-text">gcc编译流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ELF%E6%96%87%E4%BB%B6%E5%88%86%E7%B1%BB"><span class="toc-number">1.0.2.</span> <span class="toc-text">ELF文件分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.0.3.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&text=Linux-gcc编译"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&title=Linux-gcc编译"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&is_video=false&description=Linux-gcc编译"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linux-gcc编译&body=Check out this article: http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&title=Linux-gcc编译"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&title=Linux-gcc编译"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&title=Linux-gcc编译"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&title=Linux-gcc编译"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&name=Linux-gcc编译&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/OS-Linux-gcc%E7%BC%96%E8%AF%91/&t=Linux-gcc编译"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

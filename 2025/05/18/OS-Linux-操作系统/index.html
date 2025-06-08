@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="磁盘分区 MBR分区 存放开机记录和分区表，分区表64bytes最多存储4个分区，这4个分区为主分区和扩展分区。逻辑分区从5开始 GPT分区 GPT 没有扩展分区概念  系统文件 ls 查看信息 drwxr-xr-x 3 root root 17 May 6 00:14 .config，对这个信息的解释如下：  drwxr-xr-x：文件类型以及权限，第 1 位为文件类型字段，后 9 位为文件权限">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux操作系统">
+<meta property="og:url" content="http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="磁盘分区 MBR分区 存放开机记录和分区表，分区表64bytes最多存储4个分区，这4个分区为主分区和扩展分区。逻辑分区从5开始 GPT分区 GPT 没有扩展分区概念  系统文件 ls 查看信息 drwxr-xr-x 3 root root 17 May 6 00:14 .config，对这个信息的解释如下：  drwxr-xr-x：文件类型以及权限，第 1 位为文件类型字段，后 9 位为文件权限">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="linux操作系统">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>linux操作系统</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/OS-Linux-%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4%E8%A1%8C/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/OS-Linux-%E7%B3%BB%E7%BB%9F%E5%88%9D%E5%A7%8B%E5%8C%96/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&text=linux操作系统"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&title=linux操作系统"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&is_video=false&description=linux操作系统"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=linux操作系统&body=Check out this article: http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&title=linux操作系统"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&title=linux操作系统"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&title=linux操作系统"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&title=linux操作系统"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&name=linux操作系统&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&t=linux操作系统"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA"><span class="toc-number">1.</span> <span class="toc-text">磁盘分区</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E6%96%87%E4%BB%B6"><span class="toc-number">2.</span> <span class="toc-text">系统文件</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        linux操作系统
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E9%9D%A2%E8%AF%95/">面试</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/linux%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">linux操作系统</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="磁盘分区"><a href="#磁盘分区" class="headerlink" title="磁盘分区"></a>磁盘分区</h1><ol>
+<li>MBR分区<br> 存放开机记录和分区表，分区表64bytes最多存储4个分区，这4个分区为主分区和扩展分区。逻辑分区从5开始</li>
+<li>GPT分区<br> GPT 没有扩展分区概念</li>
+</ol>
+<h1 id="系统文件"><a href="#系统文件" class="headerlink" title="系统文件"></a>系统文件</h1><ol>
+<li><p>ls 查看信息<br> drwxr-xr-x 3 root root 17 May 6 00:14 .config，对这个信息的解释如下：</p>
+<p> drwxr-xr-x：文件类型以及权限，第 1 位为文件类型字段，后 9 位为文件权限字段<br> 3：链接数<br> root：文件拥有者<br> root：所属群组<br> 17：文件大小<br> May 6 00:14：文件最后被修改的时间<br> .config：文件名<br> 常见的文件类型及其含义有：</p>
+<p> d：目录<br> -：文件<br> l：链接文件<br> 9 位的文件权限字段中，每 3 个为一组，共 3 组，每一组分别代表对文件拥有者、所属群组以及其它人的文件权限。一组权限中的 3 位分别为 r、w、x 权限，表示可读、可写、可执行。</p>
+<p> 文件时间有以下三种：</p>
+<p> modification time (mtime)：文件的内容更新就会更新；<br> status time (ctime)：文件的状态（权限、属性）更新就会更新；<br> access time (atime)：读取文件时就会更新。</p>
+</li>
+<li><p>cd<br> 更换当前目录。</p>
+<p> cd [相对路径或绝对路径]</p>
+</li>
+<li><p>mkdir<br> 创建目录。<br> mkdir [-mp] 目录名称<br> -m ：配置目录权限<br> -p ：递归创建目录</p>
+</li>
+<li><p>rmdir<br> 删除目录，目录必须为空。</p>
+<p> rmdir [-p] 目录名称<br> -p ：递归删除目录</p>
+</li>
+<li><p>touch<br> 更新文件时间或者建立新文件。</p>
+<p> touch [-acdmt] filename<br> -a ： 更新 atime<br> -c ： 更新 ctime，若该文件不存在则不建立新文件<br> -m ： 更新 mtime<br> -d ： 后面可以接更新日期而不使用当前日期，也可以使用 –date&#x3D;”日期或时间”<br> -t ： 后面可以接更新时间而不使用当前时间，格式为[YYYYMMDDhhmm]</p>
+</li>
+<li><p>cp<br> 复制文件。如果源文件有两个以上，则目的文件一定要是目录才行。</p>
+<p> cp [-adfilprsu] source destination<br> -a ：相当于 -dr –preserve&#x3D;all<br> -d ：若来源文件为链接文件，则复制链接文件属性而非文件本身<br> -i ：若目标文件已经存在时，在覆盖前会先询问<br> -p ：连同文件的属性一起复制过去<br> -r ：递归复制<br> -u ：destination 比 source 旧才更新 destination，或 destination 不存在的情况下才复制<br> –preserve&#x3D;all ：除了 -p 的权限相关参数外，还加入 SELinux 的属性, links, xattr 等也复制了</p>
+</li>
+<li><p>rm<br> 删除文件。</p>
+<p> rm [-fir] 文件或目录<br> -r ：递归删除</p>
+</li>
+<li><p>mv<br> 移动文件。</p>
+<p> mv [-fiu] source destination<br> mv [options] source1 source2 source3 …. directory<br> -f ： force 强制的意思，如果目标文件已经存在，不会询问而直接覆盖</p>
+</li>
+<li><p>chmod<br> 可以将一组权限用数字来表示，此时一组权限的 3 个位当做二进制数字的位，从左到右每个位的权值为 4、2、1，即每个权限对应的数字权值为 r : 4、w : 2、x : 1。</p>
+<p> chmod [-R] xyz dirname&#x2F;filename<br> 示例：将 .bashrc 文件的权限修改为 -rwxr-xr–。</p>
+<p> chmod 754 .bashrc<br> 也可以使用符号来设定权限。</p>
+<p> chmod [ugoa]  [+-&#x3D;] [rwx] dirname&#x2F;filename</p>
+<ul>
+<li>u：拥有者</li>
+<li>g：所属群组</li>
+<li>o：其他人</li>
+<li>a：所有人</li>
+<li>+：添加权限</li>
+<li>-：移除权限</li>
+<li>&#x3D;：设定权限<br> 示例：为 .bashrc 文件的所有用户添加写权限。</li>
+</ul>
+<p> chmod a+w .bashrc</p>
+</li>
+<li><p>硬连接与软连接<br>10.1 实体链接<br>在目录下创建一个条目，记录着文件名与 inode 编号，这个 inode 就是源文件的 inode。</p>
+<p>删除任意一个条目，文件还是存在，只要引用数量不为 0。</p>
+<p>有以下限制：不能跨越文件系统、不能对目录进行链接。</p>
+<p>$ ln &#x2F;etc&#x2F;crontab .<br>$ ll -i &#x2F;etc&#x2F;crontab crontab<br>34474855 -rw-r–r–. 2 root root 451 Jun 10 2014 crontab<br>34474855 -rw-r–r–. 2 root root 451 Jun 10 2014 &#x2F;etc&#x2F;crontab<br>10.2 符号链接<br>符号链接文件保存着源文件所在的绝对路径，在读取时会定位到源文件上，可以理解为 Windows 的快捷方式。</p>
+<p>当源文件被删除了，链接文件就打不开了。</p>
+<p>因为记录的是路径，所以可以为目录建立符号链接。</p>
+<p>$ ll -i &#x2F;etc&#x2F;crontab &#x2F;root&#x2F;crontab2<br>34474855 -rw-r–r–. 2 root root 451 Jun 10 2014 &#x2F;etc&#x2F;crontab<br>53745909 lrwxrwxrwx. 1 root root 12 Jun 23 22:31 &#x2F;root&#x2F;crontab2 -&gt; &#x2F;etc&#x2F;crontab</p>
+</li>
+<li><p>获取文件内容</p>
+<ol>
+<li>cat<br>取得文件内容。</li>
+</ol>
+<p>$ cat [-AbEnTv] filename<br>-n ：打印出行号，连同空白行也会有行号，-b 不会<br>2. tac<br>是 cat 的反向操作，从最后一行开始打印。</p>
+<ol start="3">
+<li><p>more<br>和 cat 不同的是它可以一页一页查看文件内容，比较适合大文件的查看。</p>
+</li>
+<li><p>less<br>和 more 类似，但是多了一个向前翻页的功能。</p>
+</li>
+<li><p>head<br>取得文件前几行。</p>
+</li>
+</ol>
+<p>$ head [-n number] filename<br>-n ：后面接数字，代表显示几行的意思</p>
+<ol start="6">
+<li><p>tail<br>是 head 的反向操作，只是取得是后几行。</p>
+</li>
+<li><p>od<br>以字符或者十六进制的形式显示二进制文件。</p>
+</li>
+</ol>
+</li>
+<li><p>指令与文件搜索</p>
+<ol>
+<li>which<br>指令搜索。</li>
+</ol>
+<p>$ which [-a] command<br>-a ：将所有指令列出，而不是只列第一个<br>2. whereis<br>文件搜索。速度比较快，因为它只搜索几个特定的目录。</p>
+<p>$ whereis [-bmsu] dirname&#x2F;filename<br>3. locate<br>文件搜索。可以用关键字或者正则表达式进行搜索。</p>
+<p>locate 使用 &#x2F;var&#x2F;lib&#x2F;mlocate&#x2F; 这个数据库来进行搜索，它存储在内存中，并且每天更新一次，所以无法用 locate 搜索新建的文件。可以使用 updatedb 来立即更新数据库。</p>
+<p>$ locate [-ir] keyword<br>-r：正则表达式<br>4. find<br>文件搜索。可以使用文件的属性和权限进行搜索。</p>
+<p>find [basedir] [option]<br>example: find . -name “shadow*”</p>
+</li>
+<li><p>压缩与打包<br>压缩文件名<br>Linux 底下有很多压缩文件名，常见的如下：</p>
+<p>扩展名 压缩程序<br>*.Z compress<br>*.zip   zip<br>*.gz    gzip<br>*.bz2   bzip2<br>*.xz    xz<br>*.tar   tar 程序打包的数据，没有经过压缩<br>*.tar.gz    tar 程序打包的文件，经过 gzip 的压缩<br>*.tar.bz2   tar 程序打包的文件，经过 bzip2 的压缩<br>*.tar.xz    tar 程序打包的文件，经过 xz 的压缩<br>压缩指令</p>
+<ol>
+<li><p>gzip<br> gzip 是 Linux 使用最广的压缩指令，可以解开 compress、zip 与 gzip 所压缩的文件。</p>
+<p> 经过 gzip 压缩过，源文件就不存在了。</p>
+<p> 有 9 个不同的压缩等级可以使用。</p>
+<p> 可以使用 zcat、zmore、zless 来读取压缩文件的内容。</p>
+<p> $ gzip [-cdtv#] filename<br> -c ：将压缩的数据输出到屏幕上<br> -d ：解压缩<br> -t ：检验压缩文件是否出错<br> -v ：显示压缩比等信息<br> -# ： # 为数字的意思，代表压缩等级，数字越大压缩比越高，默认为 6</p>
+</li>
+<li><p>bzip2<br> 提供比 gzip 更高的压缩比。</p>
+<p> 查看命令：bzcat、bzmore、bzless、bzgrep。</p>
+<p> $ bzip2 [-cdkzv#] filename<br> -k ：保留源文件</p>
+</li>
+<li><p>xz<br> 提供比 bzip2 更佳的压缩比。</p>
+<p> 可以看到，gzip、bzip2、xz 的压缩比不断优化。不过要注意的是，压缩比越高，压缩的时间也越长。</p>
+<p> 查看命令：xzcat、xzmore、xzless、xzgrep。</p>
+<p> $ xz [-dtlkc#] filename</p>
+</li>
+<li><p>tar打包<br> 压缩指令只能对一个文件进行压缩，而打包能够将多个文件打包成一个大文件。tar 不仅可以用于打包，也可以使用 gzip、bzip2、xz 将打包文件进行压缩。</p>
+<p> $ tar [-z|-j|-J] [cv] [-f 新建的 tar 文件] filename…  &#x3D;&#x3D;打包压缩<br> $ tar [-z|-j|-J] [tv] [-f 已有的 tar 文件]              &#x3D;&#x3D;查看<br> $ tar [-z|-j|-J] [xv] [-f 已有的 tar 文件] [-C 目录]    &#x3D;&#x3D;解压缩<br> -z ：使用 zip；<br> -j ：使用 bzip2；<br> -J ：使用 xz；<br> -c ：新建打包文件；<br> -t ：查看打包文件里面有哪些文件；<br> -x ：解打包或解压缩的功能；<br> -v ：在压缩&#x2F;解压缩的过程中，显示正在处理的文件名；<br> -f : filename：要处理的文件；<br> -C 目录 ： 在特定目录解压缩。<br> 使用方式    命令<br> 打包压缩    tar -jcv -f filename.tar.bz2 要被压缩的文件或目录名称<br> 查 看 tar -jtv -f filename.tar.bz2<br> 解压缩 tar -jxv -f filename.tar.bz2 -C 要解压缩的目录</p>
+</li>
+</ol>
+</li>
+<li><p>Bash<br>可以通过 Shell 请求内核提供服务，Bash 正是 Shell 的一种。</p>
+<p>特性<br>命令历史：记录使用过的命令<br>命令与文件补全：快捷键：tab<br>命名别名：例如 lm 是 ls -al 的别名<br>shell scripts<br>通配符：例如 ls -l &#x2F;usr&#x2F;bin&#x2F;X* 列出 &#x2F;usr&#x2F;bin 下面所有以 X 开头的文件<br>变量操作<br>对一个变量赋值直接使用 &#x3D;。<br>对变量取用需要在变量前加上 $ ，也可以用 ${} 的形式；</p>
+<p>数据流重定向<br>重定向指的是使用文件代替标准输入、标准输出和标准错误输出。</p>
+<p>1   代码  运算符<br>标准输入 (stdin)    0   &lt; 或 &lt;&lt;<br>标准输出 (stdout)   1   &gt; 或 &gt;&gt;<br>标准错误输出 (stderr) 2   2&gt; 或 2&gt;&gt;<br>其中，有一个箭头的表示以覆盖的方式重定向，而有两个箭头的表示以追加的方式重定向。</p>
+<p>可以将不需要的标准输出以及标准错误输出重定向到 &#x2F;dev&#x2F;null，相当于扔进垃圾箱。</p>
+<p>如果需要将标准输出以及标准错误输出同时重定向到一个文件，需要将某个输出转换为另一个输出，例如 2&gt;&amp;1 表示将标准错误输出转换为标准输出。</p>
+<p>$ find &#x2F;home -name .bashrc &gt; list 2&gt;&amp;</p>
+</li>
+<li><p>管道指令 (cat file | grep “regex” | wc -l)<br>管道是将一个命令的标准输出作为另一个命令的标准输入，在数据需要经过多个步骤的处理之后才能得到我们想要的内容时就可以使用管道。</p>
+<p>选取命令:cut.grep<br>cut -d ‘分隔字符’ -f field &#x2F;&#x2F; 用于分隔字符<br>cut -c 字符范围<br>[参数说明]<br>-d : 后面接分隔字符,通常与 -f 一起使用<br>-f : 根据-d 将信息分隔成数段，-f 后接数字 表示取出第几段<br>-c : 以字符为单位取出固定字符区间的信息<br><br><br>栗子1：<br>打印&#x2F;etc&#x2F;passwd文件中以:为分隔符的第1个字段和第6个字段分别表示用户名和家目录<br>[root@izuf6i29flb2df231kt91hz &#x2F;]# cat etc&#x2F;passwd | cut -d ‘:’ -f 1,6<br>root:&#x2F;root<br>bin:&#x2F;bin<br>daemon:&#x2F;sbin<br>adm:&#x2F;var&#x2F;adm<br>lp:&#x2F;var&#x2F;spool&#x2F;lpd<br><br>栗子2：<br>打印&#x2F;etc&#x2F;passwd文件中每一行的前10个字符：<br>[root@izuf6i29flb2df231kt91hz &#x2F;]# cat &#x2F;etc&#x2F;passwd | cut -c 1-10<br>root:x:0:0<br>bin:x:1:1:<br>daemon:x:2<br>adm:x:3:4:<br>lp:x:4:7:l<br>排序命令：sort,wc,uniq<br>sort [-fbMnrtuk] [file or stdin]<br>[参数]<br>-f ：忽略大小写的差异，例如A 与a 视为编码相同<br>-b ：忽略最前面的空格部分<br>-M ：以月份的名字来排序，例如JAN, DEC 等等的排序方法<br>-n ：使用『纯数字』进行排序默认是以文字型态来排序的)<br>-r ：反向排序<br>-u ：就是uniq ，相同的资料中，仅出现一行代表<br>-t ：分隔符号，预设是用[tab] 键来分隔<br>-k ：以那个区间(field) 来进行排序的意思<br><br>uniq<br>uniq [-ic]<br>[参数]<br>-i ：忽略大小写的不同<br>-c ：进行计数<br><br>wc<br>wc [-lwm]<br>[参数]<br>-l ：仅列出行<br>-w ：仅列出多少字(英文单字)<br>-m ：多少字符<br>字符转换命令：tr,col,join,paste,expand<br>切割命令：split</p>
+</li>
+<li><p>进程管理 (ps -aux | grep tomcat 指定进程)（netstat -apn | grep 4000）(lsof -i tcp:4000)<br>查看进程</p>
+<ol>
+<li>ps<br>查看某个时间点的进程信息。</li>
+</ol>
+<p>示例一：查看自己的进程</p>
+<p>$ ps -l<br>示例二：查看系统所有进程</p>
+<p>$ ps aux<br>示例三：查看特定的进程</p>
+<p>$ ps aux | grep threadx<br>2. pstree<br>查看进程树。</p>
+<p>示例：查看所有进程树</p>
+<p>$ pstree -A<br>3. top<br>实时显示进程信息。</p>
+<p>示例：两秒钟刷新一次</p>
+<p>$ top -d 2<br>4. netstat<br>查看占用端口的进程</p>
+<p>示例：查看特定端口的进程<br>$ netstat -anp | grep port</p>
+</li>
+</ol>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA"><span class="toc-number">1.</span> <span class="toc-text">磁盘分区</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E6%96%87%E4%BB%B6"><span class="toc-number">2.</span> <span class="toc-text">系统文件</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&text=linux操作系统"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&title=linux操作系统"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&is_video=false&description=linux操作系统"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=linux操作系统&body=Check out this article: http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&title=linux操作系统"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&title=linux操作系统"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&title=linux操作系统"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&title=linux操作系统"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&name=linux操作系统&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/OS-Linux-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/&t=linux操作系统"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="自动化对比   模块 UIAutomation appium selenium pyppeteer 终极武器(chrome-devtools-protocol)    跨平台 否 Android，ios 是 chrome 浏览器就行 是   缺点 无法跨平台 adb驱动 太强大 chrome 协议 底层   driver google原生 UIAutomation #很多 chrome all">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自动化测试对比">
+<meta property="og:url" content="http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="自动化对比   模块 UIAutomation appium selenium pyppeteer 终极武器(chrome-devtools-protocol)    跨平台 否 Android，ios 是 chrome 浏览器就行 是   缺点 无法跨平台 adb驱动 太强大 chrome 协议 底层   driver google原生 UIAutomation #很多 chrome all">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="自动化">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>自动化测试对比</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E7%BE%A4%E6%8E%A7/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%B7%A8%E5%9F%9F%E5%AE%9E%E7%8E%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&text=自动化测试对比"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&title=自动化测试对比"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&is_video=false&description=自动化测试对比"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=自动化测试对比&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&title=自动化测试对比"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&title=自动化测试对比"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&title=自动化测试对比"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&title=自动化测试对比"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&name=自动化测试对比&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&t=自动化测试对比"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AF%B9%E6%AF%94"><span class="toc-number">1.</span> <span class="toc-text">自动化对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A9%B1%E5%8A%A8%E4%BB%A3%E7%A0%81"><span class="toc-number">2.</span> <span class="toc-text">驱动代码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#UIAutomation"><span class="toc-number">2.1.</span> <span class="toc-text">UIAutomation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Seleinum"><span class="toc-number">2.2.</span> <span class="toc-text">Seleinum</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Appium"><span class="toc-number">2.3.</span> <span class="toc-text">Appium</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pyppeteer"><span class="toc-number">3.</span> <span class="toc-text">pyppeteer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#chrome-devtools-protocol"><span class="toc-number">4.</span> <span class="toc-text">chrome-devtools-protocol</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E5%8C%96%E5%8F%8D%E5%8F%8D%E7%88%AC%E8%99%AB"><span class="toc-number"></span> <span class="toc-text">自动化反反爬虫</span></a>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        自动化测试对比
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.429Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E7%88%AC%E8%99%AB-%E7%8E%84%E5%AD%A6/">爬虫-玄学</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/" rel="tag">自动化</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="自动化对比"><a href="#自动化对比" class="headerlink" title="自动化对比"></a>自动化对比</h2><table>
+<thead>
+<tr>
+<th align="left">模块</th>
+<th align="right">UIAutomation</th>
+<th align="right">appium</th>
+<th align="right">selenium</th>
+<th align="right">pyppeteer</th>
+<th align="right">终极武器(chrome-devtools-protocol)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">跨平台</td>
+<td align="right">否</td>
+<td align="right">Android，ios</td>
+<td align="right">是</td>
+<td align="right">chrome 浏览器就行</td>
+<td align="right">是</td>
+</tr>
+<tr>
+<td align="left">缺点</td>
+<td align="right">无法跨平台</td>
+<td align="right">adb驱动</td>
+<td align="right">太强大</td>
+<td align="right">chrome 协议</td>
+<td align="right">底层</td>
+</tr>
+<tr>
+<td align="left">driver</td>
+<td align="right">google原生</td>
+<td align="right">UIAutomation</td>
+<td align="right">#很多</td>
+<td align="right">chrome</td>
+<td align="right">all</td>
+</tr>
+</tbody></table>
+<p>#很多：</p>
+<ol>
+<li><p>selenium可支持的PC浏览器驱动包括：</p>
+<p> safari driver【包含在selenium server中】</p>
+<p> ie driver</p>
+<p> chrome driver 【第三方】</p>
+<p> opera driver【第三方]</p>
+</li>
+<li><p>selenium可支持的伪浏览器驱动：</p>
+<p> PhantomJS Driver【第三方,停止更新】</p>
+<p> HtmlUnit Driver【包含在selenium server中】</p>
+</li>
+<li><p>selenium可支持的移动端驱动：</p>
+<p> Windows Phone driver </p>
+<p> Selendroid-Selenium for Android【第三方】</p>
+<p> ios-driver【第三方】</p>
+<p> Appium 支持iphone、ipad、android、FirefoxOS【第三方】</p>
+</li>
+</ol>
+<h2 id="驱动代码"><a href="#驱动代码" class="headerlink" title="驱动代码"></a>驱动代码</h2><ul>
+<li><h3 id="UIAutomation"><a href="#UIAutomation" class="headerlink" title="UIAutomation"></a>UIAutomation</h3></li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">python 端安装 uiautomator2 client：</span><br><span class="line">pip install uiautomator2</span><br><span class="line">Android端安装 ATX server</span><br><span class="line">安装方法</span><br><span class="line">离线</span><br><span class="line">    将init_machine.sh,及android_package.zip上传至/data/local/tmp目录下</span><br><span class="line">    给手机安装termux，此为命令行工具，打开软件</span><br><span class="line">    输入su,切换至管理员账户</span><br><span class="line">    输入cd data/local/tmp,因为云手机不能打/符，所有用tab键来凑齐。</span><br><span class="line">    输入sh init_machine.sh,即可安装好软件和服务</span><br><span class="line">    </span><br><span class="line">usb线连</span><br><span class="line">    在电脑上输入python -m uiautomator2 init即可</span><br><span class="line">    ### 2、打开ATX</span><br><span class="line">    打开ATX 点击&quot;启动uiautomator&quot;</span><br><span class="line">    ### 3、打开QpythonL</span><br><span class="line">    一定要先打开这个软件，不然你python脚本会上传不成功</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">import uiautomator2 as u2</span><br><span class="line"></span><br><span class="line"># 0.0.0.0 为本机，127.0.0.1这个也行，这个连接是在手机上运行的</span><br><span class="line">d = u2.connect(&#x27;http://0.0.0.0:7912&#x27;)</span><br><span class="line"># 如果远程操作，就填入手机ATX显示的ip，下面有图</span><br><span class="line"># d = u2.connect(&#x27;http://172.17.2.237:7912&#x27;)</span><br><span class="line"># 字符串为包名，下面有获取包名教程</span><br><span class="line">sess = d.session(&quot;com.tencent.wework&quot;)</span><br><span class="line"></span><br><span class="line">def my_click(sess, ele, timeout=3):</span><br><span class="line">    ele.wait(timeout=timeout) # 等待超时，因为可能此时界面动画，或者反映迟钝，该控件还没出现</span><br><span class="line">    x, y = ele.center() # 找到该空间的中间坐标</span><br><span class="line">    sess.touch.down(x, y) # 在此坐标按下</span><br><span class="line">    time.sleep(0.3)</span><br><span class="line">    sess.touch.up() #等待3秒后抬起</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def click_search_btn(sess):</span><br><span class="line">    ele = sess(resourceId=package_name+&quot;:id/e3g&quot;, #找到该空间的id</span><br><span class="line">               className=&quot;android.widget.TextView&quot;,# 找到该空间的类名</span><br><span class="line">               instance=0) #如果根据属性查找有多个控件，则找第一个</span><br><span class="line">    my_click(sess, ele, 20)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">click_search_btn(sess)</span><br><span class="line">print(&#x27;begin to input&#x27;)</span><br><span class="line">ele = sess(resourceId=&quot;com.tencent.wework:id/dpu&quot;, className=&quot;android.widget.EditText&quot;)</span><br><span class="line">ele.set_text(phone) # 将手机号填入</span><br><span class="line">print(&#x27;end to input&#x27;)</span><br><span class="line">time.sleep(2)</span><br><span class="line"># print(u&quot;点击搜索&quot;)</span><br><span class="line"># 点击搜索</span><br><span class="line">sess(resourceId=&quot;com.tencent.wework:id/azq&quot;,</span><br><span class="line">           className=&quot;android.widget.RelativeLayout&quot;).child(className=&quot;android.widget.TextView&quot;).click() # 因为该控件没有id，所以先找它爹，再找它爹的儿子控件，.click()直接触发点击事件。</span><br><span class="line">ele1 = sess(resourceId=&quot;com.tencent.wework:id/sa&quot;,</span><br><span class="line">               className=&quot;android.widget.TextView&quot;)</span><br><span class="line">ele1.get_text() # 获取标签文本内容</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li><h3 id="Seleinum"><a href="#Seleinum" class="headerlink" title="Seleinum"></a>Seleinum</h3></li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">安装：</span><br><span class="line">pip install selenium</span><br><span class="line">自行下载需要驱动的driver：如chromedriver</span><br><span class="line">实用executable_path 引入driver路径</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">from selenium import webdriver</span><br><span class="line">import time</span><br><span class="line"> </span><br><span class="line">drivers = [&#x27;HtmlUnit&#x27;, &#x27;PhantomJS&#x27;, &#x27;Chrome&#x27;, &#x27;FF&#x27;, &#x27;IE&#x27;] </span><br><span class="line"> </span><br><span class="line">dervers_time = &#123;</span><br><span class="line">	&#x27;HtmlUnit&#x27; : 0,</span><br><span class="line">	&#x27;PhantomJS&#x27; : 0,</span><br><span class="line">	&#x27;Chrome&#x27; : 0,</span><br><span class="line">	&#x27;FF&#x27; : 0,</span><br><span class="line">	&#x27;IE&#x27; : 0,</span><br><span class="line">&#125;</span><br><span class="line">times = 50</span><br><span class="line">def run_with_Chrome():</span><br><span class="line">	common_step(webdriver.Chrome())</span><br><span class="line"> </span><br><span class="line">def run_with_FF():</span><br><span class="line">	common_step(webdriver.Firefox())</span><br><span class="line">	</span><br><span class="line">def run_with_IE():</span><br><span class="line">	common_step(webdriver.Ie())</span><br><span class="line"> </span><br><span class="line">def run_with_PhantomJS():</span><br><span class="line">	common_step(webdriver.PhantomJS(executable_path=r&#x27;C:\Python27\Scripts\phantomjs.exe&#x27;))</span><br><span class="line">	</span><br><span class="line">def run_with_HtmlUnit():</span><br><span class="line">	driver = webdriver.Remote(&quot;http://localhost:4444/wd/hub&quot;, </span><br><span class="line">								desired_capabilities=webdriver.DesiredCapabilities.HTMLUNIT)</span><br><span class="line">	common_step(driver)</span><br><span class="line">	</span><br><span class="line">def common_step(driver):</span><br><span class="line">	driver.get(&#x27;http://www.baidu.com&#x27;)</span><br><span class="line">	ele = driver.find_element_by_id(&#x27;su&#x27;)</span><br><span class="line">	print ele.get_attribute(&#x27;value&#x27;)</span><br><span class="line">	driver.quit()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><h3 id="Appium"><a href="#Appium" class="headerlink" title="Appium"></a>Appium</h3></li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">1.node.js 安装</span><br><span class="line">brew install node</span><br><span class="line">npm install -g appium  # get appium     </span><br><span class="line">npm install wd         # get appium client</span><br><span class="line"></span><br><span class="line">直接用npm下载往往不成功，这是需要通过代理来下载</span><br><span class="line">具体方法如下：</span><br><span class="line">npm i cnpm -g --registry=http://registry.npm.taobao.org</span><br><span class="line">cnpm i appium -g       # get appium</span><br><span class="line">cnpm i wd -g　　       # get appium client</span><br><span class="line">cnpm i appium-doctor 　# get appium-doctor</span><br><span class="line"></span><br><span class="line">2.检查Appium成功安装</span><br><span class="line">appium-doctor</span><br><span class="line">更具提示配置 xcode 和 Android SDK</span><br><span class="line"></span><br><span class="line">3.下载appium客户端更加方便地址 github</span><br><span class="line">4.python client 安装 pip install Appium_Python_Client</span><br><span class="line">5.启动appium server .用客户端appium 启动即可</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"># encoding: utf-8</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">--------------------------------------</span><br><span class="line">@describe 自动化微信添加好友</span><br><span class="line">@version: 1.0</span><br><span class="line">@project: operator_spider</span><br><span class="line">@file: app_chrome.py</span><br><span class="line">@author: yuanlang </span><br><span class="line">@time: 2019-02-19 10:14</span><br><span class="line">---------------------------------------</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">import unittest</span><br><span class="line">from time import sleep</span><br><span class="line"></span><br><span class="line">from appium import webdriver</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class MyTestCase(unittest.TestCase):</span><br><span class="line"></span><br><span class="line">    def setUp(self):</span><br><span class="line">        capabilities = &#123;</span><br><span class="line">            &#x27;platformName&#x27;: &#x27;Android&#x27;,</span><br><span class="line">            &#x27;platformVersion&#x27;: &quot;5.1&quot;,</span><br><span class="line">            &#x27;deviceName&#x27;: &quot;mx4&quot;,</span><br><span class="line">            &#x27;appPackage&#x27;: &#x27;com.tencent.mm&#x27;,</span><br><span class="line">            &#x27;appActivity&#x27;: &#x27;.ui.LauncherUI&#x27;,</span><br><span class="line">            &#x27;automationName&#x27;: &#x27;Uiautomator2&#x27;,</span><br><span class="line">            &#x27;unicodeKeyboard&#x27;: True,</span><br><span class="line">            &#x27;resetKeyboard&#x27;: True,</span><br><span class="line">            &#x27;noReset&#x27;: True,</span><br><span class="line">            &#x27;chromeOptions&#x27;: &#123;&#x27;androidProcess&#x27;: &#x27;com.tencent.mm:tools&#x27;&#125;,</span><br><span class="line">        &#125;</span><br><span class="line">        self.driver = webdriver.Remote(&quot;http://127.0.0.1:4723/wd/hub&quot;, capabilities)</span><br><span class="line">        self.driver.implicitly_wait(30)</span><br><span class="line"></span><br><span class="line">        sleep(5)</span><br><span class="line"></span><br><span class="line">    def test_chromeApp(self):</span><br><span class="line">        # 点击加号</span><br><span class="line">        print(&quot;search&quot;)</span><br><span class="line">        driver = self.driver</span><br><span class="line">        el1 = driver.find_element_by_id(&quot;com.tencent.mm:id/gd&quot;)</span><br><span class="line">        el1.click()</span><br><span class="line">        sleep(5)</span><br><span class="line">        el2 = driver.find_element_by_xpath(</span><br><span class="line">            &quot;/hierarchy/android.widget.FrameLayout/android.widget.ListView/android.widget.LinearLayout[2]/android.widget.LinearLayout/android.widget.TextView&quot;)</span><br><span class="line">        el2.click()</span><br><span class="line">        sleep(5)</span><br><span class="line">        el3 = driver.find_element_by_id(&quot;com.tencent.mm:id/hx&quot;)</span><br><span class="line">        el3.click()</span><br><span class="line">        sleep(5)</span><br><span class="line">        driver.find_element_by_id(&quot;com.tencent.mm:id/hx&quot;).send_keys(&quot;15775691981&quot;)</span><br><span class="line">        sleep(5)</span><br><span class="line">        driver.find_element_by_id(&quot;com.tencent.mm:id/l4&quot;).click()</span><br><span class="line">        sleep(5)</span><br><span class="line">        print(driver.context)</span><br><span class="line">        name = driver.find_element_by_id(&quot;com.tencent.mm:id/ang&quot;).text</span><br><span class="line">        print(name)</span><br><span class="line"></span><br><span class="line">    def tearDown(self):</span><br><span class="line">        self.driver.close_app()</span><br><span class="line">        self.driver.quit()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    unittest.main()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="pyppeteer"><a href="#pyppeteer" class="headerlink" title="pyppeteer"></a>pyppeteer</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">原生是node.js 开发基于chrome-devtools-protocol + websocket</span><br><span class="line">python也有对应改写版</span><br><span class="line">项目由google维护</span><br><span class="line"></span><br><span class="line">pip install pyppeteer</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"># encoding: utf-8</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">--------------------------------------</span><br><span class="line">@describe </span><br><span class="line">@version: 1.0</span><br><span class="line">@project: operator_spider</span><br><span class="line">@file: dddd.py</span><br><span class="line">@author: yuanlang </span><br><span class="line">@time: 2019-02-21 19:11</span><br><span class="line">---------------------------------------</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">import asyncio</span><br><span class="line">import pyppeteer</span><br><span class="line">from collections import namedtuple</span><br><span class="line"></span><br><span class="line">Response = namedtuple(&quot;rs&quot;, &quot;title url html cookies headers history status&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">async def get_html(url, timeout=30):</span><br><span class="line">    # 默认30s</span><br><span class="line">    #,executablePath=&quot;&quot;</span><br><span class="line">    browser = await pyppeteer.launch(headless=False, args=[&#x27;--no-sandbox&#x27;])</span><br><span class="line">    page = await  browser.newPage()</span><br><span class="line">    js=&quot;&quot;&quot;</span><br><span class="line">    function sniffDetector() &#123;</span><br><span class="line">    const userAgent = window.navigator.userAgent;</span><br><span class="line">    const platform = window.navigator.platform;</span><br><span class="line"></span><br><span class="line">    window.navigator.__defineGetter__(&#x27;userAgent&#x27;, function() &#123;</span><br><span class="line">      window.navigator.sniffed = true;</span><br><span class="line">      return userAgent;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    window.navigator.__defineGetter__(&#x27;platform&#x27;, function() &#123;</span><br><span class="line">      window.navigator.sniffed = true;</span><br><span class="line">      return platform;</span><br><span class="line">    &#125;);</span><br><span class="line">    //自动化反反爬虫，反自动化检测</span><br><span class="line">    Object.defineProperty(navigator, &#x27;webdriver&#x27;, &#123;</span><br><span class="line">        get: () =&gt; false,</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    await page.evaluateOnNewDocument(js)</span><br><span class="line">    res = await page.goto(url, options=&#123;&#x27;timeout&#x27;: int(timeout * 1000)&#125;)</span><br><span class="line">    await asyncio.sleep(5)</span><br><span class="line">    data = await page.content()</span><br><span class="line">    title = await page.title()</span><br><span class="line">    resp_cookies = await page.cookies()</span><br><span class="line">    resp_headers = res.headers</span><br><span class="line">    resp_history = None</span><br><span class="line">    resp_status = res.status</span><br><span class="line">    response = Response(title=title, url=url,</span><br><span class="line">                        html=data,</span><br><span class="line">                        cookies=resp_cookies,</span><br><span class="line">                        headers=resp_headers,</span><br><span class="line">                        history=resp_history,</span><br><span class="line">                        status=resp_status)</span><br><span class="line">    return response</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    url_list = [&quot;https://jx.ac.10086.cn&quot;]</span><br><span class="line">    task = (get_html(url) for url in url_list)</span><br><span class="line"></span><br><span class="line">    loop = asyncio.get_event_loop()</span><br><span class="line">    results = loop.run_until_complete(asyncio.gather(*task))</span><br><span class="line">    for res in results:</span><br><span class="line">        print(res)</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h2 id="chrome-devtools-protocol"><a href="#chrome-devtools-protocol" class="headerlink" title="chrome-devtools-protocol"></a>chrome-devtools-protocol</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">底层采用websocket 协议控制浏览器。[协议连接](https://chromedevtools.github.io/devtools-protocol/)</span><br><span class="line">安装</span><br><span class="line">1.pip install pychrom</span><br><span class="line">2./Chromium --remote-debugging-port=9222</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">import pychrome</span><br><span class="line"></span><br><span class="line">browser = pychrome.Browser(url=&quot;http://127.0.0.1:9222&quot;)</span><br><span class="line">tab = browser.new_tab()</span><br><span class="line"></span><br><span class="line">def request_will_be_sent(**kwargs):</span><br><span class="line">    print(&quot;loading: %s&quot; % kwargs.get(&#x27;request&#x27;).get(&#x27;url&#x27;))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">tab.set_listener(&quot;Network.requestWillBeSent&quot;, request_will_be_sent)</span><br><span class="line"></span><br><span class="line">tab.start()</span><br><span class="line">tab.call_method(&quot;Network.enable&quot;)</span><br><span class="line">tab.call_method(&quot;Page.navigate&quot;, url=&quot;https://jx.ac.10086.cn&quot;, _timeout=5)</span><br><span class="line">import time</span><br><span class="line"># print(&quot;ok&quot;)</span><br><span class="line">time.sleep(5)</span><br><span class="line">result=tab.call_method(&quot;Runtime.evaluate&quot;,expression=&quot;document.documentElement.outerHTML&quot;)</span><br><span class="line">print(result)</span><br><span class="line">tab.stop()</span><br></pre></td></tr></table></figure>
+
+<h1 id="自动化反反爬虫"><a href="#自动化反反爬虫" class="headerlink" title="自动化反反爬虫"></a>自动化反反爬虫</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Object.defineProperty(navigator, &#x27;webdriver&#x27;, &#123;</span><br><span class="line">        get: () =&gt; false,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">// overwrite the `languages` property to use a custom getter</span><br><span class="line">Object.defineProperty(navigator, &quot;languages&quot;, &#123;</span><br><span class="line">  get: function() &#123;</span><br><span class="line">    return [&quot;zh-CN&quot;,&quot;zh&quot;,&quot;zh-TW&quot;,&quot;en-US&quot;,&quot;en&quot;];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">// Overwrite the `plugins` property to use a custom getter.</span><br><span class="line">Object.defineProperty(navigator, &#x27;plugins&#x27;, &#123;</span><br><span class="line">  get: () =&gt; [1, 2, 3, 4, 5],</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">// Pass the Webdriver test</span><br><span class="line">Object.defineProperty(navigator, &#x27;webdriver&#x27;, &#123;</span><br><span class="line">  get: () =&gt; false,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// Pass the Chrome Test.</span><br><span class="line">// We can mock this in as much depth as we need for the test.</span><br><span class="line">window.navigator.chrome = &#123;</span><br><span class="line">  runtime: &#123;&#125;,</span><br><span class="line">  // etc.</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// Pass the Permissions Test.</span><br><span class="line">const originalQuery = window.navigator.permissions.query;</span><br><span class="line">window.navigator.permissions.query = (parameters) =&gt; (</span><br><span class="line">  parameters.name === &#x27;notifications&#x27; ?</span><br><span class="line">    Promise.resolve(&#123; state: Notification.permission &#125;) :</span><br><span class="line">    originalQuery(parameters)</span><br><span class="line">);</span><br><span class="line">&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 修改chromedriver</span><br><span class="line">$ hexedit chromedriver </span><br><span class="line"></span><br><span class="line">        # 操作</span><br><span class="line">        1. tab 跳转到string栏</span><br><span class="line">        2. ctrl+S 查找 var key = &#x27;$cdc_asdjflasutopfhvcZLmcfl_&#x27;（对于2.40版本）</span><br><span class="line">        3. 替换&#x27;$cdc_asdjflasutopfhvcZLmcfl_&#x27;为任意值</span><br><span class="line">        4. ctrl+X 保存</span><br><span class="line"></span><br><span class="line"># 移动chromedriver 到 /usr/bin</span><br><span class="line">$ mv chromedriver /usr/bin</span><br><span class="line"></span><br><span class="line">[详细连接](&quot;https://zhuanlan.zhihu.com/p/43581988?utm_source=wechat_session&amp;utm_medium=social&amp;utm_oi=32546582691840&amp;from=groupmessage&quot;)</span><br></pre></td></tr></table></figure>
+
+
+<p>总结：seleium 是采用webdriver 协议 ,seleium server端也是使用chrome-devtools-protocol。只不过为了跨平台采用webdriver restful api 形式开发。chrome-devtools-protocol 可以使用 .&#x2F;chromium –remote-debug 自动化测试</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AF%B9%E6%AF%94"><span class="toc-number">1.</span> <span class="toc-text">自动化对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A9%B1%E5%8A%A8%E4%BB%A3%E7%A0%81"><span class="toc-number">2.</span> <span class="toc-text">驱动代码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#UIAutomation"><span class="toc-number">2.1.</span> <span class="toc-text">UIAutomation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Seleinum"><span class="toc-number">2.2.</span> <span class="toc-text">Seleinum</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Appium"><span class="toc-number">2.3.</span> <span class="toc-text">Appium</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pyppeteer"><span class="toc-number">3.</span> <span class="toc-text">pyppeteer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#chrome-devtools-protocol"><span class="toc-number">4.</span> <span class="toc-text">chrome-devtools-protocol</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E5%8C%96%E5%8F%8D%E5%8F%8D%E7%88%AC%E8%99%AB"><span class="toc-number"></span> <span class="toc-text">自动化反反爬虫</span></a>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&text=自动化测试对比"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&title=自动化测试对比"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&is_video=false&description=自动化测试对比"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=自动化测试对比&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&title=自动化测试对比"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&title=自动化测试对比"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&title=自动化测试对比"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&title=自动化测试对比"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&name=自动化测试对比&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E5%AF%B9%E6%AF%94/&t=自动化测试对比"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

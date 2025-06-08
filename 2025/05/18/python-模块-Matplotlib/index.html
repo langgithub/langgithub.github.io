@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="一：基本知识 第一层是底层的容器层，主要包括Canvas（画板）、Figure（画布）、Axes（绘画区）  第二层是辅助显示层，主要包括Axis（坐标）、Spines（边框线）、Tick（刻度）、Grid（网格）、Legend（图例）、Title（标题）等  第三层为图像层，即通过plot（折线）、hist（直方图）、contour、bar（条形图）、barbs、scatter（散点），pie(">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Matplotlib">
+<meta property="og:url" content="http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="一：基本知识 第一层是底层的容器层，主要包括Canvas（画板）、Figure（画布）、Axes（绘画区）  第二层是辅助显示层，主要包括Axis（坐标）、Spines（边框线）、Tick（刻度）、Grid（网格）、Legend（图例）、Title（标题）等  第三层为图像层，即通过plot（折线）、hist（直方图）、contour、bar（条形图）、barbs、scatter（散点），pie(">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://wx4.sinaimg.cn/mw690/005EpKr8ly1g1dslzabgzj30gd0fnwfb.jpg">
+<meta property="og:image" content="https://wx1.sinaimg.cn/mw690/005EpKr8ly1g1dslza6zmj30dz0hkjrw.jpg">
+<meta property="og:image" content="https://wx1.sinaimg.cn/mw690/005EpKr8ly1g1dslzbha2j30ej04mmx1.jpg">
+<meta property="og:image" content="https://wx2.sinaimg.cn/mw690/005EpKr8ly1g1dslza9qrj30hs0dcab2.jpg">
+<meta property="og:image" content="https://wx1.sinaimg.cn/mw690/005EpKr8ly1g1dslz9qg1j30hs0dcdfn.jpg">
+<meta property="og:image" content="https://wx1.sinaimg.cn/mw690/005EpKr8ly1g1dslzaknuj30hs0dcq4n.jpg">
+<meta property="og:image" content="https://wx3.sinaimg.cn/mw690/005EpKr8ly1g1dslzamsej30hs0dcq3b.jpg">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wx4.sinaimg.cn/mw690/005EpKr8ly1g1dslzabgzj30gd0fnwfb.jpg">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Matplotlib</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/python-scrapy-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D(1)/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/python-%E6%A8%A1%E5%9D%97-openpyxl/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&text=Matplotlib"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&title=Matplotlib"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&is_video=false&description=Matplotlib"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Matplotlib&body=Check out this article: http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&title=Matplotlib"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&title=Matplotlib"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&title=Matplotlib"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&title=Matplotlib"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&name=Matplotlib&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&t=Matplotlib"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86"><span class="toc-number">1.</span> <span class="toc-text">一：基本知识</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.0.1.</span> <span class="toc-text">基本概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%98%E5%9B%BE%E5%8F%82%E6%95%B0%E3%80%8A%E4%B8%80%E3%80%8B"><span class="toc-number">1.0.2.</span> <span class="toc-text">绘图参数《一》</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%98%E5%9B%BE%E5%8F%82%E6%95%B0%E3%80%8A%E4%BA%8C%E3%80%8B"><span class="toc-number">1.0.3.</span> <span class="toc-text">绘图参数《二》</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C-%E6%A1%88%E4%BE%8B"><span class="toc-number">2.</span> <span class="toc-text">二.案例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%E5%9B%BE%E5%BD%A2"><span class="toc-number">3.</span> <span class="toc-text">三.自定义函数图形</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Matplotlib
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/code-python/">code-python</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/python/" rel="tag">python</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h3 id="一：基本知识"><a href="#一：基本知识" class="headerlink" title="一：基本知识"></a>一：基本知识</h3><ol>
+<li><p>第一层是底层的容器层，主要包括Canvas（画板）、Figure（画布）、Axes（绘画区）</p>
+</li>
+<li><p>第二层是辅助显示层，主要包括Axis（坐标）、Spines（边框线）、Tick（刻度）、Grid（网格）、Legend（图例）、Title（标题）等</p>
+</li>
+<li><p>第三层为图像层，即通过plot（折线）、hist（直方图）、contour、bar（条形图）、barbs、scatter（散点），pie(饼图)等方法绘制的图像。</p>
+</li>
+</ol>
+<h5 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h5><p><img src="https://wx4.sinaimg.cn/mw690/005EpKr8ly1g1dslzabgzj30gd0fnwfb.jpg" alt="image"></p>
+<h5 id="绘图参数《一》"><a href="#绘图参数《一》" class="headerlink" title="绘图参数《一》"></a>绘图参数《一》</h5><p><img src="https://wx1.sinaimg.cn/mw690/005EpKr8ly1g1dslza6zmj30dz0hkjrw.jpg" alt="image"></p>
+<h5 id="绘图参数《二》"><a href="#绘图参数《二》" class="headerlink" title="绘图参数《二》"></a>绘图参数《二》</h5><p><img src="https://wx1.sinaimg.cn/mw690/005EpKr8ly1g1dslzbha2j30ej04mmx1.jpg" alt="image"></p>
+<h3 id="二-案例"><a href="#二-案例" class="headerlink" title="二.案例"></a>二.案例</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><span class="line">import matplotlib.pyplotasplt</span><br><span class="line"></span><br><span class="line">importnumpyasnp</span><br><span class="line"></span><br><span class="line">fig=plt.figure()</span><br><span class="line"></span><br><span class="line">fig.set_figwidth(1200)</span><br><span class="line"></span><br><span class="line">########饼图############</span><br><span class="line"></span><br><span class="line">axes=fig.add_subplot(2,3,1)</span><br><span class="line"></span><br><span class="line">labels=&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;,&#x27;D&#x27;</span><br><span class="line"></span><br><span class="line">fracs=[15,30,45,10]</span><br><span class="line"></span><br><span class="line">axes.set_aspect(aspect=1)#plt.axes(aspect=1)使x y轴比例相同</span><br><span class="line"></span><br><span class="line">explode=[0,0.05,0,0]#突出某一部分区域</span><br><span class="line"></span><br><span class="line">axes.pie(x=fracs,labels=labels,autopct=&#x27;%.0f%%&#x27;,explode=explode)#autopct显示百分比</span><br><span class="line"></span><br><span class="line">########线图###########</span><br><span class="line"></span><br><span class="line">axes=fig.add_subplot(2,3,2)</span><br><span class="line"></span><br><span class="line">x=np.arange(1,5)</span><br><span class="line"></span><br><span class="line">y=x*2</span><br><span class="line"></span><br><span class="line">axes.plot(x,y)</span><br><span class="line"></span><br><span class="line">axes.grid(True,color=&#x27;g&#x27;,linestyle=&#x27;--&#x27;,linewidth=&#x27;1&#x27;)</span><br><span class="line"></span><br><span class="line">#########多条线#########</span><br><span class="line"></span><br><span class="line">axes=fig.add_subplot(2,3,3)</span><br><span class="line"></span><br><span class="line">x=np.arange(1,11,1)</span><br><span class="line"></span><br><span class="line">axes.plot(x,x*2)</span><br><span class="line"></span><br><span class="line">axes.plot(x,x*3)</span><br><span class="line"></span><br><span class="line">axes.plot(x,x*4)</span><br><span class="line"></span><br><span class="line">axes.legend([&#x27;Normal&#x27;,&#x27;Fast&#x27;,&#x27;Faster&#x27;])</span><br><span class="line"></span><br><span class="line">########散点图##########</span><br><span class="line"></span><br><span class="line">axes=fig.add_subplot(2,3,4)</span><br><span class="line"></span><br><span class="line">x=np.random.randn(1000)</span><br><span class="line"></span><br><span class="line">y=x+np.random.randn(1000)*0.5</span><br><span class="line"></span><br><span class="line">axes.scatter(x,y,s=5,marker=&#x27;&lt;&#x27;)# s表示面积，marker表示图形</span><br><span class="line"></span><br><span class="line">#########条形图##########</span><br><span class="line"></span><br><span class="line">axes=fig.add_subplot(2,3,5)</span><br><span class="line"></span><br><span class="line">y=[20,10,40,25,15]</span><br><span class="line"></span><br><span class="line">index=np.arange(5)</span><br><span class="line"></span><br><span class="line">axes.bar(left=index,height=y,color=&#x27;green&#x27;)</span><br><span class="line"></span><br><span class="line">#########箱形图##########</span><br><span class="line"></span><br><span class="line">axes=fig.add_subplot(2,3,6)</span><br><span class="line"></span><br><span class="line">data=np.random.normal(size=(1000,4),loc=0,scale=1)#标准整体分布</span><br><span class="line"></span><br><span class="line">labels=[&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;,&#x27;D&#x27;]</span><br><span class="line"></span><br><span class="line">axes.boxplot(data,labels=labels)</span><br><span class="line"></span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line">#########直方图##########</span><br><span class="line"></span><br><span class="line">mu=100</span><br><span class="line"></span><br><span class="line">sigma=20</span><br><span class="line"></span><br><span class="line">x=mu+sigma*np.random.randn(20000)#样本数量</span><br><span class="line"></span><br><span class="line">plt.hist(x,bins=100,color=&#x27;green&#x27;,normed=True)# bins显示有几个直方,normed是否对数据进行标准化</span><br><span class="line"></span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line">#########等高线##########</span><br><span class="line"></span><br><span class="line">#定义等高线图的横纵坐标x，y</span><br><span class="line"></span><br><span class="line">#从左边取值为从-3到3，各取5个点，一共取5*5 = 25个点</span><br><span class="line"></span><br><span class="line">x=np.linspace(-3,3,5)</span><br><span class="line"></span><br><span class="line">y=np.linspace(-3,3,5)</span><br><span class="line"></span><br><span class="line">#将原始数据变成网格数据</span><br><span class="line"></span><br><span class="line">X, Y=np.meshgrid(x, y)</span><br><span class="line"></span><br><span class="line">#各地点对应的高度数据</span><br><span class="line"></span><br><span class="line">#Height是个5*5的数组，记录地图上25个点的高度汇总</span><br><span class="line"></span><br><span class="line">Height= [[0,0,1,2,2],[0,-2,-2,1,5],[4,2,6,8,1],[3,-3,-3,0,5],[1,-5,-2,0,3]]</span><br><span class="line"></span><br><span class="line">#填充颜色</span><br><span class="line"></span><br><span class="line">plt.contourf(X, Y, Height,10,alpha=0.6,cmap=plt.cm.hot)</span><br><span class="line"></span><br><span class="line">#绘制等高线</span><br><span class="line"></span><br><span class="line">C=plt.contour(X, Y, Height,10,colors=&#x27;black&#x27;,linewidth=0.5)</span><br><span class="line"></span><br><span class="line">#显示各等高线的数据标签</span><br><span class="line"></span><br><span class="line">plt.clabel(C,inline=True,fontsize=10)</span><br><span class="line"></span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+
+
+
+<p><img src="https://wx2.sinaimg.cn/mw690/005EpKr8ly1g1dslza9qrj30hs0dcab2.jpg" alt="image"><br>figure布局<br><img src="https://wx1.sinaimg.cn/mw690/005EpKr8ly1g1dslz9qg1j30hs0dcdfn.jpg" alt="image"><br>figure图2<br><img src="https://wx1.sinaimg.cn/mw690/005EpKr8ly1g1dslzaknuj30hs0dcq4n.jpg" alt="image"><br>figure图3</p>
+<h3 id="三-自定义函数图形"><a href="#三-自定义函数图形" class="headerlink" title="三.自定义函数图形"></a>三.自定义函数图形</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">importmatplotlib.pyplotasplt</span><br><span class="line"></span><br><span class="line">importnumpyasnp</span><br><span class="line"></span><br><span class="line">x=np.linspace(-3,3,50)</span><br><span class="line"></span><br><span class="line">y1=2*x+1</span><br><span class="line"></span><br><span class="line">y2=x**2</span><br><span class="line"></span><br><span class="line"># plt.figure()</span><br><span class="line"></span><br><span class="line"># plt.plot(x,y1)</span><br><span class="line"></span><br><span class="line">plt.figure()</span><br><span class="line"></span><br><span class="line">l1=plt.plot(x,y2,label=&#x27;up&#x27;)</span><br><span class="line"></span><br><span class="line">l2=plt.plot(x,y1,color=&#x27;red&#x27;,linewidth=1.0,linestyle=&#x27;--&#x27;,label=&#x27;down&#x27;)</span><br><span class="line"></span><br><span class="line">plt.xlim((-1,2))</span><br><span class="line"></span><br><span class="line">plt.ylim((-3,5))</span><br><span class="line"></span><br><span class="line">plt.ylabel(&#x27;I am y&#x27;)</span><br><span class="line"></span><br><span class="line">plt.xlabel(&#x27;I am x&#x27;)</span><br><span class="line"></span><br><span class="line">new_ticks=np.linspace(-1,2,5)</span><br><span class="line"></span><br><span class="line">print(new_ticks)</span><br><span class="line"></span><br><span class="line">plt.xticks(new_ticks)</span><br><span class="line"></span><br><span class="line">plt.yticks([-2,-1.8,-1,1,3],[r&#x27;$re\ bad$&#x27;,r&#x27;$re2\alpha$&#x27;,r&#x27;$re3$&#x27;,&#x27;re4&#x27;,&#x27;re5&#x27;])</span><br><span class="line"></span><br><span class="line">ax=plt.gca()</span><br><span class="line"></span><br><span class="line">ax.spines[&#x27;right&#x27;].set_color(&#x27;none&#x27;)</span><br><span class="line"></span><br><span class="line">ax.spines[&#x27;top&#x27;].set_color(&#x27;none&#x27;)</span><br><span class="line"></span><br><span class="line">#ax.xaxis.set_ticks_position(&#x27;bottom&#x27;)</span><br><span class="line"></span><br><span class="line">#ax.yaxis.set_ticks_position(&#x27;left&#x27;)</span><br><span class="line"></span><br><span class="line">ax.spines[&#x27;bottom&#x27;].set_position((&#x27;data&#x27;,0))</span><br><span class="line"></span><br><span class="line">ax.spines[&#x27;left&#x27;].set_position((&#x27;data&#x27;,0))</span><br><span class="line"></span><br><span class="line">plt.legend()</span><br><span class="line"></span><br><span class="line">#plt.legend(handles=[l1,],labels=[&#x27;aa&#x27;,],loc=&#x27;best&#x27;)</span><br><span class="line"></span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+
+<p><img src="https://wx3.sinaimg.cn/mw690/005EpKr8ly1g1dslzamsej30hs0dcq3b.jpg" alt="image"></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%EF%BC%9A%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86"><span class="toc-number">1.</span> <span class="toc-text">一：基本知识</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.0.1.</span> <span class="toc-text">基本概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%98%E5%9B%BE%E5%8F%82%E6%95%B0%E3%80%8A%E4%B8%80%E3%80%8B"><span class="toc-number">1.0.2.</span> <span class="toc-text">绘图参数《一》</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%98%E5%9B%BE%E5%8F%82%E6%95%B0%E3%80%8A%E4%BA%8C%E3%80%8B"><span class="toc-number">1.0.3.</span> <span class="toc-text">绘图参数《二》</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C-%E6%A1%88%E4%BE%8B"><span class="toc-number">2.</span> <span class="toc-text">二.案例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%E5%9B%BE%E5%BD%A2"><span class="toc-number">3.</span> <span class="toc-text">三.自定义函数图形</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&text=Matplotlib"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&title=Matplotlib"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&is_video=false&description=Matplotlib"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Matplotlib&body=Check out this article: http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&title=Matplotlib"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&title=Matplotlib"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&title=Matplotlib"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&title=Matplotlib"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&name=Matplotlib&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E6%A8%A1%E5%9D%97-Matplotlib/&t=Matplotlib"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

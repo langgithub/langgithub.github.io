@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="系统环境准备  1、网络配置  vi &#x2F;etc&#x2F;sysconfig&#x2F;network   vi &#x2F;etc&#x2F;hosts 2、SSH免密钥登录 虚拟机的环境准备非常重要：免密钥的master需要和slave免密钥；那么cloudera manager的server需要和agent免密钥； 那么具体的软件比如hdfs的namenode所在的节点就需要和它">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CDH安装">
+<meta property="og:url" content="http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="系统环境准备  1、网络配置  vi &#x2F;etc&#x2F;sysconfig&#x2F;network   vi &#x2F;etc&#x2F;hosts 2、SSH免密钥登录 虚拟机的环境准备非常重要：免密钥的master需要和slave免密钥；那么cloudera manager的server需要和agent免密钥； 那么具体的软件比如hdfs的namenode所在的节点就需要和它">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="hadoop">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>CDH安装</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/python-%E9%BB%91%E9%AD%94%E6%B3%95-%E8%A3%85%E9%A5%B0%E5%99%A8/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-HA/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&text=CDH安装"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&title=CDH安装"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&is_video=false&description=CDH安装"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=CDH安装&body=Check out this article: http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&title=CDH安装"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&title=CDH安装"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&title=CDH安装"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&title=CDH安装"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&name=CDH安装&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&t=CDH安装"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        CDH安装
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8-bigdata/">数据存储-bigdata</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/hadoop/" rel="tag">hadoop</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <ol>
+<li>系统环境准备</li>
+</ol>
+<p>1、网络配置 </p>
+<p>vi &#x2F;etc&#x2F;sysconfig&#x2F;network  </p>
+<p>vi &#x2F;etc&#x2F;hosts</p>
+<p>2、SSH免密钥登录</p>
+<p>虚拟机的环境准备非常重要：免密钥的master需要和slave免密钥；那么cloudera manager的server需要和agent免密钥；</p>
+<p>那么具体的软件比如hdfs的namenode所在的节点就需要和它的datanode节点免密钥；</p>
+<p>全部会话 ：ssh-keygen -t rsa -P ‘’ -f ~&#x2F;.ssh&#x2F;id_rsa</p>
+<p>ssh-copy-id node11&#x2F;node12&#x2F;node13</p>
+<p>3、防火墙关闭</p>
+<p>Service iptables  stop</p>
+<p>Chkconfig iptables off</p>
+<p>4、SELINUX关闭 setenforce 0</p>
+<p>vi &#x2F;etc&#x2F;selinux&#x2F;config (SELINUX&#x3D;disabled) </p>
+<p>5.安装JDK配置环境变量</p>
+<p>三台机器都需要</p>
+<p>将jdk上传到node11的&#x2F;home&#x2F;tools目录下</p>
+<p>Node11执行：scp  jdk+Tab node12:<code>pwd</code></p>
+<p> scp  jdk+Tab node13:<code>pwd</code></p>
+<p>全部会话：rpm -ivh jdk*</p>
+<p>修改 vi&#x2F;etc&#x2F;profile 添加环境变量（一个一个添加）</p>
+<p>source .&#x2F;etc&#x2F;profile</p>
+<p>export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;default &#x2F;&#x2F;注意java的路径</p>
+<p>export PATH&#x3D;JAVAHOME&#x2F;bin:JAVAHOME&#x2F;bin:PATH</p>
+<p>6.安装NTP</p>
+<p>Yum install ntp -y</p>
+<p>设置开机启动 chkconfig ntpd on</p>
+<p>设置时间同步 – ntpdate -u s2c.time.edu.cn（全部会话）</p>
+<p>7.安装配置mysql</p>
+<p>yum install mysql-server -y</p>
+<p>设置开机启动：chkconfig mysqld on</p>
+<p>启动mysql：  service mysqld start</p>
+<p>查看状态：  service mysqld status</p>
+<p>mysql 进入</p>
+<p>use mysql</p>
+<p>select host,user from user</p>
+<p>修改 mysql 权限： GRANT ALL PRIVILEGES ON <em>.</em> TO ‘root‘@’%’ IDENTIFIED BY ‘123’ WITH GRANT OPTION;</p>
+<p>刷新：flush privileges;</p>
+<p>删除多余会对权限造成影响的数据：delete from user where host !&#x3D;’%’;</p>
+<p>刷新权限</p>
+<p>select host,user from user;</p>
+<p>quit 退出</p>
+<p>重新登录：mysql -u root -p</p>
+<p>密码：123</p>
+<p>8.下载第三方依赖包</p>
+<p>最后一步安装第三方依赖包的时候，主要针对的是centos，公司中还是要看使用的linux发行版缺少那些版本；</p>
+<p>yum install chkconfig python bind-utils psmisc libxslt zlib sqlite cyrus-sasl-plain cyrus-sasl-gssapi fuse fuse-libs redhat-lsb -y</p>
+<ol start="2">
+<li><p>CM安装</p>
+</li>
+<li><p>安装Cloudera Manager Server、Agent</p>
+</li>
+</ol>
+<p>上传到&#x2F;home&#x2F;toolsx下 (三台机器都要安装)</p>
+<p>mkdir &#x2F;opt&#x2F;cloudera-manager</p>
+<p>tar xvzf cloudera-manager*.tar.gz -C &#x2F;opt&#x2F;cloudera-manager</p>
+<ol start="2">
+<li>创建用户cloudera-scm</li>
+</ol>
+<p>全部会话：useradd –system –no-create-home –shell&#x3D;&#x2F;bin&#x2F;false –comment “Cloudera SCM User” cloudera-scm</p>
+<ol start="3">
+<li>配置CM Agent</li>
+</ol>
+<p>cm的安装包的server和agent都是同一个包，启动的时候启动命令指定为server还是agent；cm有一个工作目录，需要</p>
+<p>我们来创建；创建一个用户；修改agent的配置，给它指定server的位置；那个端口7182是server和agent通信的端口；</p>
+<p>server_host配置为server的名字；</p>
+<p>修改文件&#x2F;opt&#x2F;cloudera-manager&#x2F;cm-5.4.3&#x2F;etc&#x2F;cloudera-scm-agent&#x2F;config.ini中 server_host(三台机器)</p>
+<ol start="4">
+<li>配置CM Server数据库</li>
+</ol>
+<p>拷贝mysql jar文件到目录 &#x2F;usr&#x2F;share&#x2F;java&#x2F;</p>
+<p>注意jar包名称要修改为mysql-connector-java.jar</p>
+<p>mysql -u root -p</p>
+<p>use mysql;</p>
+<p>grant all on <em>.</em> to ‘temp‘@’%’ identified by ‘temp’ with grant option;</p>
+<p>cd &#x2F;opt&#x2F;cloudera-manager&#x2F;cm-5.4.3&#x2F;share&#x2F;cmf&#x2F;schema&#x2F;</p>
+<p> .&#x2F;scm_prepare_database.sh mysql temp -h CDH1 -utemp -ptemp –scm-host CDH1 scm scm scm</p>
+<p>格式：数据库类型、数据库、数据库服务器、用户名、密码、cm server服务器</p>
+<ol start="5">
+<li>创建Parcel目录</li>
+</ol>
+<p>创建parcel目录，这些目录是server和agent用来接收和发送数据的目录，server端的parcel-repo这个目录会把所有</p>
+<p>的安装文件全部下载到此目录，而agent也需要安装包，parcels就是用来存储指定的安装包的，当然需要有权限能操作</p>
+<p>这些目录；</p>
+<p>Server节点</p>
+<p> – mkdir -p &#x2F;opt&#x2F;cloudera&#x2F;parcel-repo</p>
+<p>– chown cloudera-scm:cloudera-scm &#x2F;opt&#x2F;cloudera&#x2F;parcel-repo</p>
+<p>Agent节点</p>
+<p>– mkdir -p &#x2F;opt&#x2F;cloudera&#x2F;parcels</p>
+<p>– chown cloudera-scm:cloudera-scm &#x2F;opt&#x2F;cloudera&#x2F;parcels</p>
+<ol start="6">
+<li>制作CDH本地源</li>
+</ol>
+<p>下载好文件CDH-5.4.0-1.cdh5.4.0.p0.27-el6.parcel以及manifest.json，将这两个文件放到server节点的 &#x2F;opt&#x2F;cloudera&#x2F;parcel-repo下。</p>
+<p>实际上这个三个文件</p>
+<p>打开manifest.json文件，里面是json格式的配置，找到与下载版本相对应的hash码，新建文件，文件名与你的 parel包名一致，并加上.sha后缀，将hash码复制到文件中保存。</p>
+<ol start="7">
+<li>关机做快照。</li>
+</ol>
+<p>init 0 || power off</p>
+<ol start="8">
+<li>启动CM Server、Agent</li>
+</ol>
+<p>我们的系统需要预留内存；保证自己的系统能够跑起来，关闭所有的安全卫士；保证第一台节点的内存很多，以后可以</p>
+<p>在cdh1有很多东西；虚拟机默认都采用单核单线，如果cpu可以，采用双核双线；老师使用的是16g内存，虚拟机在固态</p>
+<p>硬盘上面，启动cloudera manager都需要几分钟，如果机器不好，可能需要启动一节课；如果实在不行，就需要单台转载</p>
+<p>所有节点的功能；</p>
+<p>当我们使用server start 会立马返回一个ok，这个只是表明该命令提交成功而已；毕竟server会在linux和mysql中创建</p>
+<p>目录和数据库表，所以第一次启动的时候如果时间很长，千万不要关闭；不然下一次启动的话，依旧会创建这些目录</p>
+<p>然后就会冲突；启动成功与否，可以通过一个日志文件来查看；当看到以下命令的时候，说明启动完成：</p>
+<p>先确保启动了mysql  service mysqld start</p>
+<p>全部会话：cd &#x2F;opt&#x2F;cloudera-manager&#x2F;cm-5.4.3&#x2F;etc&#x2F;init.d&#x2F;</p>
+<p>CDH1:执行.&#x2F;cloudera-scm-server start</p>
+<p>CDH1,2,3执行：.&#x2F;cloudera-scm-agent start</p>
+<p>观察启动server的日志</p>
+<p>cd &#x2F;opt&#x2F;cloudera-manager&#x2F;cm-5.4.3&#x2F;log&#x2F;cloudera-scm-server</p>
+<p>tail -f 上面目录下的log的文件</p>
+<p>出现如下内容表明启动成功</p>
+<p>2017-02-22 19:57:04,638 INFO WebServerImpl:org.mortbay.log: Started <a href="mailto:&#83;&#x65;&#108;&#101;&#x63;&#x74;&#x43;&#x68;&#97;&#110;&#x6e;&#101;&#x6c;&#x43;&#x6f;&#x6e;&#x6e;&#x65;&#x63;&#116;&#x6f;&#114;&#x40;&#x30;&#x2e;&#48;&#46;&#48;&#46;&#x30;">&#83;&#x65;&#108;&#101;&#x63;&#x74;&#x43;&#x68;&#97;&#110;&#x6e;&#101;&#x6c;&#x43;&#x6f;&#x6e;&#x6e;&#x65;&#x63;&#116;&#x6f;&#114;&#x40;&#x30;&#x2e;&#48;&#46;&#48;&#46;&#x30;</a>:7180</p>
+<p>2017-02-22 19:57:04,638 INFO WebServerImpl:com.cloudera.server.cmf.WebServerImpl: Started Jetty server.</p>
+<p>进入web浏览器进行访问，端口号：7180</p>
+<p>至此。CM安装成功。</p>
+<p>9.关闭CDH</p>
+<p>先关闭浏览器页面的服务。</p>
+<p>上下两个一次关闭。</p>
+<p>再关闭虚拟机命令行的服务。</p>
+<p>搭建CDH集群</p>
+<p>通过CM把CDH集群部署起来，部署的方式有四种：cm,yum,rpm,tarball,其中我们采用的是离线cdh</p>
+<p>下面所有的操作都是在web界面上操作的；9个步骤，</p>
+<p>如果不小心点击了外网的版本，那么就会从外网下载，这个时候点击返回，依旧会下载，那么唯一的解决办法</p>
+<p>就是停掉server,进去之后会出现已下载，也就是我们早就下载好到了parcels-repo，当然会是100%；然后第二</p>
+<p>个步骤是分配，就是把parcels-repo里面的软件分发到agent的parcel目录去；</p>
+<p>cloudera建议我们的&#x2F;proc&#x2F;sys&#x2F;vm&#x2F;swappiness交换内存为0，将这个文件设置为0即可；当然这样修改只是本次开机</p>
+<p>下次开机依旧不会改成这样；可以改另一个文件；</p>
+<p>我们后面看到的图表，监控都是来自于CM service;从最开始那个ppt图上面可以看到</p>
+<p>在使用cm配置cdh的时候，默认是没有给我们做高可用，虽然我们使用的是cm版本五，使用的hadoop是2.x,但是</p>
+<p>还是会有snn，只有在做了高可用之后snn才会消失；当我们只在cm上面安装hadoop的时候，有一个步骤，数据库检测</p>
+<p>，由于安装hadoop不需要数据库，所以会一闪而过；</p>
+<p>以下利用CM搭建CDH</p>
+<p>Jar包存放位置：</p>
+<p>&#x2F;opt&#x2F;cloudera&#x2F;parcels&#x2F;CDH-5.4.0-1.cdh5.4.0.p0.27</p>
+<p>查看任务管理器–观察内存使用状况</p>
+<p>注：添加新主机需重在新主机上装agent，步骤与上述步骤一样</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&text=CDH安装"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&title=CDH安装"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&is_video=false&description=CDH安装"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=CDH安装&body=Check out this article: http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&title=CDH安装"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&title=CDH安装"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&title=CDH安装"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&title=CDH安装"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&name=CDH安装&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E6%95%B0%E6%8D%AE-hadoop-CDH%E5%AE%89%E8%A3%85/&t=CDH安装"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

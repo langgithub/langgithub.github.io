@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="搬砖  ebpf in android1.ebpf原理收集资料https:&#x2F;&#x2F;www.ebpf.top&#x2F;post&#x2F;ebpf-overview-part-3&#x2F; 我当前阶段理解的重点是: 前端，后端，加载器， 数据结构 2.ebpf学习经历 收集资料   https:&#x2F;&#x2F;blog.seeflower.dev&#x2F;archives&#x2F;176&#x2F;  ebpf是linux内核提供的hook api看了很多大佬博客">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逆向-内核-ebpf">
+<meta property="og:url" content="http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="搬砖  ebpf in android1.ebpf原理收集资料https:&#x2F;&#x2F;www.ebpf.top&#x2F;post&#x2F;ebpf-overview-part-3&#x2F; 我当前阶段理解的重点是: 前端，后端，加载器， 数据结构 2.ebpf学习经历 收集资料   https:&#x2F;&#x2F;blog.seeflower.dev&#x2F;archives&#x2F;176&#x2F;  ebpf是linux内核提供的hook api看了很多大佬博客">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-03-25T07:00:00.000Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="ebpf">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>逆向-内核-ebpf</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&text=逆向-内核-ebpf"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&title=逆向-内核-ebpf"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&is_video=false&description=逆向-内核-ebpf"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-内核-ebpf&body=Check out this article: http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&title=逆向-内核-ebpf"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&title=逆向-内核-ebpf"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&title=逆向-内核-ebpf"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&title=逆向-内核-ebpf"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&name=逆向-内核-ebpf&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&t=逆向-内核-ebpf"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ebpf-in-android"><span class="toc-number">1.</span> <span class="toc-text">ebpf in android</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-ebpf%E5%8E%9F%E7%90%86"><span class="toc-number">1.1.</span> <span class="toc-text">1.ebpf原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-ebpf%E5%AD%A6%E4%B9%A0%E7%BB%8F%E5%8E%86"><span class="toc-number">1.2.</span> <span class="toc-text">2.ebpf学习经历</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-uprobe%E6%A3%80%E6%B5%8B"><span class="toc-number">1.3.</span> <span class="toc-text">3.uprobe检测</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        逆向-内核-ebpf
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-03-25T07:00:00.000Z" class="dt-published" itemprop="datePublished">2024-03-25</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E9%80%86%E5%90%91-ebpf/">逆向-ebpf</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/ebpf/" rel="tag">ebpf</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>搬砖</p>
+</blockquote>
+<h1 id="ebpf-in-android"><a href="#ebpf-in-android" class="headerlink" title="ebpf in android"></a>ebpf in android</h1><h2 id="1-ebpf原理"><a href="#1-ebpf原理" class="headerlink" title="1.ebpf原理"></a>1.ebpf原理</h2><p>收集资料<br><a target="_blank" rel="noopener" href="https://www.ebpf.top/post/ebpf-overview-part-3/">https://www.ebpf.top/post/ebpf-overview-part-3/</a></p>
+<p>我当前阶段理解的重点是: 前端，后端，加载器， 数据结构</p>
+<h2 id="2-ebpf学习经历"><a href="#2-ebpf学习经历" class="headerlink" title="2.ebpf学习经历"></a>2.ebpf学习经历</h2><blockquote>
+<p>收集资料</p>
+</blockquote>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.seeflower.dev/archives/176/">https://blog.seeflower.dev/archives/176/</a></li>
+</ul>
+<p>ebpf是linux内核提供的hook api<br>看了很多大佬博客，前期在Android上运行bpf程序遇到问题很多，重点是内核版本，Android api变化， 编译环境方面问题很多<br>总结了下bpf快速上手路线,我的手机小米12，应使用kenelSu root了</p>
+<ol>
+<li><p>多看理解早期基本用法 <a target="_blank" rel="noopener" href="https://blog.seeflower.dev/archives/89/">bpf on Android</a> </p>
+</li>
+<li><p>Android上体验bcc脚本</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://blog.seeflower.dev/archives/140/">环境准备</a><br>安装magiskSSH模块,它会帮我创建好linux在安卓上的环境,还会准备好ssh, 注意这里用的frp内网穿透提供ssh登录能力,如果不需要做内网穿透，直接ssh链接内网手机就可以了。当然我是用frp内网穿透链接云手机，只需要将我自己电脑上的公钥上传到跳板机器和内网手机</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Host jumpserver2</span><br><span class="line">User root</span><br><span class="line">HostName *****</span><br><span class="line">Port 22</span><br><span class="line"></span><br><span class="line">Host phone</span><br><span class="line">User root</span><br><span class="line">Port 22900</span><br><span class="line">HostName localhost</span><br><span class="line">ProxyJump jumpserver2</span><br></pre></td></tr></table></figure>
+<p>发现没有，不需要额外配置 IdentityFile，直接ssh phone</p>
+<p>本来打算用 vscode ssh 开发的，折腾了半天vscode无法打开Android目录，因为在ssh链接时候用了bash 命令，然而Android上没有bash命令，报解析错误，后改为在手机端启动<a target="_blank" rel="noopener" href="https://www.cnblogs.com/minskiter/p/16986874.html">code tunnel</a> 来远程开发</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.seeflower.dev/archives/111/">体验ebpf</a><br>没体验赶紧体验，不懂就问chatgpt,比如</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">BPF Maps</span><br><span class="line">BPF_PERCPU_ARRAY(ssl_data, struct probe_SSL_data_t, 1); 声明了一个 per-CPU 数组来存储追踪事件的数据。// 也就是初始化1个数据结构probe_SSL_data_t 放在 ssl_data</span><br><span class="line">BPF_PERF_OUTPUT(perf_SSL_rw); 和 BPF_PERF_OUTPUT(perf_SSL_do_handshake); 创建了用于将追踪数据发送到用户空间的性能输出数组。// 也就是创建的输出管道，内核里不断perf_submit 提交数据到管道，python前端注册好管道监听就能获取到相关数据</span><br><span class="line">BPF_HASH(start_ns, u32); 和 BPF_HASH(bufs, u32, u64); 声明了哈希表来存储事件开始的时间戳和缓冲区地址。// 这个就不用解释了，hash</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>eCapture 编译</p>
+<ul>
+<li><p>复习下osi七层协议，重点是ssl&#x2F;tls</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">应用层          (第7层) | ← 应用程序（如 Web 浏览器、电子邮件客户端）</span><br><span class="line">表示层          (第6层) | ← 数据格式化、数据加密、数据压缩</span><br><span class="line">会话层          (第5层) | ← 会话管理、身份验证</span><br><span class="line">-------------------------| ← SSL/TLS 加密层 (对tcp加密；提供了身份验证、密钥交换、加密和解密)</span><br><span class="line">传输层          (第4层) | ← 可靠的数据传输（如 TCP 协议）</span><br><span class="line">网络层          (第3层) | ← 路由、IP 数据报传输、地址解析</span><br><span class="line">数据链路层       (第2层) | ← 物理寻址、错误检测和修正</span><br><span class="line">物理层          (第1层) | ← 物理介质传输（如电缆、光纤）</span><br><span class="line"></span><br><span class="line">socket是抽象概念，跨越了多个层次。</span><br><span class="line">应用层协议（如 HTTP、FTP、SMTP）使用 Socket API 来实现网络通信功能。（应用层）</span><br><span class="line">Socket定义了端口和传输协议（如 TCP 或 UDP）（传输层）</span><br><span class="line">Socket本身不包含会话层和表示层的全部功能</span><br></pre></td></tr></table></figure>
+
+<p>在 Android 系统中，绝大多数与 TLS 相关的操作都是通过位于 &#x2F;apex&#x2F;com.android.conscrypt&#x2F;lib64&#x2F;libssl.so（对于 64 位系统）这一路径下的库来执行的。这个库是一个由 BoringSSL 提供支持的 Conscrypt 库的一部分，BoringSSL 本身是 Google 维护的 OpenSSL 的分支版本。</p>
+<p>Conscrypt 作为 Android 平台上的一个安全提供者，为高级应用程序编程接口（API）实现了底层的加密协议。应用程序和开发者通常使用 Android SDK 中提供的更高级别的 API，例如 javax.net.ssl.SSLContext 和 HttpsURLConnection，以及流行的网络库如 OkHttp，它们在内部都沟通与 Conscrypt 提供的功能以建立和维护安全的网络连接。</p>
+<p>除非开发者在 Android 应用中明确地引入了自定义的 TLS 库（例如使用一个独立的 OpenSSL 版本或其他的 SSL&#x2F;TLS 实现），否则默认情况下，安全通信都是通过系统提供的 Conscrypt 实现的 TLS 功能来处理的。通过 Security 类和 Provider 类的 API，Conscrypt 被集成和注册到 Java 安全框架中。这意味着不仅系统本身的网络通信依赖 Conscrypt，第三方应用程序除非另外指定，都会默认使用它来处理相关的 SSL&#x2F;TLS 连接。</p>
+<p>因此，如果你正在处理安全连接、证书验证或其他与 TLS 相关的安全特性，只要不是使用的自定义的加密库，你可以认为所有的操作最终都是通过 Android 系统提供的 Conscrypt 实现，进而调用 &#x2F;apex&#x2F;com.android.conscrypt&#x2F;lib64&#x2F;libssl.so 库的函数来完成的。</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.seeflower.dev/archives/172/">编译eCapture</a><br>我的编译过程</p>
+<ol>
+<li>使用gnirehtet将手机网络请求转发到电脑，电脑可翻墙加速下载</li>
+<li>配置go,按照上面文章就能可以搞定，最后缺什么环境变量补什么</li>
+<li>编译 make</li>
+</ol>
+</li>
+<li><p>eCapture使用</p>
+<ol>
+<li><p>先看下<a target="_blank" rel="noopener" href="https://www.cnxct.com/archives/">eCapture项目博客</a>的相关介绍 </p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnxct.com/ecapture-for-android/">重点博客</a></li>
+</ul>
+</li>
+<li><p>复习下<a target="_blank" rel="noopener" href="https://github.com/iovisor/bcc">bcc项目</a> 只看“Network and Sockets Tools”</p>
+<ul>
+<li>[x]tools&#x2F;gethostlatency </li>
+<li>[x]tools&#x2F;bindsnoop</li>
+<li>[x]tools&#x2F;netqtop tools&#x2F;netqtop.c</li>
+<li>[x]tools&#x2F;sofdsnoop</li>
+<li>[x]tools&#x2F;solisten</li>
+<li>[x]tools&#x2F;sslsniff “推荐 python sslsniff.py -p pid -l –handshake -g -n”</li>
+<li>[x]tools&#x2F;tcpaccept</li>
+<li>[x]tools&#x2F;tcpconnect</li>
+<li>[x]tools&#x2F;tcpconnlat</li>
+<li>[x]tools&#x2F;tcpdrop</li>
+<li>[x]tools&#x2F;tcplife</li>
+<li>[x]tools&#x2F;tcpretrans</li>
+<li>[x]tools&#x2F;tcprtt</li>
+<li>[x]tools&#x2F;tcpstates</li>
+<li>[x]tools&#x2F;tcpsubnet</li>
+<li>[x]tools&#x2F;tcpsynbl</li>
+<li>[x]tools&#x2F;tcptop</li>
+<li>[x]tools&#x2F;tcptracer</li>
+<li>[x]tools&#x2F;tcpcong</li>
+</ul>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.seeflower.dev/archives/172/">ecapture编译</a><br> 我的手机需要引入header文件<br> ANDROID&#x3D;1 make nocore</p>
+</li>
+<li><p>使用 .&#x2F;ecapture tls -h</p>
+</li>
+<li><p>vscode remote 远程调试ecapture</p>
+<ul>
+<li>在手机端启动 .&#x2F;code tunnel （我这里用的是vscode 隧道）</li>
+<li>vscode 安装Golang插件，<a target="_blank" rel="noopener" href="https://maiyang.me/post/2018-09-14-tips-vscode/">自动补全go代码</a></li>
+<li>插件装好后配置launch.json这个代码运行配置文件,重点是args 这个参数  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;version&quot;: &quot;0.2.0&quot;,</span><br><span class="line">    &quot;configurations&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;name&quot;: &quot;Launch ecapture&quot;,</span><br><span class="line">            &quot;type&quot;: &quot;go&quot;,</span><br><span class="line">            &quot;request&quot;: &quot;launch&quot;,</span><br><span class="line">            &quot;mode&quot;: &quot;debug&quot;,</span><br><span class="line">            &quot;program&quot;: &quot;$&#123;workspaceFolder&#125;&quot;, // 确保这里的路径指向正确的可执行文件或包</span><br><span class="line">            &quot;args&quot;: [&quot;tls&quot;], // 替换为你的实际参数</span><br><span class="line">            &quot;logOutput&quot;: &quot;dap&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>debug</li>
+<li>这时你会遇到 libpcap 没有安装问题，找到&#x2F;lib&#x2F;libpcap目录，.&#x2F;configure &amp;&amp; make &amp;&amp; make install</li>
+</ul>
+</li>
+<li><p>代码分析</p>
+<blockquote>
+<p>对比分析下<br> <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">// 来自ecapture</span><br><span class="line">struct &#123;</span><br><span class="line">    __uint(type, BPF_MAP_TYPE_PERF_EVENT_ARRAY);</span><br><span class="line">    __uint(key_size, sizeof(u32));</span><br><span class="line">    __uint(value_size, sizeof(u32));</span><br><span class="line">    __uint(max_entries, 1024);</span><br><span class="line">&#125; tls_events SEC(&quot;.maps&quot;);</span><br><span class="line"></span><br><span class="line">// 来自bcc sslsniff.py</span><br><span class="line">struct bpf_map_def SEC(&quot;maps&quot;) ssl_data = &#123;</span><br><span class="line">    .type = BPF_MAP_TYPE_PERCPU_ARRAY,</span><br><span class="line">    .key_size = sizeof(u32),</span><br><span class="line">    .value_size = sizeof(struct probe_SSL_data_t),</span><br><span class="line">    .max_entries = 1</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">映射类型：</span><br><span class="line">tls_events 是一个 BPF_MAP_TYPE_PERF_EVENT_ARRAY 类型，用于发送事件数据到用户空间。</span><br><span class="line">ssl_data 是一个 BPF_MAP_TYPE_PERCPU_ARRAY 类型，用于每个 CPU 存储特定的数据。</span><br><span class="line"></span><br><span class="line">使用场景：</span><br><span class="line">tls_events 用于与用户空间通信，如监控或跟踪 SSL/TLS 事件。</span><br><span class="line">ssl_data 用于存储每个 CPU 相关数据，例如用于性能监控或者调试目的。</span><br><span class="line">             </span><br><span class="line">映射大小：</span><br><span class="line">tls_events 可以根据系统上的 CPU 数量进行扩展，最多支持 1024 个 CPU。</span><br><span class="line">ssl_data 为每个 CPU 提供了一个数组元素。</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>tls_events  ssl_data  可以理解为不通作用的管道么?<br> <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">可以这样理解，tls_events 和 ssl_data 在 eBPF 程序中的确类似于不同作用的“管道”，其中每个管道都有不同的用途和行为。这里的“管道”是指它们各自如何在内核和用户空间之间传输数据的方式。</span><br><span class="line"></span><br><span class="line">tls_events 映射（管道）</span><br><span class="line">tls_events 映射是一个 BPF_MAP_TYPE_PERF_EVENT_ARRAY 类型的 eBPF 映射。它的主要作用是作为一个通道将数据从内核空间（eBPF 程序）发送到用户空间（分析工具或者监听程序）。这种映射允许 eBPF 程序通过 perf event 基础设施高效地传输数据，该数据通常与监控或跟踪事件有关。</span><br><span class="line"></span><br><span class="line">当 eBPF 程序用 bpf_perf_event_output 函数把数据发送到 tls_events 映射时，用户空间监听程序可以从关联的 perf event 文件描述符读取这些事件数据。</span><br><span class="line"></span><br><span class="line">ssl_data 映射（管道）</span><br><span class="line">ssl_data 映射是一个 BPF_MAP_TYPE_PERCPU_ARRAY 类型的 eBPF 映射。这个映射像是为每个 CPU 专门创建的一个本地存储区域，使得 eBPF 程序可以避免跨 CPU 的数据共享和潜在的竞争状态。它通常用于存储每个 CPU 核心特定的上下文信息或用于临时存储计算数据。</span><br><span class="line"></span><br><span class="line">由于是 per-CPU 映射，ssl_data 并不直接涉及到用户空间的数据传输。它更像是内核空间内部的一个局部存储区，用于 eBPF 程序的内部数据管理。</span><br><span class="line"></span><br><span class="line">总结</span><br><span class="line">tls_events 和 ssl_data 虽然都是 eBPF 程序中的数据结构，但它们的“管道”作用是不同的：</span><br><span class="line"></span><br><span class="line">tls_events 类似于一个将数据从 eBPF 程序发送到用户空间的出口管道。</span><br><span class="line">ssl_data 类似于一个在内核中为每个 CPU 提供数据存储的内部管道。</span><br><span class="line">根据需要传输数据的方向（内核到用户空间，还是内核内部）和用途（事件传输，还是数据存储），你会选择合适的映射类型来实现你的目标。</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+</li>
+<li><p><a target="_blank" rel="noopener" href="http://blog.silence.pink/p/trace-openssl-with-ebpf/">参数ssl读取</a></p>
+<ul>
+<li>ecapature&#x2F;utils&#x2F; 下介绍了如何读取ssl结构体相关的参数信息</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-274546.htm">定制bcc&#x2F;ebpf在android平台上实现基于dwarf的用户态栈回溯</a></p>
+<ol>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/SeeFlowerX/unwinddaemon">unwinddaemon</a></p>
+<ul>
+<li>[x]直接ndk交叉编译 .&#x2F;build.sh<br>  编译问题: <a target="_blank" rel="noopener" href="https://github.com/SeeFlowerX/unwinddaemon/issues/2">https://github.com/SeeFlowerX/unwinddaemon/issues/2</a></li>
+<li>[x]<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_33350950/article/details/134752123">基于aosp编译</a><br>  编译问题: <a target="_blank" rel="noopener" href="https://blog.csdn.net/Chris_1994/article/details/135017508">https://blog.csdn.net/Chris_1994/article/details/135017508</a><br>  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1. 直接拉取对应分支</span><br><span class="line">repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b android14-release</span><br><span class="line">repo sync -j8</span><br><span class="line"></span><br><span class="line">2. 交换内存不够的处理办法</span><br><span class="line">sudo dd if=/dev/zero of=/swapfile bs=1M count=20480</span><br><span class="line">sudo mkswap /swapfile</span><br><span class="line">sudo swapon /swapfile</span><br></pre></td></tr></table></figure><br>  unwinddaemon编译问题：<br>  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">system/extras/unwinddaemon/lib.cpp:454:85: error: unused parameter &#x27;stack_buf&#x27; [-Werror,-Wunused-parameter]</span><br><span class="line">const char* UnwindCallChainV2(int pid, UnwindOption* opt, uint64_t* regs_buf, void* stack_buf)</span><br><span class="line">注: 对于警告问题直接注释，(void)stack_buf; // 显式声明 stack_buf 为未使用</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/SeeFlowerX/unwindbcc">unwindbcc</a> 主要是在注册事件前，事件回调后修改相关代码。实现跨进程通讯打印</p>
+<ol>
+<li>open_perf_buffer(BPF.cc)-&gt;open_all_cpu-&gt;open_on_cpu-&gt;bpf_open_perf_buffer_opts(libbpf.c)-&gt;__NR_perf_event_open</li>
+<li>perf_reader_poll(perf_reader.c)-&gt;perf_reader_event_read-&gt;parse_sw-&gt;print_frame_info</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/SeeFlowerX/stackplz">stackplz</a><br>   注:go环境和ndk交叉编译, android端debian没有对于的cpu架构ndk</p>
+</li>
+</ol>
+<h2 id="3-uprobe检测"><a href="#3-uprobe检测" class="headerlink" title="3.uprobe检测"></a>3.uprobe检测</h2><p><a target="_blank" rel="noopener" href="https://www.cnxct.com/defeating-ebpf-uprobe-monitoring/">https://www.cnxct.com/defeating-ebpf-uprobe-monitoring/</a>     </p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ebpf-in-android"><span class="toc-number">1.</span> <span class="toc-text">ebpf in android</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-ebpf%E5%8E%9F%E7%90%86"><span class="toc-number">1.1.</span> <span class="toc-text">1.ebpf原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-ebpf%E5%AD%A6%E4%B9%A0%E7%BB%8F%E5%8E%86"><span class="toc-number">1.2.</span> <span class="toc-text">2.ebpf学习经历</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-uprobe%E6%A3%80%E6%B5%8B"><span class="toc-number">1.3.</span> <span class="toc-text">3.uprobe检测</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&text=逆向-内核-ebpf"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&title=逆向-内核-ebpf"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&is_video=false&description=逆向-内核-ebpf"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-内核-ebpf&body=Check out this article: http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&title=逆向-内核-ebpf"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&title=逆向-内核-ebpf"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&title=逆向-内核-ebpf"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&title=逆向-内核-ebpf"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&name=逆向-内核-ebpf&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/&t=逆向-内核-ebpf"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

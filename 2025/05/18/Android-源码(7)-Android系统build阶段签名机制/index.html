@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="本文介绍Android系统build阶段的签名机制。 一、系统build阶段签名机制 系统中有4组key用于build阶段对apk进行签名：   Media Platform Shared Testkey  default key是放在Android源码的&#x2F;build&#x2F;target&#x2F;product&#x2F;security目录下:  media.pk8与media.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android源码(7)-Android系统build阶段签名机制">
+<meta property="og:url" content="http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="本文介绍Android系统build阶段的签名机制。 一、系统build阶段签名机制 系统中有4组key用于build阶段对apk进行签名：   Media Platform Shared Testkey  default key是放在Android源码的&#x2F;build&#x2F;target&#x2F;product&#x2F;security目录下:  media.pk8与media.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/cd-dev-tool.png">
+<meta property="og:image" content="http://example.com/img/release-key.png">
+<meta property="og:image" content="http://example.com/img/WX20190714-095905@2x.png">
+<meta property="og:image" content="http://example.com/img/signapk.png">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="Android源码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/cd-dev-tool.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Android源码(7)-Android系统build阶段签名机制</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E6%A2%86%E6%A2%86%E5%8A%A0%E5%9B%BA%E5%88%86%E6%9E%90/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/Android-%E8%84%B1%E5%A3%B3%E7%B3%BB%E5%88%97-%E7%88%B1%E5%8A%A0%E5%AF%86%E5%88%86%E6%9E%90/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&text=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&title=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&is_video=false&description=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Android源码(7)-Android系统build阶段签名机制&body=Check out this article: http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&title=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&title=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&title=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&title=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&name=Android源码(7)-Android系统build阶段签名机制&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&t=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6"><span class="toc-number">1.</span> <span class="toc-text">一、系统build阶段签名机制</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E8%87%AA%E5%AE%9A%E4%B9%89%E7%B3%BB%E7%BB%9F%E7%AD%BE%E5%90%8D%E7%9A%84key"><span class="toc-number">2.</span> <span class="toc-text">二、自定义系统签名的key</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B-%E7%94%BB%E4%B8%AA%E5%9B%BE%E8%A1%A8%E7%A4%BA"><span class="toc-number">3.</span> <span class="toc-text">四. 画个图表示</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Android源码(7)-Android系统build阶段签名机制
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/code-Android/">code-Android</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Android%E6%BA%90%E7%A0%81/" rel="tag">Android源码</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>本文介绍Android系统build阶段的签名机制。</p>
+<h1 id="一、系统build阶段签名机制"><a href="#一、系统build阶段签名机制" class="headerlink" title="一、系统build阶段签名机制"></a>一、系统build阶段签名机制</h1><ol>
+<li>系统中有4组key用于build阶段对apk进行签名：</li>
+</ol>
+<ul>
+<li>Media</li>
+<li>Platform</li>
+<li>Shared</li>
+<li>Testkey</li>
+</ul>
+<p>default key是放在Android源码的&#x2F;build&#x2F;target&#x2F;product&#x2F;security目录下:</p>
+<ul>
+<li>media.pk8与media.x509.pem；</li>
+<li>platform.pk8与platform.x509.pem；</li>
+<li>shared.pk8与shared.x509.pem；</li>
+<li>testkey.pk8与testkey.x509.pem；<br>其中，*.pk8文件为私钥，*.x509.pem文件为公钥，这需要去了解非对称加密方式。</li>
+</ul>
+<ol start="2">
+<li>在apk的android.mk文件中会指定LOCAL_CERTIFICATE 变量：</li>
+</ol>
+<p>LOCAL_CERTIFICATE可设置的值如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_CERTIFICATE := testkey   # 普通APK，默认情况下使用</span><br><span class="line">LOCAL_CERTIFICATE := platform  # 该APK完成一些系统的核心功能,这种方式编译出来的APK所在进程的UID为system</span><br><span class="line">LOCAL_CERTIFICATE := shared    # 该APK是media/download系统中的一环</span><br><span class="line">LOCAL_CERTIFICATE := media     # 该APK是media/download系统中的一环</span><br><span class="line">如果不指定，默认使用testkey。</span><br></pre></td></tr></table></figure>
+<p>对应的，除了在Android.mk指定上述的值，还需要在APK源码的AndroidManifest.xml文件的manifest节点里面申明权限：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">android:sharedUserId=&quot;android.uid.system&quot;</span><br><span class="line">android:sharedUserId=&quot;android.uid.shared&quot;</span><br><span class="line">android:sharedUserId=&quot;android.media&quot;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>Build规则是Build&#x2F;core&#x2F;prebuilt.mk。</li>
+<li>在build&#x2F;core&#x2F;config.mk中，DEFAULT_SYSTEM_DEV_CERTIFICATE可以通过PRODUCT_DEFAULT_DEV_CERTIFICATE去指定各家厂商的key path。</li>
+</ol>
+<p>我们可以看到，默认为build&#x2F;target&#x2F;product&#x2F;security&#x2F;testkey。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># The default key if not set as LOCAL_CERTIFICATE</span><br><span class="line">ifdef PRODUCT_DEFAULT_DEV_CERTIFICATE</span><br><span class="line">  DEFAULT_SYSTEM_DEV_CERTIFICATE := $(PRODUCT_DEFAULT_DEV_CERTIFICATE)</span><br><span class="line">else</span><br><span class="line">  DEFAULT_SYSTEM_DEV_CERTIFICATE := build/target/product/security/testkey</span><br><span class="line">endif</span><br></pre></td></tr></table></figure>
+<h1 id="二、自定义系统签名的key"><a href="#二、自定义系统签名的key" class="headerlink" title="二、自定义系统签名的key"></a>二、自定义系统签名的key</h1><p>上面介绍了系统有默认四组key，那么如果我们要制作自己的key，需要怎么做呢？<br>在build&#x2F;target&#x2F;product&#x2F;security&#x2F;目录下有一个README，里面有说明怎么制作这些key并且使用。</p>
+<ol>
+<li>进入Development&#x2F;tools&#x2F; 目录</li>
+</ol>
+<p><img src="/img/cd-dev-tool.png" alt="2"></p>
+<ol start="2">
+<li>使用make_key工具生成签名文件：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh make_key releasekey  &#x27;/C=CN/ST=Guangdong/L=Shenzhen/O=Mediatek/OU=MTK/CN=fzll/emailAddress=maoao530@foxmail.com&#x27;</span><br></pre></td></tr></table></figure>
+其中：</li>
+</ol>
+<p>C : Country Name (2 letter code)<br>ST : State or Province Name (full name)<br>L : Locality Name (eg, city)<br>O : Organization Name (eg, company)<br>OU : Organizational Unit Name (eg, section)<br>CN : Common Name (eg, your name or your server’s hostname)<br>emailAddress : Contact email address<br>3. 用ls命令发现目录下多了两个文件：releasekey.x509.pem 和 releasekey.pk8</p>
+<p><img src="/img/release-key.png" alt="1"></p>
+<ol start="4">
+<li><p>同样的步骤生成platform &#x2F; shared &#x2F; media</p>
+</li>
+<li><p>用自定义的key替换build&#x2F;target&#x2F;product&#x2F;security&#x2F;目录下面的key。</p>
+</li>
+</ol>
+<p>三、对APK进行系统签名<br>为了使apk有system权限，通常我们需要对其进行系统签名：</p>
+<p>1、在应用程序的AndroidManifest.xml中的manifest节点中加入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">android:sharedUserId=&quot;android.uid.system&quot;这个属性。</span><br></pre></td></tr></table></figure>
+<p>2、修改它的Android.mk文件，加入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_CERTIFICATE := platform</span><br><span class="line">重新编译，生成的apk就有修改system权限了,我们通过ps命令查看APK所在进程的UID，发现值为system。</span><br></pre></td></tr></table></figure>
+
+<p>三. Android签名机制之—签名过程详解</p>
+<ol>
+<li>两种签名方式<ul>
+<li>jarsigner</li>
+<li>signapk</li>
+</ul>
+</li>
+<li>签名流程机制<br>源码位置：com&#x2F;android&#x2F;signapk&#x2F;sign.java</br><br>通过上面的签名时我们可以看到，Android签名apk之后，会有一个META-INF文件夹，这里有三个文件：<br>MANIFEST.MF<br>CERT.RSA<br>CERT.SF<br>下面来看看这三个文件到底是干啥的？</li>
+</ol>
+<ul>
+<li>MANIFEST.MF<br><img src="/img/WX20190714-095905@2x.png" alt="1"><br>开下源码：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br></pre></td><td class="code"><pre><span class="line">【main】</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">      if (args.length &lt; 4) usage();</span><br><span class="line"></span><br><span class="line">      sBouncyCastleProvider = new BouncyCastleProvider();</span><br><span class="line">      Security.addProvider(sBouncyCastleProvider);</span><br><span class="line"></span><br><span class="line">      boolean signWholeFile = false;</span><br><span class="line">      int argstart = 0;</span><br><span class="line">      if (args[0].equals(&quot;-w&quot;)) &#123;</span><br><span class="line">          signWholeFile = true;</span><br><span class="line">          argstart = 1;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      if ((args.length - argstart) % 2 == 1) usage();</span><br><span class="line">      int numKeys = ((args.length - argstart) / 2) - 1;</span><br><span class="line">      if (signWholeFile &amp;&amp; numKeys &gt; 1) &#123;</span><br><span class="line">          System.err.println(&quot;Only one key may be used with -w.&quot;);</span><br><span class="line">          System.exit(2);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      String inputFilename = args[args.length-2];</span><br><span class="line">      String outputFilename = args[args.length-1];</span><br><span class="line"></span><br><span class="line">      JarFile inputJar = null;</span><br><span class="line">      FileOutputStream outputFile = null;</span><br><span class="line">      int hashes = 0;</span><br><span class="line"></span><br><span class="line">      try &#123;</span><br><span class="line">          File firstPublicKeyFile = new File(args[argstart+0]);</span><br><span class="line"></span><br><span class="line">          X509Certificate[] publicKey = new X509Certificate[numKeys];</span><br><span class="line">          try &#123;</span><br><span class="line">              for (int i = 0; i &lt; numKeys; ++i) &#123;</span><br><span class="line">                  int argNum = argstart + i*2;</span><br><span class="line">                  publicKey[i] = readPublicKey(new File(args[argNum]));</span><br><span class="line">                  hashes |= getAlgorithm(publicKey[i]);</span><br><span class="line">              &#125;</span><br><span class="line">          &#125; catch (IllegalArgumentException e) &#123;</span><br><span class="line">              System.err.println(e);</span><br><span class="line">              System.exit(1);</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          // Set the ZIP file timestamp to the starting valid time</span><br><span class="line">          // of the 0th certificate plus one hour (to match what</span><br><span class="line">          // we&#x27;ve historically done).</span><br><span class="line">          long timestamp = publicKey[0].getNotBefore().getTime() + 3600L * 1000;</span><br><span class="line"></span><br><span class="line">          PrivateKey[] privateKey = new PrivateKey[numKeys];</span><br><span class="line">          for (int i = 0; i &lt; numKeys; ++i) &#123;</span><br><span class="line">              int argNum = argstart + i*2 + 1;</span><br><span class="line">              privateKey[i] = readPrivateKey(new File(args[argNum]));</span><br><span class="line">          &#125;</span><br><span class="line">          inputJar = new JarFile(new File(inputFilename), false);  // Don&#x27;t verify.</span><br><span class="line"></span><br><span class="line">          outputFile = new FileOutputStream(outputFilename);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">          if (signWholeFile) &#123;</span><br><span class="line">              SignApk.signWholeFile(inputJar, firstPublicKeyFile,</span><br><span class="line">                                    publicKey[0], privateKey[0], outputFile);</span><br><span class="line">          &#125; else &#123;</span><br><span class="line">              JarOutputStream outputJar = new JarOutputStream(outputFile);</span><br><span class="line"></span><br><span class="line">              // For signing .apks, use the maximum compression to make</span><br><span class="line">              // them as small as possible (since they live forever on</span><br><span class="line">              // the system partition).  For OTA packages, use the</span><br><span class="line">              // default compression level, which is much much faster</span><br><span class="line">              // and produces output that is only a tiny bit larger</span><br><span class="line">              // (~0.1% on full OTA packages I tested).</span><br><span class="line">              outputJar.setLevel(9);</span><br><span class="line"></span><br><span class="line">              Manifest manifest = addDigestsToManifest(inputJar, hashes);</span><br><span class="line">              copyFiles(manifest, inputJar, outputJar, timestamp);</span><br><span class="line">              signFile(manifest, inputJar, publicKey, privateKey, outputJar);</span><br><span class="line">              outputJar.close();</span><br><span class="line">          &#125;</span><br><span class="line">      &#125; catch (Exception e) &#123;</span><br><span class="line">          e.printStackTrace();</span><br><span class="line">          System.exit(1);</span><br><span class="line">      &#125; finally &#123;</span><br><span class="line">          try &#123;</span><br><span class="line">              if (inputJar != null) inputJar.close();</span><br><span class="line">              if (outputFile != null) outputFile.close();</span><br><span class="line">          &#125; catch (IOException e) &#123;</span><br><span class="line">              e.printStackTrace();</span><br><span class="line">              System.exit(1);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">【signWholeFile中调用 signFile】</span><br><span class="line">private static void signFile(Manifest manifest, JarFile inputJar,</span><br><span class="line">                            X509Certificate[] publicKey, PrivateKey[] privateKey,</span><br><span class="line">                            JarOutputStream outputJar)</span><br><span class="line">   throws Exception &#123;</span><br><span class="line">   // Assume the certificate is valid for at least an hour.</span><br><span class="line">   long timestamp = publicKey[0].getNotBefore().getTime() + 3600L * 1000;</span><br><span class="line"></span><br><span class="line">   // MANIFEST.MF</span><br><span class="line">   JarEntry je = new JarEntry(JarFile.MANIFEST_NAME);</span><br><span class="line">   je.setTime(timestamp);</span><br><span class="line">   outputJar.putNextEntry(je);</span><br><span class="line">   manifest.write(outputJar);</span><br><span class="line"></span><br><span class="line">   int numKeys = publicKey.length;</span><br><span class="line">   for (int k = 0; k &lt; numKeys; ++k) &#123;</span><br><span class="line">       // CERT.SF / CERT#.SF</span><br><span class="line">       je = new JarEntry(numKeys == 1 ? CERT_SF_NAME :</span><br><span class="line">                         (String.format(CERT_SF_MULTI_NAME, k)));</span><br><span class="line">       je.setTime(timestamp);</span><br><span class="line">       outputJar.putNextEntry(je);</span><br><span class="line">       ByteArrayOutputStream baos = new ByteArrayOutputStream();</span><br><span class="line">       writeSignatureFile(manifest, baos, getAlgorithm(publicKey[k]));</span><br><span class="line">       byte[] signedData = baos.toByteArray();</span><br><span class="line">       outputJar.write(signedData);</span><br><span class="line"></span><br><span class="line">       // CERT.RSA / CERT#.RSA</span><br><span class="line">       je = new JarEntry(numKeys == 1 ? CERT_RSA_NAME :</span><br><span class="line">                         (String.format(CERT_RSA_MULTI_NAME, k)));</span><br><span class="line">       je.setTime(timestamp);</span><br><span class="line">       outputJar.putNextEntry(je);</span><br><span class="line">       writeSignatureBlock(new CMSProcessableByteArray(signedData),</span><br><span class="line">                           publicKey[k], privateKey[k], outputJar);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;   </span><br><span class="line"></span><br><span class="line">【main函数中 addDigestsToManifest】</span><br><span class="line">/**</span><br><span class="line"> * Add the hash(es) of every file to the manifest, creating it if</span><br><span class="line"> * necessary.</span><br><span class="line"> */</span><br><span class="line">private static Manifest addDigestsToManifest(JarFile jar, int hashes)</span><br><span class="line">    throws IOException, GeneralSecurityException &#123;</span><br><span class="line">    Manifest input = jar.getManifest();</span><br><span class="line">    Manifest output = new Manifest();</span><br><span class="line">    Attributes main = output.getMainAttributes();</span><br><span class="line">    if (input != null) &#123;</span><br><span class="line">        main.putAll(input.getMainAttributes());</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        main.putValue(&quot;Manifest-Version&quot;, &quot;1.0&quot;);</span><br><span class="line">        main.putValue(&quot;Created-By&quot;, &quot;1.0 (Android SignApk)&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    MessageDigest md_sha1 = null;</span><br><span class="line">    MessageDigest md_sha256 = null;</span><br><span class="line">    if ((hashes &amp; USE_SHA1) != 0) &#123;</span><br><span class="line">        md_sha1 = MessageDigest.getInstance(&quot;SHA1&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    if ((hashes &amp; USE_SHA256) != 0) &#123;</span><br><span class="line">        md_sha256 = MessageDigest.getInstance(&quot;SHA256&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    byte[] buffer = new byte[4096];</span><br><span class="line">    int num;</span><br><span class="line"></span><br><span class="line">    // We sort the input entries by name, and add them to the</span><br><span class="line">    // output manifest in sorted order.  We expect that the output</span><br><span class="line">    // map will be deterministic.</span><br><span class="line"></span><br><span class="line">    TreeMap&lt;String, JarEntry&gt; byName = new TreeMap&lt;String, JarEntry&gt;();</span><br><span class="line"></span><br><span class="line">    for (Enumeration&lt;JarEntry&gt; e = jar.entries(); e.hasMoreElements(); ) &#123;</span><br><span class="line">        JarEntry entry = e.nextElement();</span><br><span class="line">        byName.put(entry.getName(), entry);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    for (JarEntry entry: byName.values()) &#123;</span><br><span class="line">        String name = entry.getName();</span><br><span class="line">        if (!entry.isDirectory() &amp;&amp;</span><br><span class="line">            (stripPattern == null || !stripPattern.matcher(name).matches())) &#123;</span><br><span class="line">            InputStream data = jar.getInputStream(entry);</span><br><span class="line">            while ((num = data.read(buffer)) &gt; 0) &#123;</span><br><span class="line">                if (md_sha1 != null) md_sha1.update(buffer, 0, num);</span><br><span class="line">                if (md_sha256 != null) md_sha256.update(buffer, 0, num);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            Attributes attr = null;</span><br><span class="line">            if (input != null) attr = input.getAttributes(name);</span><br><span class="line">            attr = attr != null ? new Attributes(attr) : new Attributes();</span><br><span class="line">            if (md_sha1 != null) &#123;</span><br><span class="line">                attr.putValue(&quot;SHA1-Digest&quot;,</span><br><span class="line">                              new String(Base64.encode(md_sha1.digest()), &quot;ASCII&quot;));</span><br><span class="line">            &#125;</span><br><span class="line">            if (md_sha256 != null) &#123;</span><br><span class="line">                attr.putValue(&quot;SHA-256-Digest&quot;,</span><br><span class="line">                              new String(Base64.encode(md_sha256.digest()), &quot;ASCII&quot;));</span><br><span class="line">            &#125;</span><br><span class="line">            output.getEntries().put(name, attr);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return output;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+总结：生成三个文件 MANIFEST.MF，CERT.SF，CERT.RSA</li>
+</ul>
+<ol>
+<li><p>&#x2F;&#x2F; MANIFEST.MF<br>JarEntry je &#x3D; new JarEntry(JarFile.MANIFEST_NAME);<br>je.setTime(timestamp);<br>outputJar.putNextEntry(je);<br>manifest.write(outputJar);</br><br>除了三个文件(MANIFEST.MF,CERT.RSA,CERT.SF)，其他的文件都会对文件内容做一次SHA1算法，就是计算出文件的摘要信息,然后用Base64进行编码即可，保存到MANIFEST.MF</p>
+</li>
+<li><p>&#x2F;&#x2F; CERT.SF &#x2F; CERT#.SF<br>je &#x3D; new JarEntry(numKeys &#x3D;&#x3D; 1 ? CERT_SF_NAME :<br>          (String.format(CERT_SF_MULTI_NAME, k)));</p>
+</li>
+</ol>
+<p>je.setTime(timestamp);<br>outputJar.putNextEntry(je);<br>ByteArrayOutputStream baos &#x3D; new ByteArrayOutputStream();<br>writeSignatureFile(manifest, baos, getAlgorithm(publicKey[k]));<br>byte[] signedData &#x3D; baos.toByteArray();<br>outputJar.write(signedData);</br><br>1》计算这个MANIFEST.MF文件的整体SHA1值，再经过BASE64编码后，记录在CERT.SF主属性块（在文件头上）的“SHA1-Digest-Manifest”属性值值下</br><br>2》逐条计算MANIFEST.MF文件中每一个块的SHA1，并经过BASE64编码后，记录在CERT.SF中的同名块中，属性的名字是“SHA1-Digest“</p>
+<ol start="3">
+<li>&#x2F;&#x2F; CERT.RSA &#x2F; CERT#.RSA<br>je &#x3D; new JarEntry(numKeys &#x3D;&#x3D; 1 ? CERT_RSA_NAME :<br> (String.format(CERT_RSA_MULTI_NAME, k)));<br>je.setTime(timestamp);<br>outputJar.putNextEntry(je);<br>writeSignatureBlock(new CMSProcessableByteArray(signedData),<br>publicKey[k], privateKey[k], outputJar);</br><br>我们看到，这里会把之前生成的 CERT.SF文件， 用私钥计算出签名, 然后将签名以及包含公钥信息的数字证书一同写入 CERT.RSA 中保存。CERT.RSA是一个满足PKCS7格式的文件。</li>
+</ol>
+<h1 id="四-画个图表示"><a href="#四-画个图表示" class="headerlink" title="四. 画个图表示"></a>四. 画个图表示</h1><p><img src="/img/signapk.png" alt="signapk"></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6"><span class="toc-number">1.</span> <span class="toc-text">一、系统build阶段签名机制</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E8%87%AA%E5%AE%9A%E4%B9%89%E7%B3%BB%E7%BB%9F%E7%AD%BE%E5%90%8D%E7%9A%84key"><span class="toc-number">2.</span> <span class="toc-text">二、自定义系统签名的key</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B-%E7%94%BB%E4%B8%AA%E5%9B%BE%E8%A1%A8%E7%A4%BA"><span class="toc-number">3.</span> <span class="toc-text">四. 画个图表示</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&text=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&title=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&is_video=false&description=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Android源码(7)-Android系统build阶段签名机制&body=Check out this article: http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&title=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&title=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&title=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&title=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&name=Android源码(7)-Android系统build阶段签名机制&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(7)-Android%E7%B3%BB%E7%BB%9Fbuild%E9%98%B6%E6%AE%B5%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6/&t=Android源码(7)-Android系统build阶段签名机制"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

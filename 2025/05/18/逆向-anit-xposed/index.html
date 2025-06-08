@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="xposed攻防check: https:&#x2F;&#x2F;github.com&#x2F;w568w&#x2F;XposedCheckerhider: https:&#x2F;&#x2F;github.com&#x2F;Yaerin&#x2F;XposedHider 常用检查xposed方式 直接加载xposed类 读取加载后的动态链接库  主动抛出异常检查xposed关键字 获取安装的应用程序 …  123456789101112131415161718192021">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xposed攻防">
+<meta property="og:url" content="http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="xposed攻防check: https:&#x2F;&#x2F;github.com&#x2F;w568w&#x2F;XposedCheckerhider: https:&#x2F;&#x2F;github.com&#x2F;Yaerin&#x2F;XposedHider 常用检查xposed方式 直接加载xposed类 读取加载后的动态链接库  主动抛出异常检查xposed关键字 获取安装的应用程序 …  123456789101112131415161718192021">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="xposed">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>xposed攻防</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/%E9%80%86%E5%90%91-IOS-%E5%B7%A5%E5%85%B7%E8%AF%B4%E6%98%8E/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E9%80%86%E5%90%91-hook-xposed/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&text=xposed攻防"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&title=xposed攻防"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&is_video=false&description=xposed攻防"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=xposed攻防&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&title=xposed攻防"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&title=xposed攻防"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&title=xposed攻防"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&title=xposed攻防"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&name=xposed攻防&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&t=xposed攻防"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#xposed%E6%94%BB%E9%98%B2"><span class="toc-number">1.</span> <span class="toc-text">xposed攻防</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%A3%80%E6%9F%A5xposed%E6%96%B9%E5%BC%8F"><span class="toc-number">1.0.1.</span> <span class="toc-text">常用检查xposed方式</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        xposed攻防
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.429Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E7%88%AC%E8%99%AB-Android%E9%80%86%E5%90%91/">爬虫-Android逆向</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/xposed/" rel="tag">xposed</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="xposed攻防"><a href="#xposed攻防" class="headerlink" title="xposed攻防"></a>xposed攻防</h1><p>check: <a target="_blank" rel="noopener" href="https://github.com/w568w/XposedChecker">https://github.com/w568w/XposedChecker</a><br>hider: <a target="_blank" rel="noopener" href="https://github.com/Yaerin/XposedHider">https://github.com/Yaerin/XposedHider</a></p>
+<h3 id="常用检查xposed方式"><a href="#常用检查xposed方式" class="headerlink" title="常用检查xposed方式"></a>常用检查xposed方式</h3><ol>
+<li>直接加载xposed类</li>
+<li>读取加载后的动态链接库 </li>
+<li>主动抛出异常检查xposed关键字</li>
+<li>获取安装的应用程序</li>
+<li>…</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br></pre></td><td class="code"><pre><span class="line">//直接加载xposed类</span><br><span class="line">XC_MethodHook hookClass = new XC_MethodHook() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void beforeHookedMethod(MethodHookParam param) &#123;</span><br><span class="line">        Log.i(&quot;xposed&quot;,&quot;xposed1&quot;);</span><br><span class="line">        String packageName = (String) param.args[0];</span><br><span class="line">        if (packageName.matches(&quot;de\\.robv\\.android\\.xposed\\.Xposed+.+&quot;)) &#123;</span><br><span class="line">            Log.i(&quot;xposed&quot;,&quot;de\\.robv\\.android\\.xposed\\.Xposed+.+&quot;);</span><br><span class="line">            param.setThrowable(new ClassNotFoundException(packageName));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line">// FIXME: 18-6-23 w568w: It&#x27;s very dangerous to hook these methods, thinking to replace them.</span><br><span class="line">XposedHelpers.findAndHookMethod(</span><br><span class="line">        ClassLoader.class,</span><br><span class="line">        &quot;loadClass&quot;,</span><br><span class="line">        String.class,</span><br><span class="line">        boolean.class,</span><br><span class="line">        hookClass</span><br><span class="line">);</span><br><span class="line">XposedHelpers.findAndHookMethod(</span><br><span class="line">        Class.class,</span><br><span class="line">        &quot;forName&quot;,</span><br><span class="line">        String.class,</span><br><span class="line">        boolean.class,</span><br><span class="line">        ClassLoader.class,</span><br><span class="line">        hookClass</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">//读取加载后的动态链接库 </span><br><span class="line">XposedHelpers.findAndHookMethod(BufferedReader.class, &quot;readLine&quot;, new XC_MethodHook() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void afterHookedMethod(MethodHookParam param) throws Throwable &#123;</span><br><span class="line">        String result = (String) param.getResult();</span><br><span class="line">        if(result != null) &#123;</span><br><span class="line">            if (result.contains(&quot;XposedBridge&quot;)) &#123;</span><br><span class="line">                param.setResult(&quot;&quot;);new File(&quot;&quot;).lastModified();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">//主动抛出异常检查xposed关键字</span><br><span class="line">XC_MethodHook hookStack = new XC_MethodHook() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void afterHookedMethod(MethodHookParam param) &#123;</span><br><span class="line">        Log.i(&quot;xposed&quot;,&quot;xposed3&quot;);</span><br><span class="line"></span><br><span class="line">        StackTraceElement[] elements = (StackTraceElement[]) param.getResult();</span><br><span class="line">        List&lt;StackTraceElement&gt; clone = new ArrayList&lt;&gt;();</span><br><span class="line">        for (StackTraceElement element : elements) &#123;</span><br><span class="line">            if (!element.getClassName().toLowerCase().contains(C.KW_XPOSED)) &#123;</span><br><span class="line">                clone.add(element);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        param.setResult(clone.toArray(new StackTraceElement[0]));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line">XposedHelpers.findAndHookMethod(</span><br><span class="line">        Throwable.class,</span><br><span class="line">        &quot;getStackTrace&quot;,</span><br><span class="line">        hookStack</span><br><span class="line">);</span><br><span class="line">XposedHelpers.findAndHookMethod(</span><br><span class="line">        Thread.class,</span><br><span class="line">        &quot;getStackTrace&quot;,</span><br><span class="line">        hookStack</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">//获取安装的应用程序</span><br><span class="line">XposedHelpers.findAndHookMethod(</span><br><span class="line">        &quot;android.app.ApplicationPackageManager&quot;,</span><br><span class="line">        lpparam.classLoader,</span><br><span class="line">        &quot;getInstalledPackages&quot;,</span><br><span class="line">        int.class,</span><br><span class="line">        new XC_MethodHook() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void afterHookedMethod(MethodHookParam param) &#123;</span><br><span class="line">                Log.i(&quot;xposed&quot;,&quot;xposed4&quot;);</span><br><span class="line"></span><br><span class="line">                List&lt;PackageInfo&gt; apps = (List&lt;PackageInfo&gt;) param.getResult();</span><br><span class="line">                List&lt;PackageInfo&gt; clone = new ArrayList&lt;&gt;();</span><br><span class="line">                // foreach is very slow.</span><br><span class="line">                final int len = apps.size();</span><br><span class="line">                for (int i = 0; i &lt; len; i++) &#123;</span><br><span class="line">                    PackageInfo app = apps.get(i);</span><br><span class="line">                    if (!app.packageName.toLowerCase().contains(C.KW_XPOSED)) &#123;</span><br><span class="line">                        clone.add(app);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                param.setResult(clone);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">XposedHelpers.findAndHookMethod(</span><br><span class="line">        &quot;android.app.ApplicationPackageManager&quot;,</span><br><span class="line">        lpparam.classLoader,</span><br><span class="line">        &quot;getInstalledApplications&quot;,</span><br><span class="line">        int.class,</span><br><span class="line">        new XC_MethodHook() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void afterHookedMethod(MethodHookParam param) &#123;</span><br><span class="line">                Log.i(&quot;xposed&quot;,&quot;xposed5&quot;);</span><br><span class="line"></span><br><span class="line">                List&lt;ApplicationInfo&gt; apps = (List&lt;ApplicationInfo&gt;) param.getResult();</span><br><span class="line">                List&lt;ApplicationInfo&gt; clone = new ArrayList&lt;&gt;();</span><br><span class="line">                final int len = apps.size();</span><br><span class="line">                for (int i = 0; i &lt; len; i++) &#123;</span><br><span class="line">                    ApplicationInfo app = apps.get(i);</span><br><span class="line">                    boolean shouldRemove = app.metaData != null &amp;&amp; app.metaData.getBoolean(&quot;xposedmodule&quot;) ||</span><br><span class="line">                            app.packageName != null &amp;&amp; app.packageName.toLowerCase().contains(C.KW_XPOSED) ||</span><br><span class="line">                            app.className != null &amp;&amp; app.className.toLowerCase().contains(C.KW_XPOSED) ||</span><br><span class="line">                            app.processName != null &amp;&amp; app.processName.toLowerCase().contains(C.KW_XPOSED);</span><br><span class="line">                    if (!shouldRemove) &#123;</span><br><span class="line">                        clone.add(app);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                param.setResult(clone);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">//查看某些函数是否是native</span><br><span class="line">XposedHelpers.findAndHookMethod(</span><br><span class="line">        Modifier.class,</span><br><span class="line">        &quot;isNative&quot;,</span><br><span class="line">        int.class,</span><br><span class="line">        new XC_MethodHook() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void afterHookedMethod(MethodHookParam param) &#123;</span><br><span class="line">                Log.i(&quot;xposed&quot;,&quot;xposed6&quot;);</span><br><span class="line"></span><br><span class="line">                param.setResult(false);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">XposedHelpers.findAndHookMethod(</span><br><span class="line">        System.class,</span><br><span class="line">        &quot;getProperty&quot;,</span><br><span class="line">        String.class,</span><br><span class="line">        new XC_MethodHook() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void afterHookedMethod(MethodHookParam param) &#123;</span><br><span class="line">                Log.i(&quot;xposed&quot;,&quot;xposed7&quot;);</span><br><span class="line"></span><br><span class="line">                if (&quot;vxp&quot;.equals(param.args[0])) &#123;</span><br><span class="line">                    param.setResult(null);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">XposedHelpers.findAndHookMethod(</span><br><span class="line">        File.class,</span><br><span class="line">        &quot;list&quot;,</span><br><span class="line">        new XC_MethodHook() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void afterHookedMethod(MethodHookParam param) &#123;</span><br><span class="line">                Log.i(&quot;xposed&quot;,&quot;xposed8&quot;);</span><br><span class="line"></span><br><span class="line">                String[] fs = (String[]) param.getResult();</span><br><span class="line">                if (fs == null) &#123;</span><br><span class="line">                    return;</span><br><span class="line">                &#125;</span><br><span class="line">                List&lt;String&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line">                for (String f : fs) &#123;</span><br><span class="line">                    if (!f.toLowerCase().contains(C.KW_XPOSED) &amp;&amp; !f.equals(&quot;su&quot;)) &#123;</span><br><span class="line">                        list.add(f);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                param.setResult(list.toArray(new String[0]));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">Class&lt;?&gt; clazz = null;</span><br><span class="line">try &#123;</span><br><span class="line">    clazz = Runtime.getRuntime().exec(&quot;echo&quot;).getClass();</span><br><span class="line">&#125; catch (IOException ignore) &#123;</span><br><span class="line">    XposedBridge.log(&quot;[W/XposedHider] Cannot hook Process#getInputStream&quot;);</span><br><span class="line">&#125;</span><br><span class="line">if (clazz != null) &#123;</span><br><span class="line">    XposedHelpers.findAndHookMethod(</span><br><span class="line">            clazz,</span><br><span class="line">            &quot;getInputStream&quot;,</span><br><span class="line">            new XC_MethodHook() &#123;</span><br><span class="line">                @Override</span><br><span class="line">                protected void afterHookedMethod(MethodHookParam param) &#123;</span><br><span class="line">                    Log.i(&quot;xposed&quot;,&quot;xposed9&quot;);</span><br><span class="line"></span><br><span class="line">                    InputStream is = (InputStream) param.getResult();</span><br><span class="line">                    if (is instanceof FilterXpInputStream) &#123;</span><br><span class="line">                        param.setResult(is);</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        param.setResult(new FilterXpInputStream(is));</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">XposedBridge.hookAllMethods(System.class, &quot;getenv&quot;,</span><br><span class="line">        new XC_MethodHook() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void afterHookedMethod(MethodHookParam param) &#123;</span><br><span class="line">                Log.i(&quot;xposed&quot;,&quot;xposed10&quot;);</span><br><span class="line"></span><br><span class="line">                if (param.args.length == 0) &#123;</span><br><span class="line">                    Map&lt;String, String&gt; res = (Map&lt;String, String&gt;) param.getResult();</span><br><span class="line">                    String classpath = res.get(&quot;CLASSPATH&quot;);</span><br><span class="line">                    param.setResult(filter(classpath));</span><br><span class="line">                &#125; else if (&quot;CLASSPATH&quot;.equals(param.args[0])) &#123;</span><br><span class="line">                    String classpath = (String) param.getResult();</span><br><span class="line">                    param.setResult(filter(classpath));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            private String filter(String s) &#123;</span><br><span class="line">                List&lt;String&gt; list = Arrays.asList(s.split(&quot;:&quot;));</span><br><span class="line">                List&lt;String&gt; clone = new ArrayList&lt;&gt;();</span><br><span class="line">                for (int i = 0; i &lt; list.size(); i++) &#123;</span><br><span class="line">                    if (!list.get(i).toLowerCase().contains(C.KW_XPOSED)) &#123;</span><br><span class="line">                        clone.add(list.get(i));</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                StringBuilder res = new StringBuilder();</span><br><span class="line">                for (int i = 0; i &lt; clone.size(); i++) &#123;</span><br><span class="line">                    res.append(clone);</span><br><span class="line">                    if (i != clone.size() - 1) &#123;</span><br><span class="line">                        res.append(&quot;:&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                return res.toString();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">XposedHelpers.findAndHookMethod(&quot;android.app.ApplicationPackageManager&quot;, lpparam.classLoader, &quot;getPackageInfo&quot;, String.class, int.class, new XC_MethodHook() &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void beforeHookedMethod(MethodHookParam param) throws Throwable &#123;</span><br><span class="line">        String packageName = (String) param.args[0];</span><br><span class="line">        XposedBridge.log(&quot;ApplicationPackageManager: &quot; + packageName);</span><br><span class="line">        if(packageName.equals(&quot;de.robv.android.xposed.installer&quot;))&#123;</span><br><span class="line">            param.args[0]=&quot;de.robv.android.Xposed.installer&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">XposedHelpers.findAndHookMethod(&quot;android.app.ApplicationPackageManager&quot;, lpparam.classLoader, &quot;getApplicationInfo&quot;, String.class, int.class, new XC_MethodHook() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void beforeHookedMethod(MethodHookParam param) throws Throwable &#123;</span><br><span class="line">        String packageName = (String) param.args[0];</span><br><span class="line">        if (isTarget(packageName)) &#123;</span><br><span class="line">            XposedBridge.log(&quot;packageName: &quot; + packageName);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">XposedHelpers.findAndHookMethod(&quot;android.app.ActivityManager&quot;, lpparam.classLoader, &quot;getRunningServices&quot;, int.class, new XC_MethodHook() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void afterHookedMethod(MethodHookParam param) throws Throwable &#123;</span><br><span class="line">        List&lt;ActivityManager.RunningServiceInfo&gt; serviceInfoList = (List) param.getResult();</span><br><span class="line">        List&lt;ActivityManager.RunningServiceInfo&gt; resultList = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        for (ActivityManager.RunningServiceInfo runningServiceInfo : serviceInfoList) &#123;</span><br><span class="line">            String serviceName = runningServiceInfo.process;</span><br><span class="line">            if (isTarget(serviceName)) &#123;</span><br><span class="line">                XposedBridge.log(&quot;serviceName: &quot; + serviceName);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                resultList.add(runningServiceInfo);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        param.setResult(resultList);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">XposedHelpers.findAndHookMethod(&quot;android.app.ActivityManager&quot;, lpparam.classLoader, &quot;getRunningTasks&quot;, int.class, new XC_MethodHook() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void afterHookedMethod(MethodHookParam param) throws Throwable &#123;</span><br><span class="line">        List&lt;ActivityManager.RunningTaskInfo&gt; serviceInfoList = (List) param.getResult();</span><br><span class="line">        List&lt;ActivityManager.RunningTaskInfo&gt; resultList = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        for (ActivityManager.RunningTaskInfo runningTaskInfo : serviceInfoList) &#123;</span><br><span class="line">            String taskName = runningTaskInfo.baseActivity.flattenToString();</span><br><span class="line">            if (isTarget(taskName)) &#123;</span><br><span class="line">                XposedBridge.log(&quot;taskName: &quot; + taskName);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                resultList.add(runningTaskInfo);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        param.setResult(resultList);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">XposedHelpers.findAndHookMethod(&quot;android.app.ActivityManager&quot;, lpparam.classLoader, &quot;getRunningAppProcesses&quot;, new XC_MethodHook() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void afterHookedMethod(MethodHookParam param) throws Throwable &#123;</span><br><span class="line">        List&lt;ActivityManager.RunningAppProcessInfo&gt; runningAppProcessInfos = (List) param.getResult();</span><br><span class="line">        List&lt;ActivityManager.RunningAppProcessInfo&gt; resultList = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        for (ActivityManager.RunningAppProcessInfo runningAppProcessInfo : runningAppProcessInfos) &#123;</span><br><span class="line">            String processName = runningAppProcessInfo.processName;</span><br><span class="line">            if (isTarget(processName)) &#123;</span><br><span class="line">                XposedBridge.log(&quot;processName: &quot; + processName);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                resultList.add(runningAppProcessInfo);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        param.setResult(resultList);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">private static boolean isTarget(String name) &#123;</span><br><span class="line">    return name.contains(&quot;Hu&quot;) || name.contains(&quot;xposed&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#xposed%E6%94%BB%E9%98%B2"><span class="toc-number">1.</span> <span class="toc-text">xposed攻防</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%A3%80%E6%9F%A5xposed%E6%96%B9%E5%BC%8F"><span class="toc-number">1.0.1.</span> <span class="toc-text">常用检查xposed方式</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&text=xposed攻防"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&title=xposed攻防"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&is_video=false&description=xposed攻防"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=xposed攻防&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&title=xposed攻防"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&title=xposed攻防"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&title=xposed攻防"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&title=xposed攻防"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&name=xposed攻防&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-anit-xposed/&t=xposed攻防"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

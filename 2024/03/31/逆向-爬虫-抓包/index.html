@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="搬砖  ebpf in android1.osi七层协议(ssl&#x2F;tls 所在位置)1234567应用层tcp     (第7层)        &lt;-- 应用数据（HTTP、FTP、IMAP等）表示层tcp     (第6层)   会话层tcp     (第5层)        &lt;-- SSL&#x2F;TLS 握手，密钥交换，记录协议传输层tcp     (第4层)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逆向-爬虫-抓包">
+<meta property="og:url" content="http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="搬砖  ebpf in android1.osi七层协议(ssl&#x2F;tls 所在位置)1234567应用层tcp     (第7层)        &lt;-- 应用数据（HTTP、FTP、IMAP等）表示层tcp     (第6层)   会话层tcp     (第5层)        &lt;-- SSL&#x2F;TLS 握手，密钥交换，记录协议传输层tcp     (第4层)">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-03-31T07:00:00.000Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>逆向-爬虫-抓包</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/03/31/%E9%80%86%E5%90%91-hook-plt/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&text=逆向-爬虫-抓包"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&title=逆向-爬虫-抓包"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&is_video=false&description=逆向-爬虫-抓包"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-爬虫-抓包&body=Check out this article: http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&title=逆向-爬虫-抓包"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&title=逆向-爬虫-抓包"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&title=逆向-爬虫-抓包"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&title=逆向-爬虫-抓包"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&name=逆向-爬虫-抓包&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&t=逆向-爬虫-抓包"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ebpf-in-android"><span class="toc-number">1.</span> <span class="toc-text">ebpf in android</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-osi%E4%B8%83%E5%B1%82%E5%8D%8F%E8%AE%AE-ssl-tls-%E6%89%80%E5%9C%A8%E4%BD%8D%E7%BD%AE"><span class="toc-number">1.1.</span> <span class="toc-text">1.osi七层协议(ssl&#x2F;tls 所在位置)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ssl-tls"><span class="toc-number">1.1.1.</span> <span class="toc-text">ssl&#x2F;tls</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#https"><span class="toc-number">1.1.2.</span> <span class="toc-text">https</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-https%E5%8D%95%E5%90%91%E8%AE%A4%E8%AF%81%E5%92%8C%E5%8F%8C%E5%90%91%E8%AE%A4%E8%AF%81"><span class="toc-number">1.1.3.</span> <span class="toc-text">3.2. https单向认证和双向认证</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%B8%B8%E7%94%A8%E6%8A%93%E5%8C%85%E5%B7%A5%E5%85%B7%E5%8F%8A%E5%8E%9F%E7%90%86"><span class="toc-number">1.2.</span> <span class="toc-text">2.常用抓包工具及原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%8A%93%E5%8C%85%E8%84%9A%E6%AD%A5%E5%8F%8A%E5%8E%9F%E7%90%86"><span class="toc-number">1.3.</span> <span class="toc-text">3.抓包脚步及原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%B7%A5%E4%BD%9C%E4%B8%AD%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%A1%88"><span class="toc-number">1.4.</span> <span class="toc-text">4.工作中的抓包方案</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        逆向-爬虫-抓包
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-03-31T07:00:00.000Z" class="dt-published" itemprop="datePublished">2024-03-31</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E9%80%86%E5%90%91/">逆向</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E9%80%86%E5%90%91/" rel="tag">逆向</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>搬砖</p>
+</blockquote>
+<h1 id="ebpf-in-android"><a href="#ebpf-in-android" class="headerlink" title="ebpf in android"></a>ebpf in android</h1><h2 id="1-osi七层协议-ssl-tls-所在位置"><a href="#1-osi七层协议-ssl-tls-所在位置" class="headerlink" title="1.osi七层协议(ssl&#x2F;tls 所在位置)"></a>1.osi七层协议(ssl&#x2F;tls 所在位置)</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">应用层tcp     (第7层)        &lt;-- 应用数据（HTTP、FTP、IMAP等）</span><br><span class="line">表示层tcp     (第6层)   </span><br><span class="line">会话层tcp     (第5层)        &lt;-- SSL/TLS 握手，密钥交换，记录协议</span><br><span class="line">传输层tcp     (第4层)        &lt;-- SSL/TLS 记录协议（安全的传输）</span><br><span class="line">网络层        (第3层)        &lt;-- IP协议等，进行路由选择</span><br><span class="line">数据链路层     (第2层)        &lt;-- 在物理网络中传输数据帧</span><br><span class="line">物理层        (第1层)        &lt;-- 物理传输介质</span><br></pre></td></tr></table></figure>
+<h3 id="ssl-tls"><a href="#ssl-tls" class="headerlink" title="ssl&#x2F;tls"></a>ssl&#x2F;tls</h3><p>tcp 是网络编程的抽象，ssl&#x2F;tls 对tcp加密，同时处理握手，密钥交换</p>
+<h3 id="https"><a href="#https" class="headerlink" title="https"></a>https</h3><ol>
+<li><p>TCP 三次握手：<br>TCP 连接开始时，客户端发出一个 SYN（同步序列编号） 数据包。<br>服务器回应一个带有 SYN&#x2F;ACK 标志的数据包。<br>客户端发送一个 ACK（确认）数据包，完成三次握手。</p>
+</li>
+<li><p>TLS 握手 —— 客户端发送 “Client Hello”：<br>握手开始后，客户端发送 “Client Hello” 消息，包含其支持的 TLS 版本、加密套件、压缩方法和一个客户端随机数。</p>
+</li>
+<li><p>TLS 握手 —— 服务器响应 “Server Hello”：<br>服务器选择双方共同支持的协议和密码套件，并发送 “Server Hello” 消息给客户端。它也包含一个服务器随机数。</p>
+</li>
+<li><p>服务器发送证书链：<br>这包括服务器的公共证书及任何必需的中间CA证书。根CA证书通常不会发送，因为它应该已经预先安装在客户端系统中。</p>
+</li>
+<li><p>客户端验证证书，并使用CA的公钥进行加密的密钥交换：<br>客户端验证服务器证书和证书链的有效性。如果验证通过，客户端使用服务器证书中包含的公钥来加密生成的预备主秘钥（pre-master secret）并发送给服务器。</p>
+</li>
+<li><p>密钥交换和加密套件的确定：<br>服务器利用其私钥解密并得到预备主秘钥，并基于这个秘钥以及双方共享的随机数生成主秘钥。双方会使用主秘钥派生出会话秘钥，用于此后的会话加密。<br>双方会各自发送“Change Cipher Spec”消息，之后即使用选定的对称加密算法（如 AES）、特定模式（如 GCM）和会话秘钥来加密通信。</p>
+</li>
+<li><p>握手完成，开始加密通信：<br>双方分别发送包含握手消息哈希的”Finished”消息。一旦 “Finished” 消息被验证，加密会话开始，传输的数据使用会话秘钥加密。</p>
+</li>
+</ol>
+<h3 id="3-2-https单向认证和双向认证"><a href="#3-2-https单向认证和双向认证" class="headerlink" title="3.2. https单向认证和双向认证"></a>3.2. https单向认证和双向认证</h3><ol>
+<li><p>单向认证 sslping</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">单向认证信任所有证书</span><br><span class="line">public class HttpsUtils &#123;</span><br><span class="line"></span><br><span class="line">private MyTrustManager mMyTrustManager;</span><br><span class="line"></span><br><span class="line">    private SSLSocketFactory createSSLSocketFactory() &#123;</span><br><span class="line">        SSLSocketFactory ssfFactory = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            mMyTrustManager = new MyTrustManager();</span><br><span class="line">            SSLContext sc = SSLContext.getInstance(&quot;TLS&quot;);</span><br><span class="line">            sc.init(null, new TrustManager[]&#123;mMyTrustManager&#125;, new SecureRandom());</span><br><span class="line">            ssfFactory = sc.getSocketFactory();</span><br><span class="line">        &#125; catch (Exception ignored) &#123;</span><br><span class="line">            ignored.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return ssfFactory;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //实现X509TrustManager接口</span><br><span class="line">    public class MyTrustManager implements X509TrustManager &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public X509Certificate[] getAcceptedIssuers() &#123;</span><br><span class="line">            return new X509Certificate[0];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //实现HostnameVerifier接口</span><br><span class="line">    private class TrustAllHostnameVerifier implements HostnameVerifier &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public boolean verify(String hostname, SSLSession session) &#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public OkHttpClient getTrustAllClient() &#123;</span><br><span class="line">        OkHttpClient.Builder mBuilder = new OkHttpClient.Builder();</span><br><span class="line">        mBuilder.sslSocketFactory(createSSLSocketFactory(), mMyTrustManager)</span><br><span class="line">                .hostnameVerifier(new TrustAllHostnameVerifier());</span><br><span class="line">        return mBuilder.build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>单向认证 验证服务器端证书</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public static SSLSocketFactory getSSLSocketFactory_Certificate(Context context, String str) &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        CertificateFactory instance = CertificateFactory.getInstance(&quot;X.509&quot;);</span><br><span class="line">        KeyStore instance2 = KeyStore.getInstance(KeyStore.getDefaultType());</span><br><span class="line">        instance2.load((KeyStore.LoadStoreParameter) null);</span><br><span class="line">        int i = 0;</span><br><span class="line">        for (Certificate certificateEntry : instance.generateCertificates(context.getAssets().open(str))) &#123;</span><br><span class="line">            instance2.setCertificateEntry(Integer.toString(i), certificateEntry);</span><br><span class="line">            i++;</span><br><span class="line">        &#125;</span><br><span class="line">        TrustManagerFactory instance3 = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());</span><br><span class="line">        instance3.init(instance2);</span><br><span class="line">        SSLContext instance4 = SSLContext.getInstance(&quot;TLS&quot;);</span><br><span class="line">        instance4.init((KeyManager[]) null, instance3.getTrustManagers(), new SecureRandom());</span><br><span class="line">        return instance4.getSocketFactory();</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">        throw new RuntimeException(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>双向认证</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public static SSLSocketFactory getSSLSocketFactory_Certificate(Context context, String str) &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        CertificateFactory certificateFactory = CertificateFactory.getInstance(&quot;X.509&quot;);</span><br><span class="line">        //通过证书工厂得到自签证书对象集合</span><br><span class="line">        Collection&lt;? extends Certificate&gt; certificates = certificateFactory.generateCertificates(in);</span><br><span class="line">        if (certificates.isEmpty()) &#123;</span><br><span class="line">            throw new IllegalArgumentException(&quot;expected non-empty set of trusted certificates&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        //为证书设置一个keyStore</span><br><span class="line">        char[] password = &quot;password&quot;.toCharArray(); // Any password will work.</span><br><span class="line">        KeyStore keyStore = newEmptyKeyStore(password);</span><br><span class="line">        int index = 0;</span><br><span class="line">        //将证书放入keystore中</span><br><span class="line">        for (Certificate certificate : certificates) &#123;</span><br><span class="line">            String certificateAlias = Integer.toString(index++);</span><br><span class="line">            keyStore.setCertificateEntry(certificateAlias, certificate);</span><br><span class="line">        &#125;</span><br><span class="line">        // Use it to build an X509 trust manager.</span><br><span class="line">        //使用包含自签证书信息的keyStore去构建一个X509TrustManager</span><br><span class="line">        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(</span><br><span class="line">                KeyManagerFactory.getDefaultAlgorithm());</span><br><span class="line">        keyManagerFactory.init(keyStore, password);</span><br><span class="line">        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(</span><br><span class="line">                TrustManagerFactory.getDefaultAlgorithm());</span><br><span class="line">        trustManagerFactory.init(keyStore);</span><br><span class="line">        SSLContext instance4 = SSLContext.getInstance(&quot;TLS&quot;);</span><br><span class="line">        instance4.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), new SecureRandom());</span><br><span class="line">        return instance4.getSocketFactory();</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">        throw new RuntimeException(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="2-常用抓包工具及原理"><a href="#2-常用抓包工具及原理" class="headerlink" title="2.常用抓包工具及原理"></a>2.常用抓包工具及原理</h2><p>中间人劫持</p>
+<p>旁观者观察</p>
+<h2 id="3-抓包脚步及原理"><a href="#3-抓包脚步及原理" class="headerlink" title="3.抓包脚步及原理"></a>3.抓包脚步及原理</h2><h2 id="4-工作中的抓包方案"><a href="#4-工作中的抓包方案" class="headerlink" title="4.工作中的抓包方案"></a>4.工作中的抓包方案</h2><ul>
+<li>要阻止来自特定IP地址的所有入站流量：<br>iptables -A INPUT -s <IP_ADDRESS> -j DROP</li>
+<li>iptables -L INPUT -v -n</li>
+<li>iptables -D INPUT 3</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ebpf-in-android"><span class="toc-number">1.</span> <span class="toc-text">ebpf in android</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-osi%E4%B8%83%E5%B1%82%E5%8D%8F%E8%AE%AE-ssl-tls-%E6%89%80%E5%9C%A8%E4%BD%8D%E7%BD%AE"><span class="toc-number">1.1.</span> <span class="toc-text">1.osi七层协议(ssl&#x2F;tls 所在位置)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ssl-tls"><span class="toc-number">1.1.1.</span> <span class="toc-text">ssl&#x2F;tls</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#https"><span class="toc-number">1.1.2.</span> <span class="toc-text">https</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-https%E5%8D%95%E5%90%91%E8%AE%A4%E8%AF%81%E5%92%8C%E5%8F%8C%E5%90%91%E8%AE%A4%E8%AF%81"><span class="toc-number">1.1.3.</span> <span class="toc-text">3.2. https单向认证和双向认证</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%B8%B8%E7%94%A8%E6%8A%93%E5%8C%85%E5%B7%A5%E5%85%B7%E5%8F%8A%E5%8E%9F%E7%90%86"><span class="toc-number">1.2.</span> <span class="toc-text">2.常用抓包工具及原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%8A%93%E5%8C%85%E8%84%9A%E6%AD%A5%E5%8F%8A%E5%8E%9F%E7%90%86"><span class="toc-number">1.3.</span> <span class="toc-text">3.抓包脚步及原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%B7%A5%E4%BD%9C%E4%B8%AD%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%A1%88"><span class="toc-number">1.4.</span> <span class="toc-text">4.工作中的抓包方案</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&text=逆向-爬虫-抓包"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&title=逆向-爬虫-抓包"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&is_video=false&description=逆向-爬虫-抓包"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-爬虫-抓包&body=Check out this article: http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&title=逆向-爬虫-抓包"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&title=逆向-爬虫-抓包"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&title=逆向-爬虫-抓包"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&title=逆向-爬虫-抓包"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&name=逆向-爬虫-抓包&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/&t=逆向-爬虫-抓包"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

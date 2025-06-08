@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="搬砖  frida编译1.原始frida编译  编译先看：https:&#x2F;&#x2F;frida.re&#x2F;docs&#x2F;building&#x2F;  git clone –recurse-submodules https:&#x2F;&#x2F;github.com&#x2F;frida&#x2F;frida.git git checkout 16.2.1 git submodule update cd frida make make core-android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逆向-hook-inline(frida)">
+<meta property="og:url" content="http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="搬砖  frida编译1.原始frida编译  编译先看：https:&#x2F;&#x2F;frida.re&#x2F;docs&#x2F;building&#x2F;  git clone –recurse-submodules https:&#x2F;&#x2F;github.com&#x2F;frida&#x2F;frida.git git checkout 16.2.1 git submodule update cd frida make make core-android">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/%E9%80%86%E5%90%91-frida-%E7%BC%96%E8%AF%91%E4%B8%8E%E7%89%B9%E5%BE%811.png">
+<meta property="article:published_time" content="2024-03-21T07:00:00.000Z">
+<meta property="article:modified_time" content="2025-05-18T12:48:43.127Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="hook">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/%E9%80%86%E5%90%91-frida-%E7%BC%96%E8%AF%91%E4%B8%8E%E7%89%B9%E5%BE%811.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>逆向-hook-inline(frida)</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/03/25/%E9%80%86%E5%90%91-%E5%86%85%E6%A0%B8-ebpf/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&text=逆向-hook-inline(frida)"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&title=逆向-hook-inline(frida)"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&is_video=false&description=逆向-hook-inline(frida)"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-hook-inline(frida)&body=Check out this article: http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&title=逆向-hook-inline(frida)"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&title=逆向-hook-inline(frida)"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&title=逆向-hook-inline(frida)"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&title=逆向-hook-inline(frida)"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&name=逆向-hook-inline(frida)&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&t=逆向-hook-inline(frida)"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#frida%E7%BC%96%E8%AF%91"><span class="toc-number">1.</span> <span class="toc-text">frida编译</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%8E%9F%E5%A7%8Bfrida%E7%BC%96%E8%AF%91"><span class="toc-number">1.1.</span> <span class="toc-text">1.原始frida编译</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AE%9A%E5%88%B6%E5%BA%93hluwa"><span class="toc-number">1.2.</span> <span class="toc-text">2.定制库hluwa</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-frida%E6%A3%80%E6%B5%8B%E7%82%B9"><span class="toc-number">1.3.</span> <span class="toc-text">3. frida检测点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-frida-gum%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0"><span class="toc-number">1.4.</span> <span class="toc-text">4. frida-gum内核学习</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-anti-frida"><span class="toc-number">1.5.</span> <span class="toc-text">5. anti-frida</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%86%85%E6%A0%B8%E4%B8%AD-anti-frida"><span class="toc-number">1.6.</span> <span class="toc-text">6. 内核中 anti-frida</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        逆向-hook-inline(frida)
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-03-21T07:00:00.000Z" class="dt-published" itemprop="datePublished">2024-03-21</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E9%80%86%E5%90%91-hook/">逆向-hook</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/hook/" rel="tag">hook</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>搬砖</p>
+</blockquote>
+<h1 id="frida编译"><a href="#frida编译" class="headerlink" title="frida编译"></a>frida编译</h1><h2 id="1-原始frida编译"><a href="#1-原始frida编译" class="headerlink" title="1.原始frida编译"></a>1.原始frida编译</h2><p>  编译先看：<a target="_blank" rel="noopener" href="https://frida.re/docs/building/">https://frida.re/docs/building/</a></p>
+<ul>
+<li>git clone –recurse-submodules <a target="_blank" rel="noopener" href="https://github.com/frida/frida.git">https://github.com/frida/frida.git</a></li>
+<li>git checkout 16.2.1</li>
+<li>git submodule update</li>
+<li>cd frida</li>
+<li>make</li>
+<li>make core-android-arm64</li>
+</ul>
+<p><strong>编译环境补充</strong></p>
+<ul>
+<li>sudo apt-get install build-essential curl git lib32stdc++-9-dev <br>  libc6-dev-i386 nodejs npm python3-dev python3-pip</li>
+</ul>
+<p>不出意外的话应该会报错</p>
+<blockquote>
+<p>问题一：没有ANDROID_NDK_ROOT</p>
+</blockquote>
+<pre><code>解决办法：我是从Android studio中Android sdk选项卡中安装指定报错版本的ndk，然后配置ANDROID_NDK_ROOT环境变量
+* export ANDROID_NDK_ROOT=/home/cozy/Android/Sdk/ndk/25.2.9519653
+* export PATH=$ANDROID_NDK_ROOT:$PATH
+</code></pre>
+<blockquote>
+<p>问题二：没有node环境</p>
+</blockquote>
+<pre><code>虽然安装了nodejs，但是可能版本不对也会提示编译失败
+1. npm doctor  #查看项目使用的nodejs版本
+2. curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash  #使用nvm来安装nodejs
+3. nvm install v20.11.1 #我这里用的是v20.11.1
+</code></pre>
+<h2 id="2-定制库hluwa"><a href="#2-定制库hluwa" class="headerlink" title="2.定制库hluwa"></a>2.定制库hluwa</h2><p>在frida源码同级目录下，clone hluwa代码.当然这里只适配到frida 15.0.4</p>
+<ol>
+<li>git clone <a target="_blank" rel="noopener" href="https://github.com/hluwa/Patchs.git">https://github.com/hluwa/Patchs.git</a></li>
+<li>git checkout 15.0.4  </li>
+<li>git submodule update –recursive</li>
+<li>git am ..&#x2F;..&#x2F;Patchs&#x2F;strongR-frida&#x2F;frida-core&#x2F;*.patch</li>
+<li>make core-android-arm64</li>
+</ol>
+<p>我本人应为下载 frida&#x3D;&#x3D;16.2.1, Patchs脚本只支持到15.0.4，所以就手动复制，顺便熟悉下魔改点</p>
+<h2 id="3-frida检测点"><a href="#3-frida检测点" class="headerlink" title="3. frida检测点"></a>3. frida检测点</h2><p>简单检测</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-1783400-1-1.html">https://www.52pojie.cn/thread-1783400-1-1.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-278145.htm">https://bbs.kanxue.com/thread-278145.htm</a></li>
+</ul>
+<p>一般检查主要是通过frida关键词特征</p>
+<ol>
+<li><input checked="" disabled="" type="checkbox"> 查看&#x2F;proc&#x2F;pid&#x2F;maps，查看这个文件中frida关键词</li>
+<li><input checked="" disabled="" type="checkbox"> 读取&#x2F;proc&#x2F;pid&#x2F;maps映射内存，从内存中检测“frida:rpc”类似关键词，不过内存中之只搜索到frida-agent</li>
+<li><input checked="" disabled="" type="checkbox"> 查看&#x2F;proc&#x2F;self&#x2F;task&#x2F;pid&#x2F;status, 从对现场描述文件中查找frida相关进程，如 gmain gum-js-loop pool-frida 线程名称</li>
+<li><input checked="" disabled="" type="checkbox"> 读取readlink &#x2F;proc&#x2F;self&#x2F;fd&#x2F;XXX，从frida通过管道建立双向通信角度检测frida</li>
+<li><input checked="" disabled="" type="checkbox"> 检查端口和tmp目录</li>
+</ol>
+<p>高级检查</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-268586-1.htm">https://bbs.kanxue.com/thread-268586-1.htm</a></li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzIxNDcwOTcwOQ==&mid=2247492981&idx=2&sn=1337a0dd0259195efe078be55d1d4a55&chksm=97a1c1d7a0d648c14f09d0fd9a43e150f53ce79c82ab5098b7dca6cffc663ce7d32eb5a27b2e&scene=126&sessionid=1653073641&key=0a9f15bc7a0b11091058c506225c7aacc781814ef557c1c6195dacd423a4d7507afa9035592752f9405e452a884945d59fe8a303e08a2720f63543e053d51f5610aa3b9c39f4022a941e44e6a95a4e7f94a498dbe19a9910e426a2efb448776eb27f191dff8d34dd848894604e6cda8798d3d39de7b44611a7a06cc8fdf43826&ascene=1&uin=MTA3Mzc3OTIzNQ==&devicetype=Windows+Server+2016+x64&version=6305002e&lang=zh_CN&session_us=gh_86e8b32f4148&exportkey=AScNPRbXZl0lSD8Me34jl4w=&acctmode=0&pass_ticket=CLipu1oc3Xo23kKaFPk9VMmJWr0KzXLDKmtoNd6o2PRzCklLCrUb3XxUITQ9X3B0&wx_header=0&fontgear=2">https://mp.weixin.qq.com/s?__biz=MzIxNDcwOTcwOQ==&amp;mid=2247492981&amp;idx=2&amp;sn=1337a0dd0259195efe078be55d1d4a55&amp;chksm=97a1c1d7a0d648c14f09d0fd9a43e150f53ce79c82ab5098b7dca6cffc663ce7d32eb5a27b2e&amp;scene=126&amp;sessionid=1653073641&amp;key=0a9f15bc7a0b11091058c506225c7aacc781814ef557c1c6195dacd423a4d7507afa9035592752f9405e452a884945d59fe8a303e08a2720f63543e053d51f5610aa3b9c39f4022a941e44e6a95a4e7f94a498dbe19a9910e426a2efb448776eb27f191dff8d34dd848894604e6cda8798d3d39de7b44611a7a06cc8fdf43826&amp;ascene=1&amp;uin=MTA3Mzc3OTIzNQ%3D%3D&amp;devicetype=Windows+Server+2016+x64&amp;version=6305002e&amp;lang=zh_CN&amp;session_us=gh_86e8b32f4148&amp;exportkey=AScNPRbXZl0lSD8Me34jl4w%3D&amp;acctmode=0&amp;pass_ticket=CLipu1oc3Xo23kKaFPk9VMmJWr0KzXLDKmtoNd6o2PRzCklLCrUb3XxUITQ9X3B0&amp;wx_header=0&amp;fontgear=2</a></li>
+<li><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-278423.htm">https://bbs.kanxue.com/thread-278423.htm</a></li>
+</ul>
+<p>我个人认为高级点检查点如下：</p>
+<ol>
+<li><input checked="" disabled="" type="checkbox"> 对核心native文件checksum检查，主要是对与maps文件中存在 r*xp 权限的so文件做checksum检查（注入文件前后checksum大小不一样）</li>
+<li>[] 从内核角度对linehook检测，可先看第四点</li>
+</ol>
+<h2 id="4-frida-gum内核学习"><a href="#4-frida-gum内核学习" class="headerlink" title="4. frida-gum内核学习"></a>4. frida-gum内核学习</h2><p><img src="https://cdn.jsdelivr.net/gh/langgithub/image-repo/imgblog/%E9%80%86%E5%90%91-frida-%E7%BC%96%E8%AF%91%E4%B8%8E%E7%89%B9%E5%BE%811.png" alt="Frida inline hook 的执行流程"></p>
+<h2 id="5-anti-frida"><a href="#5-anti-frida" class="headerlink" title="5. anti-frida"></a>5. anti-frida</h2><ul>
+<li>[x]直接干掉检测线程<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">// 先找到__pthread_start，再patch </span><br><span class="line">// arm64-android14</span><br><span class="line">function hook_pthread_create() &#123;</span><br><span class="line">  var libc = Process.findModuleByName(&quot;libc.so&quot;);</span><br><span class="line">  var addr_pthread_create = libc.base.add(0xCB5D8); // __pthread_start</span><br><span class="line">  Interceptor.attach(addr_pthread_create, &#123;</span><br><span class="line">    onEnter: function (args) &#123;</span><br><span class="line">      var enter = args[0].add(12 * 8).readPointer() console.log(&quot;thread start:&quot; + addr2nice(enter))</span><br><span class="line">    &#125; </span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function patch_func_nop(addr) &#123; // C0 03 5F D6</span><br><span class="line">  Memory.patchCode(addr, 4, function (code) &#123; code.writeByteArray([0xC0, 0x03, 0x5F, 0xD6]);</span><br><span class="line">&#125;); &#125;</span><br><span class="line">patch_func_nop(base.add(0x44dd4));</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ol start="2">
+<li>[x]直接干掉检测线程<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">function hook_pthread_create() &#123;</span><br><span class="line">    console.log(&quot;libmsaoaidsec.so --- &quot; + Process.findModuleByName(&quot;libmsaoaidsec.so&quot;).base)</span><br><span class="line">    Interceptor.attach(Module.findExportByName(&quot;libc.so&quot;, &quot;pthread_create&quot;), &#123;</span><br><span class="line">        onEnter(args) &#123;</span><br><span class="line">            let func_addr = args[2]</span><br><span class="line">            console.log(&quot;The thread function address is &quot; + func_addr)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function nop(addr) &#123;</span><br><span class="line">    Memory.patchCode(ptr(addr), 4, code =&gt; &#123;</span><br><span class="line">        const cw = new ThumbWriter(code, &#123; pc: ptr(addr) &#125;);</span><br><span class="line">        cw.putNop();</span><br><span class="line">        cw.putNop();</span><br><span class="line">        cw.flush();</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">function bypass()&#123;</span><br><span class="line">    let module = Process.findModuleByName(&quot;libmsaoaidsec.so&quot;)</span><br><span class="line">    nop(module.base.add(0x10AE4))</span><br><span class="line">    nop(module.base.add(0x113F8))</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="6-内核中-anti-frida"><a href="#6-内核中-anti-frida" class="headerlink" title="6. 内核中 anti-frida"></a>6. 内核中 anti-frida</h2><ol>
+<li>修改&#x2F;proc&#x2F;self&#x2F;task&#x2F;pid&#x2F;status 生成函数隐藏 __get_task_comm</li>
+<li>修改&#x2F;proc&#x2F;self&#x2F;maps 生成函数过滤 show_maps_vma</li>
+<li>修改do_readlinkat </li>
+<li>对于inline hook检测还是只能kill 检测线程</li>
+</ol>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#frida%E7%BC%96%E8%AF%91"><span class="toc-number">1.</span> <span class="toc-text">frida编译</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%8E%9F%E5%A7%8Bfrida%E7%BC%96%E8%AF%91"><span class="toc-number">1.1.</span> <span class="toc-text">1.原始frida编译</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AE%9A%E5%88%B6%E5%BA%93hluwa"><span class="toc-number">1.2.</span> <span class="toc-text">2.定制库hluwa</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-frida%E6%A3%80%E6%B5%8B%E7%82%B9"><span class="toc-number">1.3.</span> <span class="toc-text">3. frida检测点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-frida-gum%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0"><span class="toc-number">1.4.</span> <span class="toc-text">4. frida-gum内核学习</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-anti-frida"><span class="toc-number">1.5.</span> <span class="toc-text">5. anti-frida</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%86%85%E6%A0%B8%E4%B8%AD-anti-frida"><span class="toc-number">1.6.</span> <span class="toc-text">6. 内核中 anti-frida</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&text=逆向-hook-inline(frida)"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&title=逆向-hook-inline(frida)"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&is_video=false&description=逆向-hook-inline(frida)"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-hook-inline(frida)&body=Check out this article: http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&title=逆向-hook-inline(frida)"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&title=逆向-hook-inline(frida)"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&title=逆向-hook-inline(frida)"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&title=逆向-hook-inline(frida)"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&name=逆向-hook-inline(frida)&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/&t=逆向-hook-inline(frida)"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

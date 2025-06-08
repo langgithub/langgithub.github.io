@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="计算机-常识-数据库  1. 事务的ACID特征1. 原子性 2. 一致性 3. 隔离性 4. 持久性  2. 数据库三范式1. 1NF 列是原子性，不能再分 2. 在1NF基础上，一个表一个主键，其他属性必须完全依赖主键 3. 在2NF基础上，非主键列不存在依赖情况  3. 乐观锁和悲观锁1. 乐观锁 版本号控制 version字段 2. 悲观锁 for update  4. mysql 一次">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机-常识-数据库">
+<meta property="og:url" content="http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="计算机-常识-数据库  1. 事务的ACID特征1. 原子性 2. 一致性 3. 隔离性 4. 持久性  2. 数据库三范式1. 1NF 列是原子性，不能再分 2. 在1NF基础上，一个表一个主键，其他属性必须完全依赖主键 3. 在2NF基础上，非主键列不存在依赖情况  3. 乐观锁和悲观锁1. 乐观锁 版本号控制 version字段 2. 悲观锁 for update  4. mysql 一次">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2017-12-24T08:00:00.000Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="计算机-常识">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>计算机-常识-数据库</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&text=计算机-常识-数据库"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&title=计算机-常识-数据库"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&is_video=false&description=计算机-常识-数据库"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=计算机-常识-数据库&body=Check out this article: http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&title=计算机-常识-数据库"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&title=计算机-常识-数据库"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&title=计算机-常识-数据库"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&title=计算机-常识-数据库"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&name=计算机-常识-数据库&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&t=计算机-常识-数据库"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E4%BA%8B%E5%8A%A1%E7%9A%84ACID%E7%89%B9%E5%BE%81"><span class="toc-number">1.</span> <span class="toc-text">1. 事务的ACID特征</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%89%E8%8C%83%E5%BC%8F"><span class="toc-number">2.</span> <span class="toc-text">2. 数据库三范式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E4%B9%90%E8%A7%82%E9%94%81%E5%92%8C%E6%82%B2%E8%A7%82%E9%94%81"><span class="toc-number">3.</span> <span class="toc-text">3. 乐观锁和悲观锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-mysql-%E4%B8%80%E6%AC%A1%E6%80%A7%E6%B7%BB%E5%8A%A0%E5%87%A0%E5%8D%81%E4%B8%87%E5%A4%A7%E6%95%B0%E6%8D%AE"><span class="toc-number">4.</span> <span class="toc-text">4. mysql 一次性添加几十万大数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-mysql-%E6%95%B0%E6%8D%AE%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-number">5.</span> <span class="toc-text">5. mysql 数据优化方案</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        计算机-常识-数据库
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2017-12-24T08:00:00.000Z" class="dt-published" itemprop="datePublished">2017-12-24</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86/">计算机-常识</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86/" rel="tag">计算机-常识</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p><del>计算机-常识-数据库</del></p>
+</blockquote>
+<h3 id="1-事务的ACID特征"><a href="#1-事务的ACID特征" class="headerlink" title="1. 事务的ACID特征"></a>1. 事务的ACID特征</h3><pre><code>1. 原子性
+2. 一致性
+3. 隔离性
+4. 持久性
+</code></pre>
+<h3 id="2-数据库三范式"><a href="#2-数据库三范式" class="headerlink" title="2. 数据库三范式"></a>2. 数据库三范式</h3><pre><code>1. 1NF 列是原子性，不能再分
+2. 在1NF基础上，一个表一个主键，其他属性必须完全依赖主键
+3. 在2NF基础上，非主键列不存在依赖情况
+</code></pre>
+<h3 id="3-乐观锁和悲观锁"><a href="#3-乐观锁和悲观锁" class="headerlink" title="3. 乐观锁和悲观锁"></a>3. 乐观锁和悲观锁</h3><pre><code>1. 乐观锁 版本号控制 version字段
+2. 悲观锁 for update
+</code></pre>
+<h3 id="4-mysql-一次性添加几十万大数据"><a href="#4-mysql-一次性添加几十万大数据" class="headerlink" title="4. mysql 一次性添加几十万大数据"></a>4. mysql 一次性添加几十万大数据</h3><pre><code>1. insert 批量操作
+2. 开启事务，设置 innodb_log_buffer_size 尽可能大
+3. 主键顺序插入
+</code></pre>
+<h3 id="5-mysql-数据优化方案"><a href="#5-mysql-数据优化方案" class="headerlink" title="5. mysql 数据优化方案"></a>5. mysql 数据优化方案</h3><pre><code>1. 根据业务类型特点选择存储引擎，innodb 事务类型；myisam 支持全文检索
+2. 分库分表
+3. 对查询进行优化，where 和 order by 字段添加索引
+4. where 字段避免null, 避免使用！= or &lt;&gt;,避免使用or来连接条件
+5. json大表可以采用分页  
+</code></pre>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E4%BA%8B%E5%8A%A1%E7%9A%84ACID%E7%89%B9%E5%BE%81"><span class="toc-number">1.</span> <span class="toc-text">1. 事务的ACID特征</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%89%E8%8C%83%E5%BC%8F"><span class="toc-number">2.</span> <span class="toc-text">2. 数据库三范式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E4%B9%90%E8%A7%82%E9%94%81%E5%92%8C%E6%82%B2%E8%A7%82%E9%94%81"><span class="toc-number">3.</span> <span class="toc-text">3. 乐观锁和悲观锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-mysql-%E4%B8%80%E6%AC%A1%E6%80%A7%E6%B7%BB%E5%8A%A0%E5%87%A0%E5%8D%81%E4%B8%87%E5%A4%A7%E6%95%B0%E6%8D%AE"><span class="toc-number">4.</span> <span class="toc-text">4. mysql 一次性添加几十万大数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-mysql-%E6%95%B0%E6%8D%AE%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-number">5.</span> <span class="toc-text">5. mysql 数据优化方案</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&text=计算机-常识-数据库"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&title=计算机-常识-数据库"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&is_video=false&description=计算机-常识-数据库"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=计算机-常识-数据库&body=Check out this article: http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&title=计算机-常识-数据库"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&title=计算机-常识-数据库"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&title=计算机-常识-数据库"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&title=计算机-常识-数据库"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&name=计算机-常识-数据库&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2017/12/24/%E8%AE%A1%E7%AE%97%E6%9C%BA-%E5%B8%B8%E8%AF%86-%E6%95%B0%E6%8D%AE%E5%BA%93/&t=计算机-常识-数据库"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

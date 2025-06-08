@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="ARM指令用户模式 不分组寄存器（R0-R7） 分组寄存器（R8-R14） 程序计数器pc（R15） 状态寄存器CPSR  ARM处理器 ARM状态（32位对齐指令的ARM指令） Thumb状态（16位对齐指令的Thump指令）  ARM指令集 跳转指令   B 无条件跳转 BL 带链接的无条件跳转 BX 带状态切换的无条件跳转 BLX 带链接和状态的无条件跳转 B loc_地址 BNE 不相等跳">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逆向-指令-ARM">
+<meta property="og:url" content="http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="ARM指令用户模式 不分组寄存器（R0-R7） 分组寄存器（R8-R14） 程序计数器pc（R15） 状态寄存器CPSR  ARM处理器 ARM状态（32位对齐指令的ARM指令） Thumb状态（16位对齐指令的Thump指令）  ARM指令集 跳转指令   B 无条件跳转 BL 带链接的无条件跳转 BX 带状态切换的无条件跳转 BLX 带链接和状态的无条件跳转 B loc_地址 BNE 不相等跳">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>逆向-指令-ARM</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/%E9%80%86%E5%90%91-so-%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&text=逆向-指令-ARM"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&title=逆向-指令-ARM"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&is_video=false&description=逆向-指令-ARM"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-指令-ARM&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&title=逆向-指令-ARM"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&title=逆向-指令-ARM"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&title=逆向-指令-ARM"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&title=逆向-指令-ARM"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&name=逆向-指令-ARM&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&t=逆向-指令-ARM"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ARM%E6%8C%87%E4%BB%A4"><span class="toc-number">1.</span> <span class="toc-text">ARM指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.0.1.</span> <span class="toc-text">用户模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARM%E5%A4%84%E7%90%86%E5%99%A8"><span class="toc-number">1.0.2.</span> <span class="toc-text">ARM处理器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARM%E6%8C%87%E4%BB%A4%E9%9B%86"><span class="toc-number">1.0.3.</span> <span class="toc-text">ARM指令集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARM-%E6%8C%87%E4%BB%A4%E6%94%B6%E9%9B%86"><span class="toc-number">1.0.4.</span> <span class="toc-text">ARM 指令收集</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        逆向-指令-ARM
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.429Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E9%80%86%E5%90%91/">逆向</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E9%80%86%E5%90%91/" rel="tag">逆向</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="ARM指令"><a href="#ARM指令" class="headerlink" title="ARM指令"></a>ARM指令</h1><h3 id="用户模式"><a href="#用户模式" class="headerlink" title="用户模式"></a>用户模式</h3><ol>
+<li>不分组寄存器（R0-R7）</li>
+<li>分组寄存器（R8-R14）</li>
+<li>程序计数器pc（R15）</li>
+<li>状态寄存器CPSR</li>
+</ol>
+<h3 id="ARM处理器"><a href="#ARM处理器" class="headerlink" title="ARM处理器"></a>ARM处理器</h3><ol>
+<li>ARM状态（32位对齐指令的ARM指令）</li>
+<li>Thumb状态（16位对齐指令的Thump指令）</li>
+</ol>
+<h3 id="ARM指令集"><a href="#ARM指令集" class="headerlink" title="ARM指令集"></a>ARM指令集</h3><ol>
+<li>跳转指令</li>
+</ol>
+<ul>
+<li>B 无条件跳转</li>
+<li>BL 带链接的无条件跳转</li>
+<li>BX 带状态切换的无条件跳转</li>
+<li>BLX 带链接和状态的无条件跳转</li>
+<li>B loc_地址</li>
+<li>BNE 不相等跳转地址；BEQ 相等跳转地址</li>
+</ul>
+<ol start="2">
+<li>存储器和寄存器交互数据指令</li>
+</ol>
+<ul>
+<li><p>存储器（主存，内存）</p>
+</li>
+<li><p>寄存器中的数据（字符串，数，地址，各种类型数据）</p>
+</li>
+<li><p>LDR 从存储器中加载数据到寄存器 &lt;- load</p>
+</li>
+<li><p>LDR R8,[R9,#04] R8为寄存器，加载值为R9+#04所指向的存储单元</p>
+</li>
+<li><p>STR 将寄存器的数据加载到存储器 -&gt; store</p>
+</li>
+<li><p>STR R8,[R9,#04] 将R8寄存器中数据存储到R9+#04所指向的存储单元</p>
+</li>
+<li><p>LDM 将存储器的数据加载到一个寄存器列表 -&gt;</p>
+</li>
+<li><p>LDM R0, {R1-R3} 将R0指向的存储单元的数据依次加载到R1,R2,R3寄存器</p>
+</li>
+<li><p>STM 将一个寄存器列表的数据存储到指定存储器 &lt;-</p>
+</li>
+<li><p>PUSH 将寄存器值推入堆栈</p>
+</li>
+<li><p>POP 将堆栈的值推出到寄存器</p>
+</li>
+<li><p>SWP 将寄存器与存储器之间的数据进行交换</p>
+</li>
+<li><p>SWP R1，R1 [R0] 将R1寄存器与R0指向存储单元内容进行交换</p>
+</li>
+</ul>
+<ol start="3">
+<li>数据传送指令</li>
+</ol>
+<ul>
+<li>MOV 立即数或寄存器的数据数据传送到目标寄存器</li>
+<li>MOV R0,#8 R0&#x3D;#8</li>
+</ul>
+<ol start="4">
+<li>数据算术运算指令</li>
+</ol>
+<ul>
+<li>ADD,SUB,MUL,DIV</li>
+<li>有符号，无符号运算，带进位运算</li>
+</ul>
+<ol start="5">
+<li>数据逻辑运算指令</li>
+</ol>
+<ul>
+<li><p>与 ADD</p>
+</li>
+<li><p>或 ORR</p>
+</li>
+<li><p>异或 EOR</p>
+</li>
+<li><p>LSL 逻辑左移</p>
+</li>
+<li><p>LSR 逻辑右移</p>
+</li>
+<li><p>LSL R0，R1，#2   R0&#x3D;R1*2</p>
+</li>
+</ul>
+<ol start="6">
+<li>比较指令</li>
+</ol>
+<ul>
+<li>CMP </li>
+<li>CMP R0 #0   R0寄存器中值与0比较</li>
+<li>标志位</li>
+</ul>
+<ol start="7">
+<li>其他指令</li>
+</ol>
+<ul>
+<li>伪处理器指令 SWT （切换用户模式）</li>
+<li>伪指令 DCB</li>
+</ul>
+<ol start="8">
+<li>寄存器寻址指令</li>
+</ol>
+<ul>
+<li>7种，常见的5种</li>
+<li>立即寻址 MOV R0,#1234</li>
+<li>寄存器寻址 MOV R0 , R1</li>
+<li>寄存器移位寻址 MOV R0, R1,LSL #2  R0&#x3D;R1*4</li>
+<li>寄存器间接寻址 LDR R0 ,[R1] R1寄存器值作为地址赋R0</li>
+<li>寄存器间接基址偏移寻址 LDR R0,[R1,#-4]将R1寄存家的值-0x4作为地址，取出地址中的值赋R0</li>
+</ul>
+<h3 id="ARM-指令收集"><a href="#ARM-指令收集" class="headerlink" title="ARM 指令收集"></a>ARM 指令收集</h3><ol>
+<li><p>—SUB指令—</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">减法指令SUB (SUBtract) </span><br><span class="line">格式: SUB A,B //A=A-B;</span><br><span class="line">功能: 两个操作数的相减,即从A中减去B,其结果放在A中.</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>—CMP指令—</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">比较指令CMP</span><br><span class="line">格式: CMP A,B //  A-B;</span><br><span class="line">功能: 两个操作数的相减,即从A中减去B，其结果会影响标志位， 对标志位的影响与SUB指令相同。本条指令主要是用于配合条件转移指令使用。如JZ ZF=0时，跳转</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>—条件转移指令 JE&#x2F;JZ— </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">格式: JE/JZ标号 //等于跳转</span><br><span class="line">功能: ZF＝1,转到指定地址执行</span><br><span class="line">说明:</span><br><span class="line">1. 指令JE与JZ等价,它们是根据标志位ZF进行转移的指令</span><br><span class="line">2. JE,JZ均为一条指令的两种助记符表示方法</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>—str指令—</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">格式:str&#123;条件&#125;  源寄存器，&lt;存储器地址&gt;</span><br><span class="line">功能:将源寄存器中数据存到存储器地址中 </span><br><span class="line"></span><br><span class="line">说明:</span><br><span class="line">str  r1,[r2]        ; 将r1中的值存到r2所指定的地址中</span><br><span class="line">str  r1,[r2,#4]     ;将r1中的值存到r2+4所指定的地址中</span><br><span class="line">str  r1,[r2],#4     ;将r1中的值存到r2所指定的地址中, 同时r2=r2+4</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>—LDR LDM指令—</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">A.LDR加载指令 从右往左</span><br><span class="line">格式为:LDR&#123;条件&#125;  目的寄存器，&lt;存储器地址&gt;</span><br><span class="line">功能:LDR指令用亍从存储器中将一个32位的字数据传送到目的寄存器中</span><br><span class="line"></span><br><span class="line">说明：</span><br><span class="line">ldr r0，[r1]                ；将存储器地址为R1的字数据读入寄存器R0。</span><br><span class="line">ldr r0，[r1，r2]            ；将存储器地址为R1+R2的字数据读入寄存器R0。</span><br><span class="line">ldr r0，[r1，＃8]           ；将存储器地址为R1+8的字数据读入寄存器R0。</span><br><span class="line">ldr r0，[r1，r2]！          ；将存储器地址为R1+R2的字数据读入寄存器R0,幵将新地址R1＋R2写入R1。</span><br><span class="line">ldr r0，[r1，＃8]！         ；将存储器地址为R1+8的字数据读入寄存器R0，幵将新地址R1＋8写入R1。 </span><br><span class="line">ldr r0，[r1]，r2            ；将存储器地址为R1的字数据读入寄存器R0，幵将新地址R1＋R2写入R1。</span><br><span class="line">ldr r0，[r1，r2，lsl＃2]！  ；将存储器地址为R1＋R2×4的字数据读入寄存器R0，并将新地址R1＋R2×4写入R1。</span><br><span class="line">ldr r0，[r1]，r2，lsL＃2    ；将存储器地址为R1的字数据读入寄存器R0，幵将新地址R1＋R2×4写入R1。”</span><br><span class="line">B.伪指令</span><br><span class="line">格式:LDR&#123;条件&#125;  目的寄存器，&lt;存储器地址&gt;</span><br><span class="line">功能:</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">说明:将COUNT的值赋给R0</span><br><span class="line">LDR       R1,=COUNT</span><br><span class="line">LDR       R0,[R1]</span><br><span class="line">LDR       R1,=COUNT这条伪指令，是怎样完成将COUNT的地址赋给R1，有兴趣的可以看它编译后的结果。这条指令实际上会编译成一条LDR指令和一条DCD伪指令。</span><br><span class="line"></span><br><span class="line">B.LDM记载指令</span><br><span class="line">从左往右</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>—B,BL,BX,BLX 指令—</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">A.B跳转指令</span><br><span class="line">格式:B  addr</span><br><span class="line">功能:跳转指令B使程序跳转到指定的地址执行程序。</span><br><span class="line">说明:</span><br><span class="line">B  0x1234   ;跳转到绝对地址0x1234处。</span><br><span class="line"></span><br><span class="line">B.BL带返回的连接跳转</span><br><span class="line">格式:</span><br><span class="line">功能:BL指令用于实现子程序调用。子程序的返回可通过将LR寄存器的值复制到PC寄存器来实现。下面的指令可实现子程序返回：(1)、BX   R14   (2)、MOV   PC,R14</span><br><span class="line">说明:</span><br><span class="line">BL func    ;跳转到子程序func处执行，同时将当前pc值保存到LR中。</span><br><span class="line"></span><br><span class="line">C.BX跳转并切换状态</span><br><span class="line">格式:BX&#123;&lt;cond&gt;&#125;    &lt;Rm&gt;</span><br><span class="line">功能:带状态切换的跳转指令BX使程序跳转到指令中指定的参数Rm指定的地址执行程序。若 Rm 的 bit[0] 为1，切换到 Thumb 指令执行；若 Rm 的 bit[0] 为0，切换到 ARM 指令执行。</span><br><span class="line">说明:</span><br><span class="line">BX   R0    ;跳转到R0中的地址，如果R0[0]=1，则进入Thumb状态。</span><br><span class="line"></span><br><span class="line">D.BLX带返回的跳转并切换状态</span><br><span class="line">格式:</span><br><span class="line">功能:该指令为无条件执行指令</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>—BEQ BNE指令—</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">a.BEQ指令</span><br><span class="line">格式: BEQ </span><br><span class="line">功能: 相等跳转</span><br><span class="line"></span><br><span class="line">b.BNE指令</span><br><span class="line">格式: BNE</span><br><span class="line">功能: 不想等跳转</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>——-.w——</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">代表32位</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>——CHP——</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">比较指令</span><br></pre></td></tr></table></figure></li>
+</ol>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ARM%E6%8C%87%E4%BB%A4"><span class="toc-number">1.</span> <span class="toc-text">ARM指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.0.1.</span> <span class="toc-text">用户模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARM%E5%A4%84%E7%90%86%E5%99%A8"><span class="toc-number">1.0.2.</span> <span class="toc-text">ARM处理器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARM%E6%8C%87%E4%BB%A4%E9%9B%86"><span class="toc-number">1.0.3.</span> <span class="toc-text">ARM指令集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARM-%E6%8C%87%E4%BB%A4%E6%94%B6%E9%9B%86"><span class="toc-number">1.0.4.</span> <span class="toc-text">ARM 指令收集</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&text=逆向-指令-ARM"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&title=逆向-指令-ARM"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&is_video=false&description=逆向-指令-ARM"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-指令-ARM&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&title=逆向-指令-ARM"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&title=逆向-指令-ARM"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&title=逆向-指令-ARM"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&title=逆向-指令-ARM"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&name=逆向-指令-ARM&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/&t=逆向-指令-ARM"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

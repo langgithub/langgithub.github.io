@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="搬砖  PLT hook原理: 了解了 ELF 格式和 linker 的 relocation 过程之后，PLT hook 的过程就不言自明了。 它做了和 relocation 类似的事情。即：通过符号名，先在 hash table 中找到对应的符号信息（在 .dynsym 中）; 再找到对应的 PLT 信息（在 .rel.plt 或 .rela.plt 或 .rel.dyn 或 .rela.d">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逆向-hook-plt">
+<meta property="og:url" content="http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="搬砖  PLT hook原理: 了解了 ELF 格式和 linker 的 relocation 过程之后，PLT hook 的过程就不言自明了。 它做了和 relocation 类似的事情。即：通过符号名，先在 hash table 中找到对应的符号信息（在 .dynsym 中）; 再找到对应的 PLT 信息（在 .rel.plt 或 .rela.plt 或 .rel.dyn 或 .rela.d">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-03-31T07:00:00.000Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="hook">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>逆向-hook-plt</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/04/18/%E9%80%86%E5%90%91-android-root%E6%96%B9%E6%A1%88/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2024/03/31/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%8A%93%E5%8C%85/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&text=逆向-hook-plt"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&title=逆向-hook-plt"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&is_video=false&description=逆向-hook-plt"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-hook-plt&body=Check out this article: http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&title=逆向-hook-plt"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&title=逆向-hook-plt"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&title=逆向-hook-plt"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&title=逆向-hook-plt"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&name=逆向-hook-plt&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&t=逆向-hook-plt"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#PLT-hook"><span class="toc-number">1.</span> <span class="toc-text">PLT hook</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#xhook"><span class="toc-number">1.1.</span> <span class="toc-text">xhook</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E8%BF%87%E7%A8%8B"><span class="toc-number">1.1.1.</span> <span class="toc-text">1.动态链接过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-xhook%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">1.1.2.</span> <span class="toc-text">2. xhook源码分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bhook"><span class="toc-number">1.2.</span> <span class="toc-text">bhook</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bhook%E5%88%86%E6%9E%90"><span class="toc-number">1.2.1.</span> <span class="toc-text">bhook分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lsplt"><span class="toc-number">1.3.</span> <span class="toc-text">lsplt</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#jvmti"><span class="toc-number">1.4.</span> <span class="toc-text">jvmti</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        逆向-hook-plt
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-03-31T07:00:00.000Z" class="dt-published" itemprop="datePublished">2024-03-31</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E9%80%86%E5%90%91-hook/">逆向-hook</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/hook/" rel="tag">hook</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>搬砖</p>
+</blockquote>
+<h1 id="PLT-hook"><a href="#PLT-hook" class="headerlink" title="PLT hook"></a>PLT hook</h1><pre><code>原理: 了解了 ELF 格式和 linker 的 relocation 过程之后，PLT hook 的过程就不言自明了。
+它做了和 relocation 类似的事情。即：通过符号名，先在 hash table 中找到对应的符号信息（在 .dynsym 中）;
+再找到对应的 PLT 信息（在 .rel.plt 或 .rela.plt 或 .rel.dyn 或 .rela.dyn 或 .rel.dyn.aps2 或 .rela.dyn.aps2 中）;
+最后找到绝对地址信息（在 .got.plt 或 .data 或 .data.rel.ro 中）。最后要做的就是修改这个绝对地址的值，改为我们需要的自己的“代理函数”的地址。
+
+要注意的是，在修改这个绝对地址之前，需要先用 mprotect 设置当前地址位置所在内存页为“可写”的,因为 linker 在做完 relocation 后会把 .got.plt 和 .data.rel.ro 设置为只读的;
+修改完之后，需要用 __builtin___clear_cache 来清除该内存位置的 CPU cache，以使修改能立刻生效。
+</code></pre>
+<h2 id="xhook"><a href="#xhook" class="headerlink" title="xhook"></a>xhook</h2><h3 id="1-动态链接过程"><a href="#1-动态链接过程" class="headerlink" title="1.动态链接过程"></a>1.动态链接过程</h3><pre><code>动态链接是一种将程序的可执行文件与动态链接库（Shared Libraries，在 Linux 和 Android 上通常以 .so 文件存在）关联起来的技术。当你使用 dlopen 调用一个共享库时，动态链接器（在 Android 上就是 linker 或者 ld-linux.so）会按照特定的步骤加载和准备库以供使用。
+
+以下是动态链接的大致步骤：
+
+1. 检查已加载的 ELF 列表：
+动态链接器首先检查要加载的共享库是否已经加载过了。
+如果已经加载，它只会增加共享库的引用计数，并返回一个指向库的指针。
+
+2. 解析依赖并建立加载列表：
+动态链接器从 .dynamic section 读取共享库的依赖项。
+它会构建一个包括目标库及其所有未加载依赖库的加载列表。
+
+3. 加载 ELF 到内存：
+对每个还没有加载的库，动态链接器使用 mmap 预留一块内存。
+然后读取库的程序头表（Program Header Table, PHT），并将所有 PT_LOAD 类型的段(segment)映射到内存中。
+
+4. 处理 ELF 的 .dynamic section：
+通过 .dynamic section 中的条目找到例如符号表、字符串表以及重定位表的虚拟地址，并保存它们的实际内存地址供后续步骤使用。
+
+5. 执行重定位：
+针对这些 .rel* 或者 .rela* sections进行重定位操作。
+对每个重定位条目，动态链接器需要根据条目的类型和信息，找到正确的符号地址，并更新引用位置的地址。
+例如，某个函数调用的 GOT （Global Offset Table）条目在初次加载时是空的，重定位会填上正确的函数实现地址。
+
+6. 更新引用计数：
+为刚刚加载的库增加引用计数。
+
+7. 调用构造函数：
+一旦库加载到内存并重定位完毕，动态链接器会调用库的构造函数。
+构造函数在 .dynamic section 中被标记为 DT_INIT 和 DT_INIT_ARRAY 类型。
+通常这些构造函数会初始化库的静态数据或进行其他的库初始化操作。
+</code></pre>
+<h3 id="2-xhook源码分析"><a href="#2-xhook源码分析" class="headerlink" title="2. xhook源码分析"></a>2. <a target="_blank" rel="noopener" href="https://blog.yorek.xyz/android/3rd-library/xhook/#42-hook">xhook源码分析</a></h3><h2 id="bhook"><a href="#bhook" class="headerlink" title="bhook"></a>bhook</h2><h3 id="bhook分析"><a href="#bhook分析" class="headerlink" title="bhook分析"></a><a target="_blank" rel="noopener" href="https://juejin.cn/post/6998085562573783076">bhook分析</a></h3><h2 id="lsplt"><a href="#lsplt" class="headerlink" title="lsplt"></a>lsplt</h2><h2 id="jvmti"><a href="#jvmti" class="headerlink" title="jvmti"></a>jvmti</h2>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#PLT-hook"><span class="toc-number">1.</span> <span class="toc-text">PLT hook</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#xhook"><span class="toc-number">1.1.</span> <span class="toc-text">xhook</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E8%BF%87%E7%A8%8B"><span class="toc-number">1.1.1.</span> <span class="toc-text">1.动态链接过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-xhook%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">1.1.2.</span> <span class="toc-text">2. xhook源码分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bhook"><span class="toc-number">1.2.</span> <span class="toc-text">bhook</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#bhook%E5%88%86%E6%9E%90"><span class="toc-number">1.2.1.</span> <span class="toc-text">bhook分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lsplt"><span class="toc-number">1.3.</span> <span class="toc-text">lsplt</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#jvmti"><span class="toc-number">1.4.</span> <span class="toc-text">jvmti</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&text=逆向-hook-plt"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&title=逆向-hook-plt"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&is_video=false&description=逆向-hook-plt"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-hook-plt&body=Check out this article: http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&title=逆向-hook-plt"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&title=逆向-hook-plt"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&title=逆向-hook-plt"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&title=逆向-hook-plt"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&name=逆向-hook-plt&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/03/31/%E9%80%86%E5%90%91-hook-plt/&t=逆向-hook-plt"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

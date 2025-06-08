@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="（一）flume1.61.1 flume配置（将日志上传到HDFS离线分析和kafka实时分析）a1.sources &#x3D; r1 a1.sinks &#x3D; k2 k1 a1.channels &#x3D; c2 c1 Describe&#x2F;configure the sourcea1.sources.r1.type &#x3D; exec a1.sources.r1.comma">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逆向-爬虫-日志收集">
+<meta property="og:url" content="http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="（一）flume1.61.1 flume配置（将日志上传到HDFS离线分析和kafka实时分析）a1.sources &#x3D; r1 a1.sinks &#x3D; k2 k1 a1.channels &#x3D; c2 c1 Describe&#x2F;configure the sourcea1.sources.r1.type &#x3D; exec a1.sources.r1.comma">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="hadoop">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>逆向-爬虫-日志收集</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/%E9%80%86%E5%90%91-%E6%8C%87%E4%BB%A4-ARM/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%BB%91%E5%9D%97%E9%AA%8C%E8%AF%81%E7%A0%81/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&text=逆向-爬虫-日志收集"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&title=逆向-爬虫-日志收集"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&is_video=false&description=逆向-爬虫-日志收集"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-爬虫-日志收集&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&title=逆向-爬虫-日志收集"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&title=逆向-爬虫-日志收集"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&title=逆向-爬虫-日志收集"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&title=逆向-爬虫-日志收集"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&name=逆向-爬虫-日志收集&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&t=逆向-爬虫-日志收集"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Describe-configure-the-source"><span class="toc-number">1.</span> <span class="toc-text">Describe&#x2F;configure the source</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Describe-the-sink"><span class="toc-number">2.</span> <span class="toc-text">Describe the sink</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Use-a-channel-which-buffers-events-in-memory"><span class="toc-number">3.</span> <span class="toc-text">Use a channel which buffers events in memory</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        逆向-爬虫-日志收集
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.429Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8-bigdata/">数据存储-bigdata</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/hadoop/" rel="tag">hadoop</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>（一）flume1.6<br>1.1 flume配置（将日志上传到HDFS离线分析和kafka实时分析）<br>a1.sources &#x3D; r1</p>
+<p>a1.sinks &#x3D; k2 k1</p>
+<p>a1.channels &#x3D; c2 c1</p>
+<h1 id="Describe-configure-the-source"><a href="#Describe-configure-the-source" class="headerlink" title="Describe&#x2F;configure the source"></a>Describe&#x2F;configure the source</h1><p>a1.sources.r1.type &#x3D; exec</p>
+<p>a1.sources.r1.command&#x3D;tail -n +0 -f &#x2F;usr&#x2F;lang&#x2F;log.log</p>
+<p>a1.sources.r1.channels &#x3D; c1</p>
+<p>a1.sources.r1.channels &#x3D; c2</p>
+<h1 id="Describe-the-sink"><a href="#Describe-the-sink" class="headerlink" title="Describe the sink"></a>Describe the sink</h1><p>a1.sinks.k1.type &#x3D; hdfs</p>
+<p>a1.sinks.k1.channel &#x3D; c1</p>
+<p>a1.sinks.k1.hdfs.path &#x3D; hdfs:&#x2F;&#x2F;lang:8020&#x2F;user&#x2F;flume</p>
+<p>a1.sinks.k1.hdfs.filePrefix &#x3D; events-</p>
+<p>a1.sinks.k1.hdfs.round &#x3D; true</p>
+<p>a1.sinks.k1.hdfs.roundValue &#x3D; 10</p>
+<p>a1.sinks.k1.hdfs.roundUnit &#x3D; minute</p>
+<p>a1.sinks.k2.channel&#x3D;c2</p>
+<p>a1.sinks.k2.type&#x3D;org.apache.flume.sink.kafka.KafkaSink</p>
+<p>a1.sinks.k2.topic&#x3D;lang</p>
+<p>a1.sinks.k2.brokerList&#x3D;node1:9092</p>
+<p>a1.sinks.k2.requiredAcks&#x3D;1</p>
+<p>a1.sinks.k2.batchSize&#x3D;20</p>
+<h1 id="Use-a-channel-which-buffers-events-in-memory"><a href="#Use-a-channel-which-buffers-events-in-memory" class="headerlink" title="Use a channel which buffers events in memory"></a>Use a channel which buffers events in memory</h1><p>a1.channels.c1.type &#x3D; memory</p>
+<p>a1.channels.c1.capacity &#x3D; 1000</p>
+<p>a1.channels.c1.transactionCapacity &#x3D; 100</p>
+<p>a1.channels.c2.type &#x3D; memory</p>
+<p>a1.channels.c2.capacity &#x3D; 1000</p>
+<p>a1.channels.c2.transactionCapacity &#x3D; 100</p>
+<p>1.2 flume启动<br>bin&#x2F;flume-ng  agent -c conf -f conf&#x2F;flume-conf -n a1 -Dflume.root.logger&#x3D;DEBUG,console</p>
+<p>（二）kafka 0.11集群<br>2.1重要配置文件<br>server.properties:</p>
+<pre><code>    broker.id=0  (根据实际主机，分配0,1,2)
+
+    listeners=PLAINTEXT://:9092
+
+    zookeeper.connect=192.168.205.11:2181,192.168.205.12:2181,192.168.205.13:2181
+</code></pre>
+<p>producer.properties</p>
+<pre><code>    bootstrap.servers=192.168.205.11:9092,192.168.205.12:9092,192.168.205.13:9092
+</code></pre>
+<p>consumer.properties</p>
+<pre><code>     zookeeper.connect=192.168.205.11:2181,192.168.205.12:2181,192.168.205.13:2181
+</code></pre>
+<p>2.2同步配置文件<br>2.3相关命令<br>先启动zookeeper</p>
+<p>启动kafka   bin&#x2F;kafka-server-start.sh config&#x2F;server.properties &amp;</p>
+<p>停止kafka    bin&#x2F;kafka-server-stop.sh</p>
+<p>创建topic     bin&#x2F;kafka-topics.sh –create –zookeeper localhost:2181 –replication-factor 1 –partitions 1 –topic lang</p>
+<p>展示topic     bin&#x2F;kafka-topics.sh –list –zookeeper localhost:2181</p>
+<p>描述topic     bin&#x2F;kafka-topics.sh –describe –zookeeper localhost:2181 –topic lang</p>
+<p>生产者：      bin&#x2F;kafka-console-producer.sh –broker-list node1:9092 –topic lang</p>
+<p>消费者：      bin&#x2F;kafka-console-consumer.sh -bootstrap-server localhost:9092 –topic lang –from-beginning</p>
+<p>删除topic:     bin&#x2F;kafka-topics.sh –delete –zookeeper 130.51.23.95:2181 –topic topicname</p>
+<p>(三)logstash5.5.1<br>3.1配置（文件输入，es输出）<br>input {</p>
+<p>file {</p>
+<p>path &#x3D;&gt; [“&#x2F;usr&#x2F;lang&#x2F;log.log”]</p>
+<p>start_position &#x3D;&gt; “beginning”</p>
+<p>}</p>
+<p>}</p>
+<p>filter {</p>
+<p>date {</p>
+<p>match &#x3D;&gt; [ “timestamp” , “YYYY-MM-dd HH:mm:ss” ]</p>
+<p>}</p>
+<p>}</p>
+<p>output {</p>
+<p>elasticsearch {</p>
+<p>hosts &#x3D;&gt; [“192.168.205.14:9200”]</p>
+<p>}</p>
+<p>stdout {</p>
+<p>codec &#x3D;&gt; rubydebug</p>
+<p>}</p>
+<p>}</p>
+<p>3.2配置（kafka输入，es输出）<br>input {</p>
+<p>kafka {</p>
+<p>#workers &#x3D;&gt;2</p>
+<p>bootstrap_servers &#x3D;&gt; “node1:9092,node2:9092,node3:9092”    #zookeeper地址</p>
+<p>topics &#x3D;&gt; “lang”    #kafka中topic名称，记得创建该topic</p>
+<p>#group_id &#x3D;&gt; “logstash”    #默认为“logstash”</p>
+<p>#consumer_threads &#x3D;&gt;2    #消费的线程数</p>
+<p>#reset_beginning &#x3D;&gt; false</p>
+<p>#reset_beginning&#x3D;&gt;true</p>
+<p>#decorate_events &#x3D;&gt; true    #在输出消息的时候回输出自身的信息，包括：消费消息的大小、topic来源以及consumer的group信息。</p>
+<p>#type &#x3D;&gt; “nginx-access-log”</p>
+<p>}</p>
+<p>}</p>
+<p>filter {</p>
+<p>date {</p>
+<p>match &#x3D;&gt; [ “timestamp” , “YYYY-MM-dd HH:mm:ss” ]</p>
+<p>}</p>
+<p>}</p>
+<p>output {</p>
+<p>elasticsearch {</p>
+<p>hosts &#x3D;&gt; [“192.168.205.14:9200”]</p>
+<p>#index &#x3D;&gt; “kafakindex-%{+YYYY.MM.dd}”</p>
+<p>}</p>
+<p>stdout {</p>
+<p>codec &#x3D;&gt; rubydebug</p>
+<p>}</p>
+<p>}</p>
+<p>（四）elasticsearch<br>4.1内存配置   config&#x2F;jvm.properties<br>4.2配置文件   config&#x2F;elsticsearch<br>cluster.name: my-application</p>
+<p>node.name: node-1(集群中名称不一样)</p>
+<p>network.host: 192.168.205.14</p>
+<p>http.port: 9200</p>
+<p>bootstrap.system_call_filter: false</p>
+<p>http.cors.enabled: true</p>
+<p>http.cors.allow-origin: “*”</p>
+<p>4.3注意事项：Java内存参数，配置文件中空格问题<br>4.4elasticsearch-head（索引UI管理界面）<br>（五）kibana<br>没啥，直接启动</p>
+<p>有问题直接联系我 QQ：1146941596</p>
+<p>参考资料</p>
+<p>1.elk安装（参照官网）</p>
+<p><a target="_blank" rel="noopener" href="http://blog.csdn.net/onlylove_longshao/article/details/72765696">http://blog.csdn.net/onlylove_longshao/article/details/72765696</a></p>
+<p>2.注意点：操作系统内存2G，系统某些参数配置</p>
+<p>3.elasticsearch-head 安装</p>
+<pre><code>    http://blog.csdn.net/napoay/article/details/53896348
+</code></pre>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Describe-configure-the-source"><span class="toc-number">1.</span> <span class="toc-text">Describe&#x2F;configure the source</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Describe-the-sink"><span class="toc-number">2.</span> <span class="toc-text">Describe the sink</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Use-a-channel-which-buffers-events-in-memory"><span class="toc-number">3.</span> <span class="toc-text">Use a channel which buffers events in memory</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&text=逆向-爬虫-日志收集"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&title=逆向-爬虫-日志收集"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&is_video=false&description=逆向-爬虫-日志收集"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-爬虫-日志收集&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&title=逆向-爬虫-日志收集"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&title=逆向-爬虫-日志收集"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&title=逆向-爬虫-日志收集"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&title=逆向-爬虫-日志收集"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&name=逆向-爬虫-日志收集&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86/&t=逆向-爬虫-日志收集"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="逆向-android-rom刷机  刷机1. 刷机总结1.1 刷机前的准备 一般手机需要解锁，解除屏幕锁 解除fastboot使用权限（比如小米） 需要正版的twrp,官网上下载 https:&#x2F;&#x2F;twrp.me 。这一点很重要，后期的刷机，刷magisk,刷xposed.都需要借助twrp上下载的recovery镜像 下载Rom刷机包，这里提供两个好用的.注意选择手机版本  1.https:&#x2F;&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逆向-android-rom刷机">
+<meta property="og:url" content="http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="逆向-android-rom刷机  刷机1. 刷机总结1.1 刷机前的准备 一般手机需要解锁，解除屏幕锁 解除fastboot使用权限（比如小米） 需要正版的twrp,官网上下载 https:&#x2F;&#x2F;twrp.me 。这一点很重要，后期的刷机，刷magisk,刷xposed.都需要借助twrp上下载的recovery镜像 下载Rom刷机包，这里提供两个好用的.注意选择手机版本  1.https:&#x2F;&#x2F;">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-01-01T08:00:00.000Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="逆向-android">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>逆向-android-rom刷机</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/03/21/%E9%80%86%E5%90%91-hook-inline(frida)/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2018/01/01/%E9%80%86%E5%90%91-android-%E5%AE%9E%E6%88%98/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&text=逆向-android-rom刷机"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&title=逆向-android-rom刷机"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&is_video=false&description=逆向-android-rom刷机"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-android-rom刷机&body=Check out this article: http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&title=逆向-android-rom刷机"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&title=逆向-android-rom刷机"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&title=逆向-android-rom刷机"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&title=逆向-android-rom刷机"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&name=逆向-android-rom刷机&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&t=逆向-android-rom刷机"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%B7%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">刷机</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%88%B7%E6%9C%BA%E6%80%BB%E7%BB%93"><span class="toc-number">1.1.</span> <span class="toc-text">1. 刷机总结</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-%E5%88%B7%E6%9C%BA%E5%89%8D%E7%9A%84%E5%87%86%E5%A4%87"><span class="toc-number">1.1.1.</span> <span class="toc-text">1.1 刷机前的准备</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-%E5%88%B7%E6%9C%BA%E6%96%B9%E5%BC%8F"><span class="toc-number">1.1.2.</span> <span class="toc-text">1.2 刷机方式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#recovery%E6%A8%A1%E5%BC%8F%E4%B8%8B%E7%9A%84rom"><span class="toc-number">2.</span> <span class="toc-text">recovery模式下的rom</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pc%E7%AB%AFrom%E5%88%B6%E4%BD%9C"><span class="toc-number">3.</span> <span class="toc-text">pc端rom制作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#termux%E6%8A%93%E5%8C%85%E6%96%B9%E6%A1%88"><span class="toc-number">4.</span> <span class="toc-text">termux抓包方案</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BC%BA%E5%B0%91%E4%BE%9D%E8%B5%96-https-www-bilibili-com-read-cv24517186"><span class="toc-number"></span> <span class="toc-text">缺少依赖 https:&#x2F;&#x2F;www.bilibili.com&#x2F;read&#x2F;cv24517186&#x2F;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD-https-mitmproxy-org-downloads-10-3-1"><span class="toc-number"></span> <span class="toc-text">下载 https:&#x2F;&#x2F;mitmproxy.org&#x2F;downloads&#x2F;#10.3.1&#x2F;</span></a>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        逆向-android-rom刷机
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-01-01T08:00:00.000Z" class="dt-published" itemprop="datePublished">2018-01-01</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E9%80%86%E5%90%91-android/">逆向-android</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E9%80%86%E5%90%91-android/" rel="tag">逆向-android</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p><del>逆向-android-rom刷机</del></p>
+</blockquote>
+<h2 id="刷机"><a href="#刷机" class="headerlink" title="刷机"></a>刷机</h2><h3 id="1-刷机总结"><a href="#1-刷机总结" class="headerlink" title="1. 刷机总结"></a>1. 刷机总结</h3><h4 id="1-1-刷机前的准备"><a href="#1-1-刷机前的准备" class="headerlink" title="1.1 刷机前的准备"></a>1.1 刷机前的准备</h4><ul>
+<li>一般手机需要解锁，解除屏幕锁</li>
+<li>解除fastboot使用权限（比如小米）</li>
+<li>需要正版的twrp,官网上下载 <a target="_blank" rel="noopener" href="https://twrp.me/">https://twrp.me</a> 。这一点很重要，后期的刷机，刷magisk,刷xposed.都需要借助twrp上下载的recovery镜像</li>
+<li>下载Rom刷机包，这里提供两个好用的.注意选择手机版本<br>  1.<a target="_blank" rel="noopener" href="https://download.mokeedev.com/whyred/nightly/file/MK90.0-whyred-201904151652-NIGHTLY">https://download.mokeedev.com/whyred/nightly/file/MK90.0-whyred-201904151652-NIGHTLY</a><br>  2.<a target="_blank" rel="noopener" href="https://downloads.aospextended.com/whyred/">https://downloads.aospextended.com/whyred/</a></li>
+</ul>
+<h4 id="1-2-刷机方式"><a href="#1-2-刷机方式" class="headerlink" title="1.2 刷机方式"></a>1.2 刷机方式</h4><ol>
+<li><p>线刷 使用刷机精灵等软件。(bootloader)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">adb reboot bootloader (进入bootloader模式)</span><br><span class="line">fastboot -w flashall</span><br><span class="line">fastboot update XXX.zip</span><br><span class="line"></span><br><span class="line">注意重点：</span><br><span class="line">去除校验</span><br><span class="line"># fastboot $* flash crclist `dirname $0`/images/crclist.txt</span><br><span class="line"># if [ $? -ne 0 ] ; then echo &quot;Flash crclist error&quot;; exit 1; fi</span><br><span class="line"># fastboot $* flash sparsecrclist `dirname $0`/images/sparsecrclist.txt</span><br><span class="line"># if [ $? -ne 0 ] ; then echo &quot;Flash sparsecrclist error&quot;; exit 1; fi</span><br><span class="line"></span><br><span class="line">去除校验</span><br><span class="line">fastboot --disable-verity --disable-verification flash vbmeta_a images/vbmeta.img</span><br><span class="line">fastboot --disable-verity --disable-verification flash vbmeta_b images/vbmeta.img</span><br><span class="line">fastboot --disable-verity --disable-verification flash vbmeta_system_a images/vbmeta_system.img</span><br><span class="line">fastboot --disable-verity --disable-verification flash vbmeta_system_b images/vbmeta_system.img</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>卡刷(recovery)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 先刷机前准备</span><br><span class="line"># fastboot flash recovery twrp.img (刷入启动刷机包的镜像)</span><br><span class="line"># fastboot boot &lt;twrp.img&gt;</span><br><span class="line"># adb push rom(rom包) /sdcard/</span><br><span class="line"># 进入recovery模式后刷入镜像（twrp.img）,刷入rom刷机包</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="recovery模式下的rom"><a href="#recovery模式下的rom" class="headerlink" title="recovery模式下的rom"></a>recovery模式下的rom</h2><h2 id="pc端rom制作"><a href="#pc端rom制作" class="headerlink" title="pc端rom制作"></a>pc端rom制作</h2><pre><code>1. https://github.com/ColdWindScholar/TIK 
+2. 准备termux 
+    - ssh (adb forward tcp:8022 tcp:8022)(ssh 127.0.0.1 -p 8022)
+    - pkg install binutils
+    - 安装依赖 （pkg install openssh libxml2 libxslt libiconv ldd e2fsprogs）
+    - pkg update upgrade
+    - [安装内置ubuntu](https://blog.csdn.net/weixin_49966522/article/details/123602528)
+3. 解包，替换，打包，刷机
+4. 注意清除data分区数据，才能使用 adb 网络调试（原因不明）
+5. adb -s 192.168.141.202:7777 shell mkdir -p /sdcard/Download/files
+6. adb -s 192.168.141.202:7777 push ~/.../worker-release-unsigned.apk /sdcard/Download/files/worker_hot.jar
+7. adb -s 192.168.141.202:7777 reboot
+8. adb -s 192.168.141.202:7777 install ~/Work/Document/android_system/z_apk/termux-app_v0.118.0+github-debug_arm64-v8a.apk
+9. adb install /Users/eleme/Work/Android/project/frpc_android/app/release/frpc_adnroid-v0.39.1.1.apk
+10. https://github.com/wcedla/AndroidApexTools.git apex 工具
+</code></pre>
+<h2 id="termux抓包方案"><a href="#termux抓包方案" class="headerlink" title="termux抓包方案"></a>termux抓包方案</h2><pre><code>1. 安装ssh
+    pkg install openssl
+    pkg install openssh
+    ssh-keygen -A 
+    passwd
+2. 安装python
+</code></pre>
+<p>pkg install python<br>pkg install libexpat<br>pkg install libc++<br>pkg intall rust<br>pkg install binutils<br>pkg install wget<br>pkg install android-tools<br>pip install requests</p>
+<h1 id="缺少依赖-https-www-bilibili-com-read-cv24517186"><a href="#缺少依赖-https-www-bilibili-com-read-cv24517186" class="headerlink" title="缺少依赖 https://www.bilibili.com/read/cv24517186/"></a>缺少依赖 <a target="_blank" rel="noopener" href="https://www.bilibili.com/read/cv24517186/">https://www.bilibili.com/read/cv24517186/</a></h1><p>wget <a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/liuxsdev/Python-Wheels-for-Termux/Wheels/ruamel.yaml.clib-0.2.7-cp311-cp311-linux_aarch64.whl">https://cdn.jsdelivr.net/gh/liuxsdev/Python-Wheels-for-Termux/Wheels/ruamel.yaml.clib-0.2.7-cp311-cp311-linux_aarch64.whl</a><br>pip install ruamel.yaml.clib-0.2.7-cp311-cp311-linux_aarch64.whl</p>
+<h1 id="下载-https-mitmproxy-org-downloads-10-3-1"><a href="#下载-https-mitmproxy-org-downloads-10-3-1" class="headerlink" title="下载 https://mitmproxy.org/downloads/#10.3.1/"></a>下载 <a target="_blank" rel="noopener" href="https://mitmproxy.org/downloads/#10.3.1/">https://mitmproxy.org/downloads/#10.3.1/</a></h1><p>wget <a target="_blank" rel="noopener" href="https://downloads.mitmproxy.org/10.3.1/mitmproxy-10.3.1-py3-none-any.whl">https://downloads.mitmproxy.org/10.3.1/mitmproxy-10.3.1-py3-none-any.whl</a><br>python -m pip install mitmproxy-10.3.1-py3-none-any.whl<br>        # openssl x509 -inform PEM -subject_hash_old -in mitmproxy-ca-cert.cer<br>    3. 上传脚本<br>        scp -r -P 8022 &#x2F;Users&#x2F;eleme&#x2F;Work&#x2F;Python&#x2F;project&#x2F;mitm_rom&#x2F;mitm.sh 127.0.0.1:~<br>        scp -r -P 8022 &#x2F;Users&#x2F;eleme&#x2F;Work&#x2F;Python&#x2F;project&#x2F;mitm_rom&#x2F;push.sh 127.0.0.1:~<br>        scp -r -P 8022 &#x2F;Users&#x2F;eleme&#x2F;Work&#x2F;Python&#x2F;project&#x2F;mitm_rom&#x2F;update_script.py 127.0.0.1:~<br>        scp -r -P 8022 &#x2F;Users&#x2F;eleme&#x2F;Work&#x2F;Python&#x2F;project&#x2F;mitm_rom 127.0.0.1:~<br>        scp -r -P 8022 <del>&#x2F;.mitmproxy 127.0.0.1:</del><br>        settings put global http_proxy 127.0.0.1:29999<br>        cp mitm_rom&#x2F;mitm.sh mitm.sh<br>        cp mitm_rom&#x2F;push.sh push.sh<br>        cp mitm_rom&#x2F;update_script.py .<br>        chmod +x mitm.sh push.sh<br>        nano .bashrc<br>        <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">python update_script.py</span><br><span class="line">clear</span><br><span class="line">rm -rf ~/http</span><br><span class="line">mkdir -p ~/http</span><br><span class="line">sshd</span><br><span class="line">nohup ~/mitm.sh &amp;</span><br><span class="line">~/push.sh</span><br></pre></td></tr></table></figure></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%B7%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">刷机</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%88%B7%E6%9C%BA%E6%80%BB%E7%BB%93"><span class="toc-number">1.1.</span> <span class="toc-text">1. 刷机总结</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-%E5%88%B7%E6%9C%BA%E5%89%8D%E7%9A%84%E5%87%86%E5%A4%87"><span class="toc-number">1.1.1.</span> <span class="toc-text">1.1 刷机前的准备</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-%E5%88%B7%E6%9C%BA%E6%96%B9%E5%BC%8F"><span class="toc-number">1.1.2.</span> <span class="toc-text">1.2 刷机方式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#recovery%E6%A8%A1%E5%BC%8F%E4%B8%8B%E7%9A%84rom"><span class="toc-number">2.</span> <span class="toc-text">recovery模式下的rom</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pc%E7%AB%AFrom%E5%88%B6%E4%BD%9C"><span class="toc-number">3.</span> <span class="toc-text">pc端rom制作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#termux%E6%8A%93%E5%8C%85%E6%96%B9%E6%A1%88"><span class="toc-number">4.</span> <span class="toc-text">termux抓包方案</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BC%BA%E5%B0%91%E4%BE%9D%E8%B5%96-https-www-bilibili-com-read-cv24517186"><span class="toc-number"></span> <span class="toc-text">缺少依赖 https:&#x2F;&#x2F;www.bilibili.com&#x2F;read&#x2F;cv24517186&#x2F;</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD-https-mitmproxy-org-downloads-10-3-1"><span class="toc-number"></span> <span class="toc-text">下载 https:&#x2F;&#x2F;mitmproxy.org&#x2F;downloads&#x2F;#10.3.1&#x2F;</span></a>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&text=逆向-android-rom刷机"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&title=逆向-android-rom刷机"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&is_video=false&description=逆向-android-rom刷机"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-android-rom刷机&body=Check out this article: http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&title=逆向-android-rom刷机"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&title=逆向-android-rom刷机"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&title=逆向-android-rom刷机"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&title=逆向-android-rom刷机"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&name=逆向-android-rom刷机&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2018/01/01/%E9%80%86%E5%90%91-android-rom%E5%88%B7%E6%9C%BA/&t=逆向-android-rom刷机"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

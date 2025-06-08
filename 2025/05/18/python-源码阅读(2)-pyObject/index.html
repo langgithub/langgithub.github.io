@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="pyObject12345678910111213[object.h]typedef struct _object &#123;    # Py_DEBUG implies Py_TRACE_REFS    # Py_TRACE_REFS 则对象结构会变成是一个双向列表, 所有堆中活动的对象都在这列表中,Py_TRACE_REFS 则对象结构会变成是一个双向列表,所有堆中活动的对象都在这列表中,与">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python-源码阅读(2)-pyObject">
+<meta property="og:url" content="http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="pyObject12345678910111213[object.h]typedef struct _object &#123;    # Py_DEBUG implies Py_TRACE_REFS    # Py_TRACE_REFS 则对象结构会变成是一个双向列表, 所有堆中活动的对象都在这列表中,Py_TRACE_REFS 则对象结构会变成是一个双向列表,所有堆中活动的对象都在这列表中,与">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>python-源码阅读(2)-pyObject</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(1)-python%E4%BB%A3%E7%A0%81%E7%BC%96%E8%AF%91/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(3)-python%E4%B8%AD%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&text=python-源码阅读(2)-pyObject"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&title=python-源码阅读(2)-pyObject"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&is_video=false&description=python-源码阅读(2)-pyObject"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-源码阅读(2)-pyObject&body=Check out this article: http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&title=python-源码阅读(2)-pyObject"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&title=python-源码阅读(2)-pyObject"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&title=python-源码阅读(2)-pyObject"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&title=python-源码阅读(2)-pyObject"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&name=python-源码阅读(2)-pyObject&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&t=python-源码阅读(2)-pyObject"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#pyObject"><span class="toc-number">1.</span> <span class="toc-text">pyObject</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#type"><span class="toc-number">2.</span> <span class="toc-text">type</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6"><span class="toc-number">3.</span> <span class="toc-text">垃圾回收机制</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        python-源码阅读(2)-pyObject
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/python/">python</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/python/" rel="tag">python</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="pyObject"><a href="#pyObject" class="headerlink" title="pyObject"></a>pyObject</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[object.h]</span><br><span class="line">typedef struct _object &#123;</span><br><span class="line">    # Py_DEBUG implies Py_TRACE_REFS</span><br><span class="line">    # Py_TRACE_REFS 则对象结构会变成是一个双向列表, 所有堆中活动的对象都在这列表中,Py_TRACE_REFS 则对象结构会变成是一个双向列表,所有堆中活动的对象都在这列表中,与debug相关</span><br><span class="line">    _PyObject_HEAD_EXTRA</span><br><span class="line"></span><br><span class="line">    # typedef int Py_ssize_t;</span><br><span class="line">    # ob_refcnt 为int类型的应用计数</span><br><span class="line">    Py_ssize_t ob_refcnt; </span><br><span class="line"></span><br><span class="line">    # type 结构体</span><br><span class="line">    struct _typeobject *ob_type;</span><br><span class="line">&#125; PyObject;</span><br></pre></td></tr></table></figure>
+
+<h1 id="type"><a href="#type" class="headerlink" title="type"></a>type</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line">[typestruct.h]</span><br><span class="line">typedef struct _typeobject &#123;</span><br><span class="line"></span><br><span class="line">    # 扩展 ob_size 为对象提供长度的概念</span><br><span class="line">    PyObject_VAR_HEAD</span><br><span class="line"></span><br><span class="line">    # 开发引用的</span><br><span class="line">    const char *tp_name; /* For printing, in format &quot;&lt;module&gt;.&lt;name&gt;&quot; */</span><br><span class="line"></span><br><span class="line">    # 计算该类型实例的字节大小</span><br><span class="line">    Py_ssize_t tp_basicsize, tp_itemsize; /* For allocation */</span><br><span class="line"></span><br><span class="line">    /* Methods to implement standard operations */</span><br><span class="line"></span><br><span class="line">    # 指向实例析构函数的指针</span><br><span class="line">    destructor tp_dealloc;</span><br><span class="line"></span><br><span class="line">    # 保留插槽，以前用于Python 2.x中的打印格式。</span><br><span class="line">    printfunc tp_print;</span><br><span class="line"></span><br><span class="line">    # 指向get-attribute-string函数的可选指针。</span><br><span class="line">    getattrfunc tp_getattr;</span><br><span class="line"></span><br><span class="line">    # 指向get-attribute-string函数的可选指针。</span><br><span class="line">    setattrfunc tp_setattr;</span><br><span class="line"></span><br><span class="line">    # 指向另一个结构的指针</span><br><span class="line">    PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2)</span><br><span class="line">                                    or tp_reserved (Python 3) */</span><br><span class="line">    # 指向实现内置函数的函数的可选指针 repr()。</span><br><span class="line">    reprfunc tp_repr;</span><br><span class="line"></span><br><span class="line">    /* Method suites for standard classes */</span><br><span class="line"></span><br><span class="line">    # 该结构包含仅与实现数字协议的对象相关的字段</span><br><span class="line">    PyNumberMethods *tp_as_number;</span><br><span class="line"></span><br><span class="line">    # 该结构包含仅与实现数字协议的对象相关的字段</span><br><span class="line">    PySequenceMethods *tp_as_sequence;</span><br><span class="line"></span><br><span class="line">    # 该结构包含仅与实现数字协议的对象相关的字段</span><br><span class="line">    PyMappingMethods *tp_as_mapping;</span><br><span class="line"></span><br><span class="line">    /* More standard operations (here for binary compatibility) */</span><br><span class="line"></span><br><span class="line">    # 指向实现内置函数的函数的可选指针 hash()。</span><br><span class="line">    hashfunc tp_hash;</span><br><span class="line">    ternaryfunc tp_call;</span><br><span class="line">    reprfunc tp_str;</span><br><span class="line">    getattrofunc tp_getattro;</span><br><span class="line">    setattrofunc tp_setattro;</span><br><span class="line"></span><br><span class="line">    /* Functions to access object as input/output buffer */</span><br><span class="line">    # 结构包含仅与实现缓冲区接口的对象相关的字段</span><br><span class="line">    PyBufferProcs *tp_as_buffer;</span><br><span class="line"></span><br><span class="line">    /* Flags to define presence of optional/expanded features */</span><br><span class="line">    # 如果这样的标志位是清除的，则不能访问它所保护的类型字段，</span><br><span class="line">    unsigned long tp_flags;</span><br><span class="line"></span><br><span class="line">    const char *tp_doc; /* Documentation string */</span><br><span class="line"></span><br><span class="line">    /* call function for all accessible objects */</span><br><span class="line">    traverseproc tp_traverse;</span><br><span class="line"></span><br><span class="line">    /* delete references to contained objects */</span><br><span class="line">    inquiry tp_clear;</span><br><span class="line"></span><br><span class="line">    /* rich comparisons */</span><br><span class="line">    richcmpfunc tp_richcompare;</span><br><span class="line"></span><br><span class="line">    /* weak reference enabler */</span><br><span class="line">    Py_ssize_t tp_weaklistoffset;</span><br><span class="line"></span><br><span class="line">    /* Iterators */</span><br><span class="line">    getiterfunc tp_iter;</span><br><span class="line">    iternextfunc tp_iternext;</span><br><span class="line"></span><br><span class="line">    /* Attribute descriptor and subclassing stuff */</span><br><span class="line">    struct PyMethodDef *tp_methods;</span><br><span class="line">    struct PyMemberDef *tp_members;</span><br><span class="line">    struct PyGetSetDef *tp_getset;</span><br><span class="line">    struct _typeobject *tp_base;</span><br><span class="line">    PyObject *tp_dict;</span><br><span class="line">    descrgetfunc tp_descr_get;</span><br><span class="line">    descrsetfunc tp_descr_set;</span><br><span class="line">    Py_ssize_t tp_dictoffset;</span><br><span class="line">    initproc tp_init;</span><br><span class="line">    allocfunc tp_alloc;</span><br><span class="line">    newfunc tp_new;</span><br><span class="line">    freefunc tp_free; /* Low-level free-memory routine */</span><br><span class="line">    inquiry tp_is_gc; /* For PyObject_IS_GC */</span><br><span class="line">    PyObject *tp_bases;</span><br><span class="line">    PyObject *tp_mro; /* method resolution order */</span><br><span class="line">    PyObject *tp_cache;</span><br><span class="line">    PyObject *tp_subclasses;</span><br><span class="line">    PyObject *tp_weaklist;</span><br><span class="line">    destructor tp_del;</span><br><span class="line"></span><br><span class="line">    /* Type attribute cache version tag. Added in version 2.6 */</span><br><span class="line">    unsigned int tp_version_tag;</span><br><span class="line"></span><br><span class="line">    destructor tp_finalize;</span><br><span class="line"></span><br><span class="line">&#125; PyTypeObject;</span><br></pre></td></tr></table></figure>
+
+
+<pre><code>这些字段中还包括其他python协议的字段，如下所示。
+
+1.数字协议 - 实现此协议的类型将具有PyNumberMethods *tp_as_number 字段的实现。此字段是对一组实现数字操作的函数的引用，这意味着该类型将支持具有包含在tp_as_number 集合中的实现的算法。例如，非数字set类型在此字段中有一个条目，因为它支持算术运算，例如-，&lt;=等等。
+2.序列协议 - 实现此协议的类型将在PySequenceMethods *tp_as_sequence 字段中具有值。这意味着该类型将支持部分或全部的的序列的操作 ，例如len，in等
+3.映射协议 - 实现此协议的类型将具有一个值PyMappingMethods *tp_as_mapping。这将使这种类型的实例像python词典一样使用字典下标语法来设置和访问键值映射。
+4.迭代器协议 - 实现此协议的类型将在getiterfunc tp_iter 可能的iternextfunc tp_iternext字段中具有值，并且可以使用类型的实例，如python迭代器。
+5.缓冲协议 - 实现此协议的类型将在该PyBufferProcs *tp_as_buffer 字段中具有值。这些函数将允许访问类型的实例作为输入/输出缓冲区。
+</code></pre>
+<h1 id="垃圾回收机制"><a href="#垃圾回收机制" class="headerlink" title="垃圾回收机制"></a>垃圾回收机制</h1><p>源码中, 通过 Py_INCREF(op) 和 Py_DECREF(op) 两个宏来增加和较少引用计数的.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[object.h]</span><br><span class="line"></span><br><span class="line">#define Py_INCREF(op) (                         \</span><br><span class="line">    ((PyObject *)(op))-&gt;ob_refcnt++)</span><br><span class="line"></span><br><span class="line">#define Py_DECREF(op)                                   \</span><br><span class="line">    do &#123;                                                \</span><br><span class="line">        PyObject *_py_decref_tmp = (PyObject *)(op);    \</span><br><span class="line">        if (--(_py_decref_tmp)-&gt;ob_refcnt != 0)             \</span><br><span class="line">            _Py_CHECK_REFCNT(_py_decref_tmp)            \</span><br><span class="line">        else                                            \</span><br><span class="line">            _Py_Dealloc(_py_decref_tmp);                \</span><br><span class="line">    &#125; while (0)</span><br></pre></td></tr></table></figure>
+
+<p>当一个对象的引用计数减少到0后,Py_DECREF(op)会调用该对象”析构函数”进行释放.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#define _Py_Dealloc(op) (                               \</span><br><span class="line">(*Py_TYPE(op)-&gt;tp_dealloc)((PyObject *)(op)))</span><br></pre></td></tr></table></figure>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#pyObject"><span class="toc-number">1.</span> <span class="toc-text">pyObject</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#type"><span class="toc-number">2.</span> <span class="toc-text">type</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6"><span class="toc-number">3.</span> <span class="toc-text">垃圾回收机制</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&text=python-源码阅读(2)-pyObject"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&title=python-源码阅读(2)-pyObject"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&is_video=false&description=python-源码阅读(2)-pyObject"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python-源码阅读(2)-pyObject&body=Check out this article: http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&title=python-源码阅读(2)-pyObject"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&title=python-源码阅读(2)-pyObject"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&title=python-源码阅读(2)-pyObject"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&title=python-源码阅读(2)-pyObject"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&name=python-源码阅读(2)-pyObject&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/python-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB(2)-pyObject/&t=python-源码阅读(2)-pyObject"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

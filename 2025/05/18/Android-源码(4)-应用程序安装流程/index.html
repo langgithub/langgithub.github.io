@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="一. 安装流程图 从上图我们可以看到apk安装到最后都会调用到这个flow： 1PMS.scanPackageTracedLI&#x3D;&gt;PMS.scanPackageLI&#x3D;&gt;PMS.scanPackageDirtyLI  二. APK文件结构APK(Android Package)，可以看做是一个zip压缩包，可以通过解压缩工具解开，其文件结构如下：    目录 or 文件 描述    as">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android源码(4)-应用程序安装流程">
+<meta property="og:url" content="http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="一. 安装流程图 从上图我们可以看到apk安装到最后都会调用到这个flow： 1PMS.scanPackageTracedLI&#x3D;&gt;PMS.scanPackageLI&#x3D;&gt;PMS.scanPackageDirtyLI  二. APK文件结构APK(Android Package)，可以看做是一个zip压缩包，可以通过解压缩工具解开，其文件结构如下：    目录 or 文件 描述    as">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/pms_install.png">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="Activity">
+<meta property="article:tag" content="Android源码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/pms_install.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Android源码(4)-应用程序安装流程</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/Android-%E6%BA%90%E7%A0%81(3)-PackageManagerService%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/Android-%E6%BA%90%E7%A0%81(5)-ActivityManagerService%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&text=Android源码(4)-应用程序安装流程"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&title=Android源码(4)-应用程序安装流程"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&is_video=false&description=Android源码(4)-应用程序安装流程"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Android源码(4)-应用程序安装流程&body=Check out this article: http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&title=Android源码(4)-应用程序安装流程"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&title=Android源码(4)-应用程序安装流程"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&title=Android源码(4)-应用程序安装流程"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&title=Android源码(4)-应用程序安装流程"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&name=Android源码(4)-应用程序安装流程&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&t=Android源码(4)-应用程序安装流程"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80-%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">一. 安装流程图</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C-APK%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">二. APK文件结构</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89-apk%E5%AE%89%E8%A3%85%E6%96%B9%E6%B3%95"><span class="toc-number">3.</span> <span class="toc-text">三. apk安装方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B-%E5%BC%95%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">四.引用程序安装过程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94%E3%80%81adb-push"><span class="toc-number">5.</span> <span class="toc-text">五、adb push</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AD%E3%80%81adb-install"><span class="toc-number">6.</span> <span class="toc-text">六、adb install</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%83%E3%80%81ApplicationPackageManager"><span class="toc-number">7.</span> <span class="toc-text">七、ApplicationPackageManager</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AB%E3%80%81PackageHanlder"><span class="toc-number">8.</span> <span class="toc-text">八、PackageHanlder</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B9%9D%E3%80%81startCopy"><span class="toc-number">9.</span> <span class="toc-text">九、startCopy</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Android源码(4)-应用程序安装流程
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/code-Android/">code-Android</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Activity/" rel="tag">Activity</a>, <a class="p-category" href="/tags/Android%E6%BA%90%E7%A0%81/" rel="tag">Android源码</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="一-安装流程图"><a href="#一-安装流程图" class="headerlink" title="一. 安装流程图"></a>一. 安装流程图</h1><p><img src="/img/pms_install.png" alt="pms-install"></p>
+<p>从上图我们可以看到apk安装到最后都会调用到这个flow：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PMS.scanPackageTracedLI=&gt;PMS.scanPackageLI=&gt;PMS.scanPackageDirtyLI</span><br></pre></td></tr></table></figure>
+
+<h1 id="二-APK文件结构"><a href="#二-APK文件结构" class="headerlink" title="二. APK文件结构"></a>二. APK文件结构</h1><p>APK(Android Package)，可以看做是一个zip压缩包，可以通过解压缩工具解开，其文件结构如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">目录 or 文件</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">assert</td>
+<td align="center">存放的原生资源文件,通过AssetManager类访问</td>
+</tr>
+<tr>
+<td align="center">lib</td>
+<td align="center">native库文件</td>
+</tr>
+<tr>
+<td align="center">META - INF</td>
+<td align="center">存放签名信息，用来保证APK包的完整性和系统的安全。系统安装APK时，应用管理器会按照对应算法对包里文件做校验，<br>如果校验结果与META-INF中内容不一致，则不会安装这个APK。</td>
+</tr>
+<tr>
+<td align="center">res</td>
+<td align="center">种资源文件系统会在R.java里面自动生成该资源文件的ID，所以访问这种资源文件比较简单，通过R.XXX.ID即可</td>
+</tr>
+<tr>
+<td align="center">AndroidManifest.xml</td>
+<td align="center">每个应用都必须定义和包含，描述应用的名字、版本权限、引用的库文件等信息。apk中的AndroidManifest.xml经过压缩，<br>可以通过AXMLPrinter2工具解开。</td>
+</tr>
+<tr>
+<td align="center">classes.dex</td>
+<td align="center">是JAVA源码编译后生成的JAVA字节码文件。但Android使用的dalvik虚拟机与标准的JAVA虚拟机不兼容，<br>dex文件与class文件相比，不论是文件结构还是opcode都不一样。</td>
+</tr>
+<tr>
+<td align="center">resources.arsc</td>
+<td align="center">编译后的二进制资源文件。</td>
+</tr>
+</tbody></table>
+<h1 id="三-apk安装方法"><a href="#三-apk安装方法" class="headerlink" title="三. apk安装方法"></a>三. apk安装方法</h1><p>apk有下面4种安装方法：</p>
+<table>
+<thead>
+<tr>
+<th align="center">方法</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">开机过程中安装</td>
+<td align="center">开机时完成，没有安装界面，如系统应用、其它预置应用</td>
+</tr>
+<tr>
+<td align="center">adb工具安装</td>
+<td align="center">没有安装界面，adb install&#x2F;push xxxx.apk</td>
+</tr>
+<tr>
+<td align="center">第三方应用安装</td>
+<td align="center">通过packageinstaller.apk进行安装，有安装界面，如打开文件管理器并点击sdk卡里APK文件</td>
+</tr>
+<tr>
+<td align="center">网络下载应用安装</td>
+<td align="center">通过google market应用完成，没有安装界面</td>
+</tr>
+</tbody></table>
+<p>简单说明下apk安装的基本过程：</p>
+<p>拷贝目标apk到指定文件目录<br>调用scanPackageLI为apk文件在系统中注册信息</p>
+<h1 id="四-引用程序安装过程"><a href="#四-引用程序安装过程" class="headerlink" title="四.引用程序安装过程"></a>四.引用程序安装过程</h1><p>上述几种安装方法最终都通过PackageManagerService.scanPackageLI完成，总结起来大致有以下三种方式：</p>
+<ul>
+<li>adb push：<br>PackageManagerService的内部类AppDirObserver实现了监听app目录的功能，当把某个APK文件放到app目录下面时，PMS会收到ADD_EVENTS事件<br>frameworks\base\services\java\com\android\server\pm\PackageManagerService.java</li>
+<li>adb install：<br>安装入口函数为Pm.runInstall<br>frameworks\base\cmds\pm\src\com\android\commands\pm\Pm.java</li>
+<li>网络下载应用安装和第三方应用安装：<br>安装入口函数为ApplicationPackageManager.installPackage<br>frameworks\base\core\java\android\app\ApplicationPackageManager.java</li>
+</ul>
+<h1 id="五、adb-push"><a href="#五、adb-push" class="headerlink" title="五、adb push"></a>五、adb push</h1><p>Android 4.4平台，PackageManagerService的内部类AppDirObserver实现了监听app目录的功能，当把某个APK文件放到app目录下面时，PMS会收到ADD_EVENTS事件。<br>如果是添加事件，则调用scanPackageLI，并使用updatePermissionsLPw授权；如果是删除事件则调用removePackageLI移除该apk的相关信息。最后都要调用writeLPr重新保存相关信息到packages.xml。</p>
+<p>关于AppDirObserver具体如何监听的，可以查看：AppDirObserver</p>
+<p>不过我在android 7.0 sdk里面没有看到这个类，难道7.0把这个功能砍了？手头没有7.0平台，不好验证。</p>
+<p>我猜测现在通过adb push apk到data&#x2F;app或者system&#x2F;app的apk，如果这个监听的功能砍了，那么应该是会通过reboot重启系统，走PMS.main流程，scanDir–&gt;scanPackageLI去安装apk。</p>
+<p>以上待填坑。</p>
+<h1 id="六、adb-install"><a href="#六、adb-install" class="headerlink" title="六、adb install"></a>六、adb install</h1><p>adb install 的安装方式，会调用system&#x2F;core&#x2F;adb&#x2F;commandline.cpp中的adb_commandline函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">adb_commandline</span><br><span class="line">    install_app_legacy or install_app </span><br><span class="line">        pm_command</span><br><span class="line">            send_shell_command</span><br><span class="line">                Pm.runInstall()</span><br></pre></td></tr></table></figure>
+<p>这个过程会把apk文件copy到data&#x2F;local&#x2F;tmp&#x2F;目录下，然后向shell服务发送pm命令安装apk，最后调用Pm.runInstall()方法来安装apk。</p>
+<p>6.1 pm.runInstall<br>frameworks\base\cmds\pm\src\com\android\commands\pm\Pm.java</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">private int runInstall() throws RemoteException &#123;</span><br><span class="line">    final InstallParams params = makeInstallParams();</span><br><span class="line">    // 1. 创建session</span><br><span class="line">    final int sessionId = doCreateSession(params.sessionParams,</span><br><span class="line">            params.installerPackageName, params.userId);</span><br><span class="line">    try &#123;</span><br><span class="line">        final String inPath = nextArg();</span><br><span class="line">        if (inPath == null &amp;&amp; params.sessionParams.sizeBytes == 0) &#123;</span><br><span class="line">            System.err.println(&quot;Error: must either specify a package size or an APK file&quot;);</span><br><span class="line">            return 1;</span><br><span class="line">        &#125;</span><br><span class="line">        // 2. 写session</span><br><span class="line">        if (doWriteSession(sessionId, inPath, params.sessionParams.sizeBytes, &quot;base.apk&quot;,</span><br><span class="line">                false /*logSuccess*/) != PackageInstaller.STATUS_SUCCESS) &#123;</span><br><span class="line">            return 1;</span><br><span class="line">        &#125;</span><br><span class="line">        // 3. 提交Session</span><br><span class="line">        if (doCommitSession(sessionId, false /*logSuccess*/)</span><br><span class="line">                != PackageInstaller.STATUS_SUCCESS) &#123;</span><br><span class="line">            return 1;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;Success&quot;);</span><br><span class="line">        return 0;</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            mInstaller.abandonSession(sessionId);</span><br><span class="line">        &#125; catch (Exception ignore) &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从上面的代码来看，runInstall主要进行了三件事，即创建session、对session进行写操作，最后提交session。</p>
+<p>6.1.1 doCreateSession<br>实际调用的是PackageInstallerService的createSession，这个过程主要是为APK安装做好准备工作，例如权限检查、目的临时文件的创建等， 最终创建出PackageInstallerSession对象。PackageInstallerSession可以看做是”安装APK”这个请求的封装，其中包含了处理这个请求需要的一些信息。<br>实际上PackageInstallerSession不仅是分装请求的对象，其自身还是个服务端。</p>
+<p>6.1.2 doWriteSession<br>通过PackageInstallerSession将&#x2F;data&#x2F;local&#x2F;tmp的apk拷贝到终端目录内。</p>
+<p>6.1.3 doCommitSession<br>doWriteSession结束后，如果没有出现任何错误，那么APK源文件已经copy到目的地址了，doCommitSession最终会调用到PMS.installStage来安装apk，调用流程如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PackageInstallerSession.commit ==&gt; commitLocked(); ==&gt; PMS.installStage()</span><br></pre></td></tr></table></figure>
+
+<p>PMS.installStage()会调用sendMessage将”INIT_COPY”发送给PackageHandler：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">void installStage(String packageName, File stagedDir, String stagedCid,</span><br><span class="line">        IPackageInstallObserver2 observer, PackageInstaller.SessionParams sessionParams,</span><br><span class="line">        String installerPackageName, int installerUid, UserHandle user,</span><br><span class="line">        Certificate[][] certificates) &#123;</span><br><span class="line">    if (DEBUG_EPHEMERAL) &#123;</span><br><span class="line">        if ((sessionParams.installFlags &amp; PackageManager.INSTALL_EPHEMERAL) != 0) &#123;</span><br><span class="line">            Slog.d(TAG, &quot;Ephemeral install of &quot; + packageName);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    final VerificationInfo verificationInfo = new VerificationInfo(</span><br><span class="line">            sessionParams.originatingUri, sessionParams.referrerUri,</span><br><span class="line">            sessionParams.originatingUid, installerUid);</span><br><span class="line">    final OriginInfo origin;</span><br><span class="line">    if (stagedDir != null) &#123;</span><br><span class="line">        origin = OriginInfo.fromStagedFile(stagedDir);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        origin = OriginInfo.fromStagedContainer(stagedCid);</span><br><span class="line">    &#125;</span><br><span class="line">    final Message msg = mHandler.obtainMessage(INIT_COPY);</span><br><span class="line">    final InstallParams params = new InstallParams(origin, null, observer,</span><br><span class="line">            sessionParams.installFlags, installerPackageName, sessionParams.volumeUuid,</span><br><span class="line">            verificationInfo, user, sessionParams.abiOverride,</span><br><span class="line">            sessionParams.grantedRuntimePermissions, certificates);</span><br><span class="line">    params.setTraceMethod(&quot;installStage&quot;).setTraceCookie(System.identityHashCode(params));</span><br><span class="line">    msg.obj = params;</span><br><span class="line">    Trace.asyncTraceBegin(TRACE_TAG_PACKAGE_MANAGER, &quot;installStage&quot;,</span><br><span class="line">            System.identityHashCode(msg.obj));</span><br><span class="line">    Trace.asyncTraceBegin(TRACE_TAG_PACKAGE_MANAGER, &quot;queueInstall&quot;,</span><br><span class="line">            System.identityHashCode(msg.obj));</span><br><span class="line">    mHandler.sendMessage(msg);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>PackageHandler用于处理apk的安装请求等消息，后面分析。</p>
+<h1 id="七、ApplicationPackageManager"><a href="#七、ApplicationPackageManager" class="headerlink" title="七、ApplicationPackageManager"></a>七、ApplicationPackageManager</h1><p>网络下载应用安装或者通过第三方应用安装，最终都会通过ApplicationPackageManager.installPackage来安装：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public void installPackage(Uri packageURI, PackageInstallObserver observer,</span><br><span class="line">            int flags, String installerPackageName) &#123;</span><br><span class="line">        installCommon(packageURI, observer, flags, installerPackageName, mContext.getUserId());</span><br><span class="line">    &#125;</span><br><span class="line">private void installCommon(Uri packageURI,</span><br><span class="line">        PackageInstallObserver observer, int flags, String installerPackageName,</span><br><span class="line">        int userId) &#123;</span><br><span class="line">    if (!&quot;file&quot;.equals(packageURI.getScheme())) &#123;</span><br><span class="line">        throw new UnsupportedOperationException(&quot;Only file:// URIs are supported&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    final String originPath = packageURI.getPath();</span><br><span class="line">    try &#123;</span><br><span class="line">        // PMS.installPackageAsUser</span><br><span class="line">        mPM.installPackageAsUser(originPath, observer.getBinder(), flags, installerPackageName,</span><br><span class="line">            userId);</span><br><span class="line">    &#125; catch (RemoteException e) &#123;</span><br><span class="line">        throw e.rethrowFromSystemServer();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>PMS.installPackageAsUser调用sendMessage将”INIT_COPY”发送给PackageHandler:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void installPackageAsUser(String originPath, IPackageInstallObserver2 observer,</span><br><span class="line">        int installFlags, String installerPackageName, int userId) &#123;</span><br><span class="line">    ...</span><br><span class="line">    final Message msg = mHandler.obtainMessage(INIT_COPY);</span><br><span class="line">    final VerificationInfo verificationInfo = new VerificationInfo(</span><br><span class="line">            null /*originatingUri*/, null /*referrer*/, -1 /*originatingUid*/, callingUid);</span><br><span class="line">    final InstallParams params = new InstallParams(origin, null /*moveInfo*/, observer,</span><br><span class="line">            installFlags, installerPackageName, null /*volumeUuid*/, verificationInfo, user,</span><br><span class="line">            null /*packageAbiOverride*/, null /*grantedPermissions*/,</span><br><span class="line">            null /*certificates*/);</span><br><span class="line">    params.setTraceMethod(&quot;installAsUser&quot;).setTraceCookie(System.identityHashCode(params));</span><br><span class="line">    msg.obj = params;</span><br><span class="line">    mHandler.sendMessage(msg);</span><br><span class="line">    ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>PackageHandler用于处理apk的安装请求等消息，后面分析。</p>
+<h1 id="八、PackageHanlder"><a href="#八、PackageHanlder" class="headerlink" title="八、PackageHanlder"></a>八、PackageHanlder</h1><ul>
+<li>PMS.installStage()会调用sendMessage将”INIT_COPY”发送给PackageHandler</li>
+<li>PMS.installPackageAsUser调用sendMessage将”INIT_COPY”发送给PackageHandler</li>
+</ul>
+<p>8.1 INIT_COPY<br>PackageHandler用于处理apk的安装请求等消息，在PMS构造函数中有初始化。实际处理消息的函数为doHandleMessage，我们来看看INIT_COPY的处理流程：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">class PackageHandler extends Handler &#123;</span><br><span class="line">    ...</span><br><span class="line">    void doHandleMessage(Message msg) &#123;</span><br><span class="line">        switch (msg.what) &#123;</span><br><span class="line">            case INIT_COPY: &#123;</span><br><span class="line">                //这里取出的其实就是InstallParams</span><br><span class="line">                HandlerParams params = (HandlerParams) msg.obj;</span><br><span class="line">                //idx为当前等待处理处理的安装请求的个数</span><br><span class="line">                int idx = mPendingInstalls.size();</span><br><span class="line">                ............</span><br><span class="line">                //初始时，mBound的值为false</span><br><span class="line">                if (!mBound) &#123;</span><br><span class="line">                    ............</span><br><span class="line">                    // If this is the only one pending we might</span><br><span class="line">                    // have to bind to the service again.</span><br><span class="line">                    //连接安装服务</span><br><span class="line">                    if (!connectToService()) &#123;</span><br><span class="line">                        ..................</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        // Once we bind to the service, the first</span><br><span class="line">                        // pending request will be processed.</span><br><span class="line">                        //绑定服务成功后，将新的请求加入到mPendingIntalls中，等待处理</span><br><span class="line">                        mPendingInstalls.add(idx, params);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    //如果之前已经绑定过服务，同样将新的请求加入到mPendingIntalls中，等待处理</span><br><span class="line">                    mPendingInstalls.add(idx, params);</span><br><span class="line">                    // Already bound to the service. Just make</span><br><span class="line">                    // sure we trigger off processing the first request.</span><br><span class="line">                    if (idx == 0) &#123;</span><br><span class="line">                        //如果是第一个请求，则直接发送事件MCS_BOUND，触发处理流程</span><br><span class="line">                        mHandler.sendEmptyMessage(MCS_BOUND);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>INIT_COPY主要是将新的请求加入到mPendingIntalls中，等待MCS_BOUND阶段处理。</p>
+<p>8.2 MCS_BOUND<br>INIT_COPY最后会发送MCS_BOUND消息触发接下来的流程，MCS_BOUND对应的处理流程同样定义于doHandleMessage中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">void doHandleMessage(Message msg) &#123;</span><br><span class="line">    .......</span><br><span class="line">    case MCS_BOUND: &#123;</span><br><span class="line">        ........</span><br><span class="line">        if (msg.obj != null) &#123;</span><br><span class="line">            mContainerService = (IMediaContainerService) msg.obj;</span><br><span class="line">            .......</span><br><span class="line">        &#125;</span><br><span class="line">        if (mContainerService == null) &#123;</span><br><span class="line">            if (!mBound) &#123;</span><br><span class="line">                // Something seriously wrong since we are not bound and we are not</span><br><span class="line">                // waiting for connection. Bail out.</span><br><span class="line">                ............            </span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                Slog.w(TAG, &quot;Waiting to connect to media container service&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        // 请求队列mPendingInstalls不为空</span><br><span class="line">        &#125; else if (mPendingInstalls.size() &gt; 0) &#123;</span><br><span class="line">            HandlerParams params = mPendingInstalls.get(0);</span><br><span class="line">            if (params != null) &#123;</span><br><span class="line">                ........</span><br><span class="line">                //调用参数的startCopy函数处理安装请求</span><br><span class="line">                if (params.startCopy()) &#123;</span><br><span class="line">                    ........</span><br><span class="line">                    // Delete pending install</span><br><span class="line">                    if (mPendingInstalls.size() &gt; 0) &#123;</span><br><span class="line">                        mPendingInstalls.remove(0);</span><br><span class="line">                    &#125;</span><br><span class="line">                    if (mPendingInstalls.size() == 0) &#123;</span><br><span class="line">                        if (mBound) &#123;</span><br><span class="line">                            ..........</span><br><span class="line">                            removeMessages(MCS_UNBIND);</span><br><span class="line">                            Message ubmsg = obtainMessage(MCS_UNBIND);</span><br><span class="line">                            // Unbind after a little delay, to avoid</span><br><span class="line">                            // continual thrashing.</span><br><span class="line">                            sendMessageDelayed(ubmsg, 10000);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        // There are more pending requests in queue.</span><br><span class="line">                        // Just post MCS_BOUND message to trigger processing</span><br><span class="line">                        // of next pending install.</span><br><span class="line">                        ......</span><br><span class="line">                        mHandler.sendEmptyMessage(MCS_BOUND);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                .........</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            // Should never happen ideally.</span><br><span class="line">            Slog.w(TAG, &quot;Empty queue&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        break;</span><br><span class="line">    &#125;</span><br><span class="line">.......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>如果mPendingInstalls不为空，调用InstallParams.startCopy函数处理安装请求。</li>
+<li>接着如果mPendingInstalls不为空，发送MCS_BOUND继续处理下一个，直到队列为空。</li>
+<li>如果队列为空，则等待一段时间后，发送MCS_UNBIND消息断开与安装服务的绑定。</li>
+</ul>
+<h1 id="九、startCopy"><a href="#九、startCopy" class="headerlink" title="九、startCopy"></a>九、startCopy</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/frameworks/base/services/core/java/com/android/server/pm/PackageManagerService.java</span><br></pre></td></tr></table></figure>
+
+<p>InstallParams继承HandlerParams，实际调用的是HandlerParams.startCopy:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">final boolean startCopy() &#123;</span><br><span class="line">    boolean res;</span><br><span class="line">    try &#123;</span><br><span class="line">        if (DEBUG_INSTALL) Slog.i(TAG, &quot;startCopy &quot; + mUser + &quot;: &quot; + this);</span><br><span class="line">        if (++mRetries &gt; MAX_RETRIES) &#123;</span><br><span class="line">            Slog.w(TAG, &quot;Failed to invoke remote methods on default container service. Giving up&quot;);</span><br><span class="line">            mHandler.sendEmptyMessage(MCS_GIVE_UP);</span><br><span class="line">            handleServiceError();</span><br><span class="line">            return false;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            // 调用handleStartCopy()处理</span><br><span class="line">            handleStartCopy();</span><br><span class="line">            Slog.i(TAG, &quot;Apk copy done&quot;);</span><br><span class="line">            res = true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; catch (RemoteException e) &#123;</span><br><span class="line">        if (DEBUG_INSTALL) Slog.i(TAG, &quot;Posting install MCS_RECONNECT&quot;);</span><br><span class="line">        mHandler.sendEmptyMessage(MCS_RECONNECT);</span><br><span class="line">        res = false;</span><br><span class="line">    &#125;</span><br><span class="line">    // </span><br><span class="line">    handleReturnCode();</span><br><span class="line">    return res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>PMS将先后调用handleStartCopy和handleReturnCode来完成主要的工作。</p>
+<p>9.1 handleStartCopy<br>handleStartCopy函数在HandleParams抽象类定义，在其子类InstallParams来实现，我们看看与实际安装相关的handleStartCopy函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">ublic void handleStartCopy() throws RemoteException &#123;</span><br><span class="line">    int ret = PackageManager.INSTALL_SUCCEEDED;</span><br><span class="line">    // 决定是安装在手机内还是sdcard中，设置对应标志位</span><br><span class="line">    if (origin.staged) &#123;</span><br><span class="line">        if (origin.file != null) &#123;</span><br><span class="line">            installFlags |= PackageManager.INSTALL_INTERNAL;</span><br><span class="line">            installFlags &amp;= ~PackageManager.INSTALL_EXTERNAL;</span><br><span class="line">        &#125; else if (origin.cid != null) &#123;</span><br><span class="line">            installFlags |= PackageManager.INSTALL_EXTERNAL;</span><br><span class="line">            installFlags &amp;= ~PackageManager.INSTALL_INTERNAL;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            throw new IllegalStateException(&quot;Invalid stage location&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    // 检查APK的安装位置是否正确</span><br><span class="line">    if (onInt &amp;&amp; onSd) &#123;</span><br><span class="line">        // Check if both bits are set.</span><br><span class="line">        Slog.w(TAG, &quot;Conflicting flags specified for installing on both internal and external&quot;);</span><br><span class="line">        ret = PackageManager.INSTALL_FAILED_INVALID_INSTALL_LOCATION;</span><br><span class="line">    &#125; else if (onSd &amp;&amp; ephemeral) &#123;</span><br><span class="line">        Slog.w(TAG,  &quot;Conflicting flags specified for installing ephemeral on external&quot;);</span><br><span class="line">        ret = PackageManager.INSTALL_FAILED_INVALID_INSTALL_LOCATION;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    // createInstallArgs用于创建一个安装参数对象</span><br><span class="line">    final InstallArgs args = createInstallArgs(this);</span><br><span class="line">    </span><br><span class="line">    if (ret == PackageManager.INSTALL_SUCCEEDED) &#123;</span><br><span class="line">        ...</span><br><span class="line">            // 调用InstallArgs的copyApk函数</span><br><span class="line">            ret = args.copyApk(mContainerService, true);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    mRet = ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>InstallParams$handleStartCopy()主要功能是获取安装位置信息以及复制apk到指定位置。抽象类InstallArgs中的copyApk负责复制APK文件，具体实现在子类FileInstallArgs和SdInstallArgs里面。</p>
+<p>9.2 handleReturnCode<br>InstallParams$handleReturnCode()中，调用processPendingInstall方法处理安装：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">void handleReturnCode() &#123;</span><br><span class="line">    // If mArgs is null, then MCS couldn&#x27;t be reached. When it</span><br><span class="line">    // reconnects, it will try again to install. At that point, this</span><br><span class="line">    // will succeed.</span><br><span class="line">    if (mArgs != null) &#123;</span><br><span class="line">        processPendingInstall(mArgs, mRet);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>9.3 processPendingInstall<br>主要的安装流程都在这个方法里面: PMS.processPendingInstall</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">private void processPendingInstall(final InstallArgs args, final int currentStatus) &#123;</span><br><span class="line">    mHandler.post(new Runnable() &#123;</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            mHandler.removeCallbacks(this);</span><br><span class="line">            // Result object to be returned</span><br><span class="line">            PackageInstalledInfo res = new PackageInstalledInfo();</span><br><span class="line">            res.setReturnCode(currentStatus);</span><br><span class="line">            res.uid = -1;</span><br><span class="line">            res.pkg = null;</span><br><span class="line">            res.removedInfo = null;</span><br><span class="line">            if (res.returnCode == PackageManager.INSTALL_SUCCEEDED) &#123;</span><br><span class="line">                //1、预安装，检查包状态，确保环境ok，如果环境不ok，那么会清理拷贝的文件</span><br><span class="line">                args.doPreInstall(res.returnCode);</span><br><span class="line">                synchronized (mInstallLock) &#123;</span><br><span class="line">                    //2、安装，调用installPackageTracedLI进行安装</span><br><span class="line">                    installPackageTracedLI(args, res);</span><br><span class="line">                &#125;</span><br><span class="line">                //3、安装收尾</span><br><span class="line">                args.doPostInstall(res.returnCode, res.uid);</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            if (!doRestore) &#123;</span><br><span class="line">                .......</span><br><span class="line">                //4、生成一个POST_INSTALL消息给PackageHanlder</span><br><span class="line">                Message msg = mHandler.obtainMessage(POST_INSTALL, token, 0);</span><br><span class="line">                mHandler.sendMessage(msg);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>安装过程放在一个线程里面，处理流程是预安装-安装-安装收尾-发送 POST_INSTALL消息：</p>
+<ul>
+<li>预安装：检查当前安装包的状态以及确保SDCARD的挂载，并返回状态信息。在安装前确保安装环境的可靠。</li>
+<li>安装：对mInstallLock加锁，表明同时只能有一个安装包进行安装；然后调用installPackageTracedLI完成具体安装操作。</li>
+<li>安装收尾： 检查状态，如果安装不成功，删除掉相关目录文件。</li>
+<li>发送POST_INSTALL消息：该消息由PackageHandler接收。POST_INSTALL的主要工作其实还是通过广播、回调接口通知系统中的其它组件，有新的Pacakge安装或发生了改变。</li>
+</ul>
+<p>从上面我们可以知道，具体安装apk的函数是PMS.installPackageTracedLI。</p>
+<p>十、installPackageTracedLI<br>PMS.installPackageTracedLI函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">private void installPackageTracedLI(InstallArgs args, PackageInstalledInfo res) &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        Trace.traceBegin(TRACE_TAG_PACKAGE_MANAGER, &quot;installPackage&quot;);</span><br><span class="line">        installPackageLI(args, res);</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>十一、installPackageLI<br>继续PMS.installPackageLI：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">private void installPackageLI(InstallArgs args, PackageInstalledInfo res) &#123;</span><br><span class="line">    </span><br><span class="line">    // PackageParser对象</span><br><span class="line">    PackageParser pp = new PackageParser();</span><br><span class="line">    pp.setSeparateProcesses(mSeparateProcesses);</span><br><span class="line">    pp.setDisplayMetrics(mMetrics);</span><br><span class="line">    Trace.traceBegin(TRACE_TAG_PACKAGE_MANAGER, &quot;parsePackage&quot;);</span><br><span class="line">    final PackageParser.Package pkg;</span><br><span class="line">    try &#123;</span><br><span class="line">        if (DEBUG_INSTALL) Slog.i(TAG, &quot;Start parsing apk: &quot; + installerPackageName);</span><br><span class="line">        // 1.开始解析我们的package</span><br><span class="line">        pkg = pp.parsePackage(tmpPackageFile, parseFlags);</span><br><span class="line">        if (DEBUG_INSTALL) Slog.i(TAG, &quot;Parsing done for apk: &quot; + installerPackageName);</span><br><span class="line">    &#125; catch (PackageParserException e) &#123;</span><br><span class="line">        res.setError(&quot;Failed parse during installPackageLI&quot;, e);</span><br><span class="line">        return;</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    //2. 加载证书，获取签名信息</span><br><span class="line">    try &#123;</span><br><span class="line">        // either use what we&#x27;ve been given or parse directly from the APK</span><br><span class="line">        if (args.certificates != null) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                PackageParser.populateCertificates(pkg, args.certificates);</span><br><span class="line">            &#125; catch (PackageParserException e) &#123;</span><br><span class="line">                PackageParser.collectCertificates(pkg, parseFlags);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            PackageParser.collectCertificates(pkg, parseFlags);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; catch (PackageParserException e) &#123;</span><br><span class="line">        res.setError(&quot;Failed collect during installPackageLI&quot;, e);</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    synchronized (mPackages) &#123;</span><br><span class="line">        // 3.检测packages是否存在</span><br><span class="line">        if ((installFlags &amp; PackageManager.INSTALL_REPLACE_EXISTING) != 0) &#123;</span><br><span class="line">                ...</span><br><span class="line">                replace = true;</span><br><span class="line">                </span><br><span class="line">            &#125; else if (mPackages.containsKey(pkgName)) &#123;</span><br><span class="line">                ...</span><br><span class="line">                replace = true;</span><br><span class="line">                if (DEBUG_INSTALL) Slog.d(TAG, &quot;Replace existing pacakge: &quot; + pkgName);</span><br><span class="line">            &#125;</span><br><span class="line">            ...           </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;    </span><br><span class="line">    ...</span><br><span class="line">    try (PackageFreezer freezer = freezePackageForInstall(pkgName, installFlags,</span><br><span class="line">            &quot;installPackageLI&quot;)) &#123;</span><br><span class="line">        if (replace) &#123;</span><br><span class="line">            // 4.更新已经存在的packages</span><br><span class="line">            replacePackageLIF(pkg, parseFlags, scanFlags | SCAN_REPLACING, args.user,</span><br><span class="line">                    installerPackageName, res);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            // 5.安装新的packages</span><br><span class="line">            installNewPackageLIF(pkg, parseFlags, scanFlags | SCAN_DELETE_DATA_ON_FAILURES,</span><br><span class="line">                    args.user, installerPackageName, volumeUuid, res);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>这个函数过程比较长，主要做了几件事：</p>
+<ul>
+<li>PackageParser$parsePackage，主要是解析APK的AndroidManifest.xml，将每个标签对应的信息添加到Package的相关列表中，如将下的信息添加到Package的activities列表等。</li>
+<li>加载apk证书，获取签名信息</li>
+<li>检查目前安装的APK是否在系统中已存在:<ul>
+<li>已存在，则调用replacePackageLIF进行替换安装。</li>
+<li>不存在，否则调用installNewPackageLIF进行安装。</li>
+</ul>
+</li>
+</ul>
+<p>11.1 replacePackageLIF<br>如果需要替换的是系统APP，则调用Settings$disableSystemPackageLPw来disable旧的APK；如果替换的是非系统APP，则调用deletePackageLI删除旧的APK。</p>
+<p>因为这个过程实在太差，没有必要贴出来一一分析，我来简化一下flow，有兴趣的读者可以深入跟进：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">replacePackageLIF</span><br><span class="line">    replaceSystemPackageLIF  // 系统 pkg</span><br><span class="line">        removePackageLI</span><br><span class="line">        disableSystemPackageLPw</span><br><span class="line">        clearAppDataLIF</span><br><span class="line">        scanPackageTracedLI  //安装apk</span><br><span class="line">            scanPackageLI</span><br><span class="line">                scanPackageDirtyLI  </span><br><span class="line">        updateSettingsLI</span><br><span class="line">        updatePermissionsLPw</span><br><span class="line">        mSettings.writeLPr();</span><br><span class="line">    replaceNonSystemPackageLIF  // 非系统 pkg</span><br><span class="line">        deletePackageLIF</span><br><span class="line">        clearAppDataLIF</span><br><span class="line">        clearAppProfilesLIF</span><br><span class="line">        scanPackageTracedLI    // 安装apk</span><br><span class="line">            scanPackageLI</span><br><span class="line">                scanPackageDirtyLI  </span><br><span class="line">        updateSettingsLI</span><br><span class="line">        updatePermissionsLPw</span><br><span class="line">        mSettings.writeLPr();</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>不管是更新系统还是非系统apk，都会先清除之前的packages信息，然后通过scanPackageTracedLI去安装apk，安装完后更新permissions和setting，最后通过writeLPr更新packages.xml。</p>
+<p>关于scanPackageTracedLI和Settings.writeLPr();我有在上一篇blog讲过，可以回去看看。</p>
+<p>11.2 installNewPackageLIF<br>PMS.installNewPackageLIF用于安装新的apk：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">private void installNewPackageLIF(PackageParser.Package pkg, final int policyFlags,</span><br><span class="line">            int scanFlags, UserHandle user, String installerPackageName, String volumeUuid,</span><br><span class="line">            PackageInstalledInfo res) &#123;</span><br><span class="line">        Trace.traceBegin(TRACE_TAG_PACKAGE_MANAGER, &quot;installNewPackage&quot;);</span><br><span class="line">        // Remember this for later, in case we need to rollback this install</span><br><span class="line">        String pkgName = pkg.packageName;</span><br><span class="line">        if (DEBUG_INSTALL) Slog.d(TAG, &quot;installNewPackageLI: &quot; + pkg);</span><br><span class="line">        // package已经存在</span><br><span class="line">        synchronized(mPackages) &#123;</span><br><span class="line">            if (mSettings.mRenamedPackages.containsKey(pkgName)) &#123;</span><br><span class="line">                // A package with the same name is already installed, though</span><br><span class="line">                // it has been renamed to an older name.  The package we</span><br><span class="line">                // are trying to install should be installed as an update to</span><br><span class="line">                // the existing one, but that has not been requested, so bail.</span><br><span class="line">                res.setError(INSTALL_FAILED_ALREADY_EXISTS, &quot;Attempt to re-install &quot; + pkgName</span><br><span class="line">                        + &quot; without first uninstalling package running as &quot;</span><br><span class="line">                        + mSettings.mRenamedPackages.get(pkgName));</span><br><span class="line">                return;</span><br><span class="line">            &#125;</span><br><span class="line">            if (mPackages.containsKey(pkgName)) &#123;</span><br><span class="line">                // Don&#x27;t allow installation over an existing package with the same name.</span><br><span class="line">                res.setError(INSTALL_FAILED_ALREADY_EXISTS, &quot;Attempt to re-install &quot; + pkgName</span><br><span class="line">                        + &quot; without first uninstalling.&quot;);</span><br><span class="line">                return;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        try &#123;</span><br><span class="line">            // 1. 安装apk</span><br><span class="line">            PackageParser.Package newPackage = scanPackageTracedLI(pkg, policyFlags, scanFlags,</span><br><span class="line">                    System.currentTimeMillis(), user);</span><br><span class="line">            // 2. 更新setting</span><br><span class="line">            updateSettingsLI(newPackage, installerPackageName, null, res, user);</span><br><span class="line">            if (res.returnCode == PackageManager.INSTALL_SUCCEEDED) &#123;</span><br><span class="line">                prepareAppDataAfterInstallLIF(newPackage);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                // Remove package from internal structures, but keep around any</span><br><span class="line">                // data that might have already existed</span><br><span class="line">                deletePackageLIF(pkgName, UserHandle.ALL, false, null,</span><br><span class="line">                        PackageManager.DELETE_KEEP_DATA, res.removedInfo, true, null);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (PackageManagerException e) &#123;</span><br><span class="line">            res.setError(&quot;Package couldn&#x27;t be installed in &quot; + pkg.codePath, e);</span><br><span class="line">        &#125;</span><br><span class="line">        Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>installNewPackageLIF会调用scanPackageTracedLI去安装apk，最终会调用scanPackageLI-&gt;scanPackageDirtyLI实际去安装apk。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80-%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">一. 安装流程图</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C-APK%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">二. APK文件结构</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89-apk%E5%AE%89%E8%A3%85%E6%96%B9%E6%B3%95"><span class="toc-number">3.</span> <span class="toc-text">三. apk安装方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B-%E5%BC%95%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">四.引用程序安装过程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94%E3%80%81adb-push"><span class="toc-number">5.</span> <span class="toc-text">五、adb push</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AD%E3%80%81adb-install"><span class="toc-number">6.</span> <span class="toc-text">六、adb install</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%83%E3%80%81ApplicationPackageManager"><span class="toc-number">7.</span> <span class="toc-text">七、ApplicationPackageManager</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AB%E3%80%81PackageHanlder"><span class="toc-number">8.</span> <span class="toc-text">八、PackageHanlder</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B9%9D%E3%80%81startCopy"><span class="toc-number">9.</span> <span class="toc-text">九、startCopy</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&text=Android源码(4)-应用程序安装流程"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&title=Android源码(4)-应用程序安装流程"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&is_video=false&description=Android源码(4)-应用程序安装流程"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Android源码(4)-应用程序安装流程&body=Check out this article: http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&title=Android源码(4)-应用程序安装流程"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&title=Android源码(4)-应用程序安装流程"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&title=Android源码(4)-应用程序安装流程"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&title=Android源码(4)-应用程序安装流程"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&name=Android源码(4)-应用程序安装流程&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(4)-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B/&t=Android源码(4)-应用程序安装流程"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="搬砖  ArtMethod hook1. xposed步骤一：hookMethod-&gt;hookMethodNative-&gt;XposedBridge_hookMethodNative-&gt;EnableXposedHook   123&#x2F;&#x2F; 核心:传递参数，替换artmethod entrypointSetEntryPointFromJniPtrSize(reinterpret_cas">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逆向-hook-java">
+<meta property="og:url" content="http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="搬砖  ArtMethod hook1. xposed步骤一：hookMethod-&gt;hookMethodNative-&gt;XposedBridge_hookMethodNative-&gt;EnableXposedHook   123&#x2F;&#x2F; 核心:传递参数，替换artmethod entrypointSetEntryPointFromJniPtrSize(reinterpret_cas">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-21T07:00:00.000Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="hook">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>逆向-hook-java</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder%E8%A1%A5%E5%85%85/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2024/04/18/%E9%80%86%E5%90%91-android-root%E6%96%B9%E6%A1%88/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&text=逆向-hook-java"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&title=逆向-hook-java"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&is_video=false&description=逆向-hook-java"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-hook-java&body=Check out this article: http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&title=逆向-hook-java"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&title=逆向-hook-java"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&title=逆向-hook-java"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&title=逆向-hook-java"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&name=逆向-hook-java&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&t=逆向-hook-java"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text"></span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#ArtMethod-hook"><span class="toc-number">1.1.</span> <span class="toc-text">ArtMethod hook</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-xposed"><span class="toc-number">1.1.1.</span> <span class="toc-text">1. xposed</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-lsplant"><span class="toc-number">1.1.2.</span> <span class="toc-text">2. lsplant</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-dexposed-on-art"><span class="toc-number">1.1.3.</span> <span class="toc-text">3. dexposed-on-art</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#jvmti"><span class="toc-number">1.2.</span> <span class="toc-text">jvmti</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        逆向-hook-java
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-05-21T07:00:00.000Z" class="dt-published" itemprop="datePublished">2024-05-21</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E9%80%86%E5%90%91-hook/">逆向-hook</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/hook/" rel="tag">hook</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>搬砖</p>
+</blockquote>
+<h1 id=""><a href="#" class="headerlink" title=""></a></h1><h2 id="ArtMethod-hook"><a href="#ArtMethod-hook" class="headerlink" title="ArtMethod hook"></a>ArtMethod hook</h2><h3 id="1-xposed"><a href="#1-xposed" class="headerlink" title="1. xposed"></a>1. xposed</h3><pre><code>步骤一：hookMethod-&gt;hookMethodNative-&gt;XposedBridge_hookMethodNative-&gt;EnableXposedHook
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 核心:传递参数，替换artmethod entrypoint</span><br><span class="line">SetEntryPointFromJniPtrSize(reinterpret_cast&lt;uint8_t*&gt;(hook_info), sizeof(void*));</span><br><span class="line">SetEntryPointFromQuickCompiledCode(GetQuickProxyInvokeHandler());</span><br></pre></td></tr></table></figure>
+步骤二：触发函数调用进入 artQuickProxyInvokeHandler
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 通过反射调用“handleHookedMethod”</span><br><span class="line">InvokeXposedHandleHookedMethod(soa, shorty, rcvr_jobj, proxy_methodid, args);</span><br><span class="line">// Call XposedBridge.handleHookedMethod</span><br><span class="line">jvalue invocation_args[5];</span><br><span class="line">invocation_args[0].l = hook_info-&gt;reflected_method;</span><br><span class="line">invocation_args[1].i = 1;</span><br><span class="line">invocation_args[2].l = hook_info-&gt;additional_info;</span><br><span class="line">invocation_args[3].l = rcvr_jobj;</span><br><span class="line">invocation_args[4].l = args_jobj;</span><br><span class="line">jobject result =</span><br><span class="line">soa.Env()-&gt;CallStaticObjectMethodA(ArtMethod::xposed_callback_class,</span><br><span class="line">                                   ArtMethod::xposed_callback_method,</span><br><span class="line">                                   invocation_args);</span><br></pre></td></tr></table></figure>
+步骤三：在XposedBridge的handleHookedMethod进行aop,完成hook
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">before: ((XC_MethodHook) callbacksSnapshot[beforeIdx]).beforeHookedMethod(param);</span><br><span class="line">origin: param.setResult(invokeOriginalMethodNative(method, originalMethodId,</span><br><span class="line">additionalInfo.parameterTypes, additionalInfo.returnType, param.thisObject, param.args));</span><br><span class="line">after: ((XC_MethodHook) callbacksSnapshot[afterIdx]).afterHookedMethod(param);</span><br></pre></td></tr></table></figure>
+</code></pre>
+<h3 id="2-lsplant"><a href="#2-lsplant" class="headerlink" title="2. lsplant"></a>2. <a target="_blank" rel="noopener" href="https://github.com/5ec1cff/my-notes/blob/master/lsplant.md">lsplant</a></h3><pre><code>步骤一: 将需要hook对象-target目标，和中间对象NativeHooker绑定到一起
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// new LSPosedBridge.NativeHooker.class</span><br><span class="line">auto init = env-&gt;GetMethodID(hooker, &quot;&lt;init&gt;&quot;, &quot;(Ljava/lang/reflect/Executable;)V&quot;);</span><br><span class="line">// 中间方法</span><br><span class="line">auto callback_method = env-&gt;ToReflectedMethod(hooker, env-&gt;GetMethodID(hooker, &quot;callback&quot;,</span><br><span class="line">                                                                        &quot;([Ljava/lang/Object;)Ljava/lang/Object;&quot;),</span><br><span class="line">                                              false);                   </span><br><span class="line">auto hooker_object = env-&gt;NewObject(hooker, init, hookMethod);</span><br><span class="line">hook_item-&gt;SetBackup(lsplant::Hook(env, hookMethod, hooker_object, callback_method));</span><br></pre></td></tr></table></figure>
+步骤二：通过BuildDex 生成一个与taget目标参数一样的hook bridge方法，然后多出第一个参数来存放this 指针,函数主要是调用NativeHooker 的callback方法
+步骤三：生成跳板，将原始函数的artmethod替换为动态生成的hook bridge的artmethod
+
+核心点：
+  1. 生成跳板并修改entry_point 完成hook
+  2. 在 Java 中，非静态方法（实例方法）的调用隐式地传递了一个 this 指针作为第一个参数。所以如果你要用一个静态方法去替换原来的实例方法，你需要显式地把这个 this 指针作为静态方法的第一个参数
+
+
+实际案例：
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">    LSPlant : lsplant.cc:676#bool lsplant::(anonymous namespace)::DoHook(ArtMethod *, ArtMethod *, ArtMethod *): Hooking: target = java.lang.String org.lsposed.lsplant.LSPTest.manyParametersMethod(java.lang.String, boolean, byte, short, int, long, float, double, java.lang.Integer, java.lang.Long)(0x795d3ef120), hook = java.lang.Object LSPHooker_.manyParametersMethod(java.lang.Object, java.lang.Object, boolean, byte, short, int, long, float, double, java.lang.Object, java.lang.Object)(0x795d323050), backup = java.lang.Object LSPHooker_.backup(java.lang.Object, java.lang.Object, boolean, byte, short, int, long, float, double, java.lang.Object, java.lang.Object)(0x795d323030)</span><br><span class="line">LSPlant : lsplant.cc:657#void *lsplant::(anonymous namespace)::GenerateTrampolineFor(art::ArtMethod *): trampoline: count = 0, address = 7cafdbc000, target = 7cafdbc000</span><br><span class="line">LSPlant : lsplant.cc:683#bool lsplant::(anonymous namespace)::DoHook(ArtMethod *, ArtMethod *, ArtMethod *): Generated trampoline 0x7cafdbc000</span><br><span class="line">LSPlant : lsplant.cc:699#bool lsplant::(anonymous namespace)::DoHook(ArtMethod *, ArtMethod *, ArtMethod *): Done hook: target(0x795d3ef120:0x1a000000) -&gt; 0x7cafdbc000; backup(0x795d323030:0x1a000002) -&gt; 0x797e222320; hook(0x795d323050:0x12080009) -&gt; 0x797e222070 </span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">在 Java 中，任何非静态方法隐式地接收 this 作为第一个参数。在 Android ART 环境里进行方法替换时，如果原始的非静态方法（org.lsposed.lsplant.LSPTest.manyParametersMethod）被替换为一个静态方法（LSPHooker_.manyParametersMethod），那么这个静态方法需要显式地声明一个额外的参数来接收原本隐式传递的 this 指针。</span><br><span class="line"></span><br><span class="line">因此，LSPHooker_.manyParametersMethod 的第一个参数类型是 java.lang.Object，它是为了通用性设计的，可以接收任意类型的 Java 对象。这个参数在运行时将接收原始方法的 this 指针，即实例对应的 org.lsposed.lsplant.LSPTest 对象实例。</span><br><span class="line"></span><br><span class="line">这样，在运行时，调用 LSPHooker_.manyParametersMethod 时，会将原始 target 方法被调用时的 this 指针和所有其他参数正确地传递给 hook 方法。因此，第一个参数总是用于 this 指针，而后续的参数将是 target 方法原来的参数，保持相同的顺序。 </span><br><span class="line"></span><br><span class="line">在 LSPHooker_.manyParametersMethod 方法内，你可以像处理其他参数一样处理 this 指针参数，如果你需要调用原始对象的其他非静态成员，可以将 java.lang.Object 类型的 this 指针参数转换回原始类的类型。</span><br><span class="line"></span><br><span class="line">简单地说：</span><br><span class="line"></span><br><span class="line">当原始方法（target）的 entry_point 被替换为 hook 方法的地址时，</span><br><span class="line">任何对原始 target 方法的调用都会被重定向到你的 hook 方法，</span><br><span class="line">由于 hook 方法是静态的，LSPHooker_.manyParametersMethod 需要一个额外的参数来接收 this 指针，</span><br><span class="line">在 hook 方法的第一个参数位置，你将得到原始实例的 this 指针，你可以把它看作是任何传递给 target 方法的常规参数。 </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">我猜是生成一个大致这样的类</span><br><span class="line">public class LSPHooker_ &#123;</span><br><span class="line">      static C1 hooker;</span><br><span class="line">      public static Object backup(Object obj) &#123;</span><br><span class="line">               return null;</span><br><span class="line">      &#125;</span><br><span class="line">      public static Object manyParametersMethod(Object arg0, int arg1, ... /* 其他参数 */)  &#123;</span><br><span class="line">        Object[] hook_params_array = new Object[parameter_types.size()];</span><br><span class="line">        hook_params_array[0] = arg0; // 假设arg0已经是Object类型</span><br><span class="line">        hook_params_array[1] = Integer.valueOf(arg1); // 对于原始类型进行装箱操作</span><br><span class="line">        // 对于更多参数的处理...</span><br><span class="line">        return hooker.callback(hook_params_array);</span><br><span class="line">&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+        
+</code></pre>
+<h3 id="3-dexposed-on-art"><a href="#3-dexposed-on-art" class="headerlink" title="3. dexposed-on-art"></a>3. <a target="_blank" rel="noopener" href="https://weishu.me/2017/11/23/dexposed-on-art/">dexposed-on-art</a></h3><pre><code>source-&gt;原始函数,被hook函数
+target-&gt;hook函数,是一个entry
+
+步骤一：创建跳板
+    <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">private byte[] createTrampoline(ArtMethod source)&#123;</span><br><span class="line">  final Epic.MethodInfo methodInfo = Epic.getMethodInfo(source.getAddress());</span><br><span class="line">  final Class&lt;?&gt; returnType = methodInfo.returnType;</span><br><span class="line"></span><br><span class="line">  // 动态创建一个（Bridge｜class对象中method｜artmethod｜target）</span><br><span class="line">  Method bridgeMethod = Runtime.is64Bit() ? Entry64.getBridgeMethod(returnType)</span><br><span class="line">          : Entry.getBridgeMethod(returnType);</span><br><span class="line">  final ArtMethod target = ArtMethod.of(bridgeMethod);</span><br><span class="line">  long targetAddress = target.getAddress();</span><br><span class="line">  long targetEntry = target.getEntryPointFromQuickCompiledCode();</span><br><span class="line">  long sourceAddress = source.getAddress();</span><br><span class="line">  long structAddress = EpicNative.malloc(4);</span><br><span class="line"></span><br><span class="line">  Logger.d(TAG, &quot;targetAddress:&quot;+ Debug.longHex(targetAddress));</span><br><span class="line">  Logger.d(TAG, &quot;sourceAddress:&quot;+ Debug.longHex(sourceAddress));</span><br><span class="line">  Logger.d(TAG, &quot;targetEntry:&quot;+ Debug.longHex(targetEntry));</span><br><span class="line">  Logger.d(TAG, &quot;structAddress:&quot;+ Debug.longHex(structAddress));</span><br><span class="line">  // 生成跳板</span><br><span class="line">  return shellCode.createBridgeJump(targetAddress, targetEntry, sourceAddress, structAddress);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//跳板逻辑</span><br><span class="line">byte[] instructions = new byte[]&#123;</span><br><span class="line">    0x1f, 0x20, 0x03, (byte) 0xd5,         // nop</span><br><span class="line">    0x69, 0x02, 0x00, 0x58,                // ldr x9, source_method</span><br><span class="line">    0x1f, 0x00, 0x09, (byte) 0xeb,         // cmp x0, x9</span><br><span class="line">    (byte) 0xa1, 0x02, 0x00, 0x54,         // bne 5f</span><br><span class="line">    (byte) 0x80, 0x01, 0x00, 0x58,         // ldr x0, target_method</span><br><span class="line"></span><br><span class="line">    0x29, 0x02, 0x00, 0x58,                // ldr x9, struct</span><br><span class="line">    (byte) 0xea, 0x03, 0x00, (byte) 0x91,  // mov x10, sp</span><br><span class="line"></span><br><span class="line">    0x2a, 0x01, 0x00, (byte) 0xf9,         // str x10, [x9, #0]</span><br><span class="line">    0x22, 0x05, 0x00, (byte) 0xf9,         // str x2, [x9, #8]</span><br><span class="line"></span><br><span class="line">    0x23, 0x09, 0x00, (byte) 0xf9,         // str x3, [x9, #16]</span><br><span class="line">    (byte) 0xe3, 0x03, 0x09, (byte) 0xaa,  // mov x3, x9</span><br><span class="line">    0x22, 0x01, 0x00, 0x58,                // ldr x2, source_method</span><br><span class="line">    0x22, 0x0d, 0x00, (byte) 0xf9,         // str x2, [x9, #24]</span><br><span class="line">    (byte) 0xe2, 0x03, 0x13, (byte) 0xaa,  // mov x2, x19</span><br><span class="line">    (byte) 0x89, 0x00, 0x00, 0x58,         // ldr x9, target_method_entry</span><br><span class="line">    0x20, 0x01, 0x1f, (byte) 0xd6,         // br x9</span><br><span class="line"></span><br><span class="line">    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // target_method_address</span><br><span class="line">    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // target_method_entry</span><br><span class="line">    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // source_method</span><br><span class="line">    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00  // struct</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+步骤二：修改原函数artmethod的entrypoint，直接加载指向跳板
+    
+步骤三：由跳板得知，当触发函数调用的时候会直接进入target_method_entry，原函数的参数通过申请的struct结构体填充到相关栈帧的地址上并传递进入到（Bridge｜class对象中method｜artmethod｜target）中。
+    
+步骤四：解析出原始artmethod，参数，对象。回调onHook，进入handleHookedArtMethod逻辑
+    
+步骤五：handleHookedArtMethod中通过aop方式（before-&gt;反射调用原函数-&gt;after）完成hook
+    <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public static Object handleHookedArtMethod(Object artMethodObject, Object thisObject, Object[] args) &#123;</span><br><span class="line">    ...</span><br><span class="line">    XC_MethodHook.MethodHookParam param = new XC_MethodHook.MethodHookParam();</span><br><span class="line">    param.method  = (Member) (artmethod).getExecutable();</span><br><span class="line">    param.thisObject = thisObject;</span><br><span class="line">    param.args = args;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">    ((XC_MethodHook) callbacksSnapshot[beforeIdx]).beforeHookedMethod(param);</span><br><span class="line">    ...</span><br><span class="line">    </span><br><span class="line">    // call original method if not requested otherwise</span><br><span class="line">    if (!param.returnEarly) &#123;</span><br><span class="line">      try &#123;</span><br><span class="line">        ArtMethod method = Epic.getBackMethod(artmethod);</span><br><span class="line">        Object result = method.invoke(thisObject, args);</span><br><span class="line">        param.setResult(result);</span><br><span class="line">      &#125; catch (Exception e) &#123;</span><br><span class="line">        // log(e); origin throw exception is normal.</span><br><span class="line">        param.setThrowable(e);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    ((XC_MethodHook) callbacksSnapshot[afterIdx]).afterHookedMethod(param);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</code></pre>
+<h2 id="jvmti"><a href="#jvmti" class="headerlink" title="jvmti"></a>jvmti</h2>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text"></span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#ArtMethod-hook"><span class="toc-number">1.1.</span> <span class="toc-text">ArtMethod hook</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-xposed"><span class="toc-number">1.1.1.</span> <span class="toc-text">1. xposed</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-lsplant"><span class="toc-number">1.1.2.</span> <span class="toc-text">2. lsplant</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-dexposed-on-art"><span class="toc-number">1.1.3.</span> <span class="toc-text">3. dexposed-on-art</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#jvmti"><span class="toc-number">1.2.</span> <span class="toc-text">jvmti</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&text=逆向-hook-java"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&title=逆向-hook-java"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&is_video=false&description=逆向-hook-java"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向-hook-java&body=Check out this article: http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&title=逆向-hook-java"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&title=逆向-hook-java"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&title=逆向-hook-java"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&title=逆向-hook-java"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&name=逆向-hook-java&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/05/21/%E9%80%86%E5%90%91-hook-java/&t=逆向-hook-java"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

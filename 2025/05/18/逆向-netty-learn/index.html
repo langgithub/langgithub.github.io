@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content=".1. Netty-learn   Netty-learn Gerneral Nio buffer Nio网络基本流程 Zero copy Reactor设计模式 NioEventLoopGroup Netty 组件间关系 Netty处理器 Tcp的黏包，拆包 Future        .1.1. Gerneral.1.1.1. Nio buffer capacity 总数量 limit 用于限">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Netty-learn">
+<meta property="og:url" content="http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content=".1. Netty-learn   Netty-learn Gerneral Nio buffer Nio网络基本流程 Zero copy Reactor设计模式 NioEventLoopGroup Netty 组件间关系 Netty处理器 Tcp的黏包，拆包 Future        .1.1. Gerneral.1.1.1. Nio buffer capacity 总数量 limit 用于限">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.429Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="netty">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Netty-learn</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/%E9%80%86%E5%90%91-netty-sekiro%E8%AF%B4%E6%98%8E/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&text=Netty-learn"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&title=Netty-learn"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&is_video=false&description=Netty-learn"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Netty-learn&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&title=Netty-learn"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&title=Netty-learn"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&title=Netty-learn"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&title=Netty-learn"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&name=Netty-learn&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&t=Netty-learn"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Netty-learn"><span class="toc-number">1.</span> <span class="toc-text">.1. Netty-learn</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-Gerneral"><span class="toc-number">1.1.</span> <span class="toc-text">.1.1. Gerneral</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-1-Nio-buffer"><span class="toc-number">1.1.1.</span> <span class="toc-text">.1.1.1. Nio buffer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-2-Nio%E7%BD%91%E7%BB%9C%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B"><span class="toc-number">1.1.2.</span> <span class="toc-text">.1.1.2. Nio网络基本流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-3-Zero-copy"><span class="toc-number">1.1.3.</span> <span class="toc-text">.1.1.3. Zero copy</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-4-Reactor%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.1.4.</span> <span class="toc-text">.1.1.4. Reactor设计模式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-5-NioEventLoopGroup"><span class="toc-number">1.1.5.</span> <span class="toc-text">.1.1.5. NioEventLoopGroup</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-6-Netty-%E7%BB%84%E4%BB%B6%E9%97%B4%E5%85%B3%E7%B3%BB"><span class="toc-number">1.1.6.</span> <span class="toc-text">.1.1.6. Netty 组件间关系</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-7-Netty%E5%A4%84%E7%90%86%E5%99%A8"><span class="toc-number">1.1.7.</span> <span class="toc-text">.1.1.7. Netty处理器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-8-Tcp%E7%9A%84%E9%BB%8F%E5%8C%85%EF%BC%8C%E6%8B%86%E5%8C%85"><span class="toc-number">1.1.8.</span> <span class="toc-text">.1.1.8. Tcp的黏包，拆包</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-9-Future"><span class="toc-number">1.1.9.</span> <span class="toc-text">.1.1.9. Future</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Netty-learn
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.429Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/code-java/">code-java</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/java/" rel="tag">java</a>, <a class="p-category" href="/tags/netty/" rel="tag">netty</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="1-Netty-learn"><a href="#1-Netty-learn" class="headerlink" title=".1. Netty-learn"></a>.1. Netty-learn</h2><!-- TOC -->
+
+<ul>
+<li><a href="#netty-learn">Netty-learn</a><ul>
+<li><a href="#gerneral">Gerneral</a><ul>
+<li><a href="#nio-buffer">Nio buffer</a></li>
+<li><a href="#nio%E7%BD%91%E7%BB%9C%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B">Nio网络基本流程</a></li>
+<li><a href="#zero-copy">Zero copy</a></li>
+<li><a href="#reactor%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F">Reactor设计模式</a></li>
+<li><a href="#nioeventloopgroup">NioEventLoopGroup</a></li>
+<li><a href="#netty-%E7%BB%84%E4%BB%B6%E9%97%B4%E5%85%B3%E7%B3%BB">Netty 组件间关系</a></li>
+<li><a href="#netty%E5%A4%84%E7%90%86%E5%99%A8">Netty处理器</a></li>
+<li><a href="#tcp%E7%9A%84%E9%BB%8F%E5%8C%85%E6%8B%86%E5%8C%85">Tcp的黏包，拆包</a></li>
+<li><a href="#future">Future</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!-- /TOC -->
+
+<h3 id="1-1-Gerneral"><a href="#1-1-Gerneral" class="headerlink" title=".1.1. Gerneral"></a>.1.1. Gerneral</h3><h4 id="1-1-1-Nio-buffer"><a href="#1-1-1-Nio-buffer" class="headerlink" title=".1.1.1. Nio buffer"></a>.1.1.1. Nio buffer</h4><ol>
+<li>capacity 总数量</li>
+<li>limit 用于限制读写</li>
+<li>position 下一个读写位置</li>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/av33707223?p=37">https://www.bilibili.com/video/av33707223?p=37</a> 节 去掉buffer.clear()注释掉后分析</li>
+<li>position&lt;limit&lt;capacity</li>
+</ol>
+<h4 id="1-1-2-Nio网络基本流程"><a href="#1-1-2-Nio网络基本流程" class="headerlink" title=".1.1.2. Nio网络基本流程"></a>.1.1.2. Nio网络基本流程</h4><ol>
+<li>selector 办事大厅</li>
+<li>获取ServerSocketChannel</li>
+<li>设置ServerSocketChannel 属性（是否阻塞）</li>
+<li>获取ServerSocket</li>
+<li>给ServerSocket绑定端口</li>
+<li>将通道注册到selector</li>
+<li>循环selecor</li>
+<li>获取selectorKey</li>
+<li>判断selectorKey类型返回channel</li>
+<li>处理</li>
+<li>移除selectorKey</li>
+</ol>
+<h4 id="1-1-3-Zero-copy"><a href="#1-1-3-Zero-copy" class="headerlink" title=".1.1.3. Zero copy"></a>.1.1.3. Zero copy</h4><ol>
+<li>缺少由user model缓存到system kernel缓存；由system kernel缓存到user model缓存下内容拷贝<B>2</B>次 (用户态优化)</li>
+<li>System kernel下kernel buffer到socket buffer内容拷贝改为文件描述符拷贝</li>
+<li>FileChannel transferto transferFrom 使用零拷贝</li>
+</ol>
+<h4 id="1-1-4-Reactor设计模式"><a href="#1-1-4-Reactor设计模式" class="headerlink" title=".1.1.4. Reactor设计模式"></a>.1.1.4. Reactor设计模式</h4><ol>
+<li>Handle(句柄和描述符，产生事件)：本质表示一种资源，该资源（如何写入，写出）可表示一个个事件。</li>
+<li>Synchronous Evnet demultiplexer(同步事件分离器)：它本身是一个系统调用，用于等待事件的发生（事件可能一个，多个），调用方在调用它的时候会被阻塞，一直阻塞到同步事件分离器上有事件产生为止，位于linux来说，同步事件分离器就是常用的I&#x2F;O多路复用机制，比如说select,poll,epoll等，在Java NIO中，同步事件分离器对于组件selector,对于的阻塞方法select。</li>
+<li>Event Handler（事件处理器）：本身由多个回调方法构成，这些回调方法构成了与应用相关的对于某个事件的反馈机制。java NIO中没有，netty中有（比如SimpleChannelInBand,SimpleChanneloutBand）</li>
+<li>Concrete Event Handler（具体事件处理器）：它是事件处理器的实现 ，从而实现特定的逻辑（比如自己写的MyHandler）</li>
+<li>Initation Dispatcher(初始分发器)：实际上就是Reactor角色，它本身定义了一些规范，这些规范用于控制事件的调度方式，同时又是提供了应用进行事件处理器的注册，删除等，它本身是整个事件处理器的核心所在，initiaion dispathcer会通过同步事件分离器来等待事件的发生，一旦事件发生，Initation Dispatcher首先会分离出每一个事件，然后调用事件处理器，最后调用相关的回调函数来处理这些事件。</li>
+</ol>
+<h4 id="1-1-5-NioEventLoopGroup"><a href="#1-1-5-NioEventLoopGroup" class="headerlink" title=".1.1.5. NioEventLoopGroup"></a>.1.1.5. NioEventLoopGroup</h4><ol>
+<li>NioEventLoopGroup extends MultithreadEventLoopGroup ,初始化时需要传入线程数（defalt&#x3D;Math.max(1, SystemPropertyUtil.getInt(<br>         “io.netty.eventLoopThreads”, Runtime.getRuntime().availableProcessors() * 2))）</li>
+<li>线程数大小极为EventExecutor 数组大小</li>
+<li>EventLoopGoup包含多个EventLoop</li>
+<li>一个EventLoop在他整个生命周期中都只会与唯一的一个Thread进行绑定</li>
+<li>所有的EventLoop所处理的各种I&#x2F;O事件都将在它所关联的Thread上处理</li>
+<li>一个channel在它的整个生命周期中只会注册在一个EventLoop上</li>
+<li>一个EventLoop在运行过程中，会被分配给一个或多个channel（多个channel会被注册到一个Selector上）</li>
+<li>handler中业务是单线程执行，不需要并发控制，因此不能做耗时操作</li>
+<li>Channel的实现一定是线程安全的，因此，我们可以存储一个channel 引用，并且在需要向远端发送数据时，通过这个引用来调用channel相关的方法，即使当时有很多线程都在使用它也不会出现多线程问题，而且。消息一定会按照顺序发送出去</li>
+<li>在业务开发中，不要将长时间执行的耗时任务放置到EventLoop的执行队列中，因此它会一直阻塞该线程所对于的所有channel上的其他执行任务，如果我们需要阻塞调用或耗时操作，那么我们需要使用一个专门的EventExcutor（业务线程池）</li>
+</ol>
+<ul>
+<li>使用 java eventExcutor</li>
+<li>借助pipeline中添加channelHandler调用的addLast(group , handler)</li>
+</ul>
+<h4 id="1-1-6-Netty-组件间关系"><a href="#1-1-6-Netty-组件间关系" class="headerlink" title=".1.1.6. Netty 组件间关系"></a>.1.1.6. Netty 组件间关系</h4><ol>
+<li>main Reactor 和 sub Reactor分别对于netty 中的bossGroup 和workGroup，selector 对于EventLoop</li>
+<li>ChannelInitializer（采用模板模式） 继承 ChannelInboundHandlerAdapter 继承 ChannelHandlerAdapter并且实现了ChannelInboundHandler接口，这里采用适配器模式（将ChannelHandlerContext（两空） 转化成ChannelInboundHandler（三空）接口）。以上是ChannelHandler接口转换</li>
+<li>ChannelPipline 中存放ChannelHandler，包含InBoundHandler和OutBoundHandler</li>
+<li>Channel中可以获取其对于的ChannelPipline ，ChannelPipline 也关联着唯一的Channel</li>
+<li>ChannelHandlerContext 何以获取channel  ChannelHandler ChannelPipline ，自身通过双向链表存储</li>
+<li>对于netty消息发送方式，写入到channel中的消息会从末尾开始流动，写入ChannelHandlerContext将会从ChannelPipeline中下一个ChannelHandler开始流动</li>
+</ol>
+<h4 id="1-1-7-Netty处理器"><a href="#1-1-7-Netty处理器" class="headerlink" title=".1.1.7. Netty处理器"></a>.1.1.7. Netty处理器</h4><ol>
+<li>netty处理器包含入栈处理器和出栈处理器</li>
+<li>入栈处理器顶层ChannelInboundHandler 出栈处理器顶层ChannelOutboundHandler</li>
+<li>编码：message -&gt; byte（ChannelOutboundHandler）  解码：byte -&gt; message（ChannelInboundHandler）</li>
+<li>ReplayingDecoder extends ByteToMessageDecoder 会不断重试判断读取是否满足，因此不需要数据读取大小判断</li>
+</ol>
+<h4 id="1-1-8-Tcp的黏包，拆包"><a href="#1-1-8-Tcp的黏包，拆包" class="headerlink" title=".1.1.8. Tcp的黏包，拆包"></a>.1.1.8. Tcp的黏包，拆包</h4><ol>
+<li>黏包：tcp 在传输消息时，可能数据不够发送条件，需要合并消息</li>
+<li>拆包：tcp 在数据接受时候，可能会收到多个消息合并后的数据包</li>
+<li>netty 提供前一条消息与下一条消息分割的分割符号识别</li>
+</ol>
+<h4 id="1-1-9-Future"><a href="#1-1-9-Future" class="headerlink" title=".1.1.9. Future"></a>.1.1.9. Future</h4><ol>
+<li>JDK提供的Future只能通过手工方式检查结果，而这个操作是会阻塞的；Netty则对ChannelFuture进行了增强，通过ChannelFutrueListener以回调方式来获取执行结果，去除了手工检查阻塞的操作，值得注意的是：ChannelFutureListener的OperationComplete方法是由I&#x2F;O线程执行的，因此要注意的是不要在这里执行耗时操作，否则需要通过另外的线程或线程池来执行</li>
+</ol>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Netty-learn"><span class="toc-number">1.</span> <span class="toc-text">.1. Netty-learn</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-Gerneral"><span class="toc-number">1.1.</span> <span class="toc-text">.1.1. Gerneral</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-1-Nio-buffer"><span class="toc-number">1.1.1.</span> <span class="toc-text">.1.1.1. Nio buffer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-2-Nio%E7%BD%91%E7%BB%9C%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B"><span class="toc-number">1.1.2.</span> <span class="toc-text">.1.1.2. Nio网络基本流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-3-Zero-copy"><span class="toc-number">1.1.3.</span> <span class="toc-text">.1.1.3. Zero copy</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-4-Reactor%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.1.4.</span> <span class="toc-text">.1.1.4. Reactor设计模式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-5-NioEventLoopGroup"><span class="toc-number">1.1.5.</span> <span class="toc-text">.1.1.5. NioEventLoopGroup</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-6-Netty-%E7%BB%84%E4%BB%B6%E9%97%B4%E5%85%B3%E7%B3%BB"><span class="toc-number">1.1.6.</span> <span class="toc-text">.1.1.6. Netty 组件间关系</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-7-Netty%E5%A4%84%E7%90%86%E5%99%A8"><span class="toc-number">1.1.7.</span> <span class="toc-text">.1.1.7. Netty处理器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-8-Tcp%E7%9A%84%E9%BB%8F%E5%8C%85%EF%BC%8C%E6%8B%86%E5%8C%85"><span class="toc-number">1.1.8.</span> <span class="toc-text">.1.1.8. Tcp的黏包，拆包</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-9-Future"><span class="toc-number">1.1.9.</span> <span class="toc-text">.1.1.9. Future</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&text=Netty-learn"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&title=Netty-learn"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&is_video=false&description=Netty-learn"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Netty-learn&body=Check out this article: http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&title=Netty-learn"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&title=Netty-learn"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&title=Netty-learn"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&title=Netty-learn"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&name=Netty-learn&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/%E9%80%86%E5%90%91-netty-learn/&t=Netty-learn"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="一. 准备 Java&#x2F;C&#x2F;C++基础，Java Framwork和C++ Framework, 一部分Lib则采用C. Linux相关知识，Android是基于Linux内核 MakeFile知识，Android采用make编译，可以看到很多Android.mk类似的文件 Source insight,源码阅读工具神器。（我个人mac电脑是用git + Android stad">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android源码(1)-Android源码学习指南">
+<meta property="og:url" content="http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/index.html">
+<meta property="og:site_name" content="yuan lang">
+<meta property="og:description" content="一. 准备 Java&#x2F;C&#x2F;C++基础，Java Framwork和C++ Framework, 一部分Lib则采用C. Linux相关知识，Android是基于Linux内核 MakeFile知识，Android采用make编译，可以看到很多Android.mk类似的文件 Source insight,源码阅读工具神器。（我个人mac电脑是用git + Android stad">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/316892-20160117121057022-207634193.png">
+<meta property="og:image" content="http://example.com/img/android-boot-up.png">
+<meta property="article:published_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:modified_time" content="2025-05-18T07:19:23.425Z">
+<meta property="article:author" content="yuan lang">
+<meta property="article:tag" content="Activity">
+<meta property="article:tag" content="Android源码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/316892-20160117121057022-207634193.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Android源码(1)-Android源码学习指南</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/05/18/Android-framworkEventBus/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/18/Android-%E6%BA%90%E7%A0%81(2)-Android%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&text=Android源码(1)-Android源码学习指南"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&title=Android源码(1)-Android源码学习指南"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&is_video=false&description=Android源码(1)-Android源码学习指南"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Android源码(1)-Android源码学习指南&body=Check out this article: http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&title=Android源码(1)-Android源码学习指南"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&title=Android源码(1)-Android源码学习指南"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&title=Android源码(1)-Android源码学习指南"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&title=Android源码(1)-Android源码学习指南"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&name=Android源码(1)-Android源码学习指南&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&t=Android源码(1)-Android源码学习指南"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80-%E5%87%86%E5%A4%87"><span class="toc-number">1.</span> <span class="toc-text">一. 准备</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C-%E5%85%A5%E9%97%A8%E5%AD%A6%E4%B9%A0"><span class="toc-number">2.</span> <span class="toc-text">二. 入门学习</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89-%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0"><span class="toc-number">3.</span> <span class="toc-text">三. 进阶学习</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B-Android%E6%A1%86%E6%9E%B6"><span class="toc-number">4.</span> <span class="toc-text">四. Android框架</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94-%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92"><span class="toc-number">5.</span> <span class="toc-text">五. 学习计划</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Android源码(1)-Android源码学习指南
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">yuan lang</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-18T07:19:23.425Z" class="dt-published" itemprop="datePublished">2025-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/code-Android/">code-Android</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Activity/" rel="tag">Activity</a>, <a class="p-category" href="/tags/Android%E6%BA%90%E7%A0%81/" rel="tag">Android源码</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="一-准备"><a href="#一-准备" class="headerlink" title="一. 准备"></a>一. 准备</h1><ul>
+<li>Java&#x2F;C&#x2F;C++基础，Java Framwork和C++ Framework, 一部分Lib则采用C.</li>
+<li>Linux相关知识，Android是基于Linux内核</li>
+<li>MakeFile知识，Android采用make编译，可以看到很多Android.mk类似的文件</li>
+<li>Source insight,源码阅读工具神器。（我个人mac电脑是用git + Android stadio）</li>
+<li>StartUML,类图工具（mac omniGraffle）</li>
+<li>ProcessOn&#x2F;Visio,流程图工具</li>
+</ul>
+<h1 id="二-入门学习"><a href="#二-入门学习" class="headerlink" title="二. 入门学习"></a>二. 入门学习</h1><ul>
+<li>Android官方培训 Android training（<a target="_blank" rel="noopener" href="https://developer.android.com/training/index.html%EF%BC%89">https://developer.android.com/training/index.html）</a></li>
+<li>胡凯发起的 Android官方培训课程中文版（<a target="_blank" rel="noopener" href="http://hukai.me/android-training-course-in-chinese/index.html%EF%BC%89">http://hukai.me/android-training-course-in-chinese/index.html）</a></li>
+</ul>
+<h1 id="三-进阶学习"><a href="#三-进阶学习" class="headerlink" title="三. 进阶学习"></a>三. 进阶学习</h1><p><img src="/img/316892-20160117121057022-207634193.png" alt="Android架构图"></p>
+<ul>
+<li>Application层，和用户直接交互，Java开发</li>
+<li>Java Framework层，Android api </li>
+<li>C++ Framework&#x2F;Libraries层，这一层提供动态库，Android运行库，Dalvik虚拟机等，也叫Native层</li>
+<li>Linux Kernel 层，Android是基于Linux内核，其核心进程管理，内存管理，文件管理，设备管理，网络协议，驱动之类</li>
+</ul>
+<h1 id="四-Android框架"><a href="#四-Android框架" class="headerlink" title="四. Android框架"></a>四. Android框架</h1><p>学习整体概念框架<br><img src="/img/android-boot-up.png" alt="Android架构图"></p>
+<p>4.1 Loader层</p>
+<ol>
+<li><p>Boot ROM<br>上电后，BootRom被激活，引导芯片代码从（固化在ROM）执行，加载引导程序到RAM</p>
+</li>
+<li><p>BootLoader 引导程序<br>BootLoader 是启动Android系统之前的引导程序，引导程序是厂商设定，针对特定的主板和芯片。BootLoader主要作用是检查RAM，初始化硬件参数等功能</p>
+</li>
+</ol>
+<p>4.2 Kernel层<br>Kernel 层启动流程:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alps/kernel/init/main.c</span><br><span class="line">start_kernel() ==&gt; rest_init() ==&gt; kernel_thread(kernel_init) ==&gt; kernel_init()</span><br></pre></td></tr></table></figure>
+
+<p>0号进程：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">swapper进程(pid=0):又称为idle进程，即空闲进程，由系统自动创建，运行在内核态。</span><br><span class="line">系统初始化过程kernel由无到有的第一个进程，也是唯一一个没有通过fork或kernel_thread产生的进程。</span><br><span class="line">swapper进程用于初始化进程管理，内存管理，加载Display,Camera Driver,Binder Driver等工作</span><br></pre></td></tr></table></figure>
+
+<p>1号进程：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">init进程（pid=1）：由0号进程通过kernel_thread创建，在内核空间完成初始化，加载init程序，并最终运行在用户空间，init进程是所有用户进程的鼻祖</span><br></pre></td></tr></table></figure>
+
+<p>2号进程：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kthreadd进程（pid=2）：又0号进程通过kernel_thread创建，是linux系统的内核进程，会创建内核工作线程kworkder，软中断线程ksoftirqd,thermal等内核守护进程。</span><br><span class="line">kthreadd运行在内核空间，负责所有内核线程的调度和管理，kthreadd进程是所有内核进程的鼻祖</span><br></pre></td></tr></table></figure>
+
+<p>4.3 Native层</p>
+<p>Native层主要是一号进程，并且由其孵化出一系例daemon进程，还有一些列native service</p>
+<ul>
+<li>init会孵化ueventd,lodd,healthd,installd,adbd,lmkd等用户守护进程</li>
+<li>init进程还启动servicemanager,bootanim,mediaserver等重要本地服务</li>
+<li>init进程孵化Zygote进程，Zygote进程是Android系统的第一个进程，是所有Java进程父进程</li>
+</ul>
+<p>4.4 Java层</p>
+<ul>
+<li>zygote是第一个Java进程，并且是所有Java进程的父进程，由init进程解析init.rc文件后fork</li>
+<li>System Server进程，是由Zygote进程fork而来，System Server是Zygote孵化的第一个进程。System Server 负责启动和管理整个Java framework，包含ActivityManager,PackageManager,WindowManager等服务</li>
+</ul>
+<p>4.5 Application层<br>Zygote进程孵化出第一个app进程是Launcher，Zygote进程还会创建Brower,phone,Email等App进程，每个app进程都是由Zygote进程Fork生成的</p>
+<h1 id="五-学习计划"><a href="#五-学习计划" class="headerlink" title="五. 学习计划"></a>五. 学习计划</h1><p>5.1 四大组件<br>Android 应用的四大组件Activity，service，Broadcast Receiver，Content provider。</p>
+<ul>
+<li>四大组件基础知识<ul>
+<li>Android 四大组件</li>
+</ul>
+</li>
+<li>Android组件 - Activity</li>
+<li>Android组件 - Service</li>
+<li>Android组件 - Broadcast Receiver</li>
+<li>Android组件 - Content Provider</li>
+</ul>
+<p>5.2 消息处理机制</p>
+<ul>
+<li>Android消息处理机制Looper,Handler,Message介绍<ul>
+<li>Android消息机制</li>
+</ul>
+</li>
+</ul>
+<p>5.3 IPC处理机制</p>
+<ul>
+<li>Binder机制<ul>
+<li>Binder实用指南（1）-理解篇</li>
+<li>Binder实用指南（2）-实战篇</li>
+</ul>
+</li>
+<li>Socket通讯</li>
+</ul>
+<p>5.4 系统启动</p>
+<ul>
+<li>Android系统启动总结，包含如何启动init进程，如何启动zygote和system_server进程：</li>
+<li>init进程相关包含init rc语法</li>
+<li>Zygote进程相关知识</li>
+<li>system_server进程</li>
+<li>DVM的启动</li>
+</ul>
+<p>5.5 系统服务</p>
+<ul>
+<li>Android系统服务 - ActivityManagerService<ul>
+<li>AMS启动流程</li>
+<li>AMS的activity调度</li>
+</ul>
+</li>
+<li>Android系统服务 - PackageManagerService<ul>
+<li>PackageManagerService启动流程</li>
+<li>应用程序安装流程</li>
+<li>应用程序卸载流程</li>
+<li>installd守护进程</li>
+</ul>
+</li>
+<li>Android系统服务 - WindowManagerService<ul>
+<li>Surface view 原理</li>
+</ul>
+</li>
+<li>Android系统服务 - SurfaceFlinger推图</li>
+<li>Input系统<ul>
+<li>InputReader介绍</li>
+<li>InputDispatcher介绍</li>
+</ul>
+</li>
+<li>Android系统服务 - PowermanagerService</li>
+<li>Android系统服务 - UserManagerService</li>
+<li>MediaServer<ul>
+<li>AudioFlinger-处理上层AudioTrack创建的音频</li>
+<li>MediaPlayService服务：StageFrightPlayer本地播放，NuPlayer在线播放</li>
+</ul>
+</li>
+</ul>
+<p>5.6 安全机制</p>
+<ul>
+<li>Android系统build阶段签名机制</li>
+<li>ApK签名机制</li>
+<li>APK逆向 - smali注入</li>
+</ul>
+<p>5.7 问题分析</p>
+<ul>
+<li>ANR问题原理与分析</li>
+<li>Crash&#x2F;Exception问题分析<ul>
+<li>Java Exception</li>
+<li>Native Exception</li>
+<li>Kernel Panic</li>
+</ul>
+</li>
+<li>LowMemoryKiller</li>
+</ul>
+<p>5.8 工具篇</p>
+<ul>
+<li>Android.mk介绍</li>
+<li>理解和使用systrace</li>
+</ul>
+<p>5.9 其他</p>
+<ul>
+<li>Android智能指针</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80-%E5%87%86%E5%A4%87"><span class="toc-number">1.</span> <span class="toc-text">一. 准备</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C-%E5%85%A5%E9%97%A8%E5%AD%A6%E4%B9%A0"><span class="toc-number">2.</span> <span class="toc-text">二. 入门学习</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89-%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0"><span class="toc-number">3.</span> <span class="toc-text">三. 进阶学习</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B-Android%E6%A1%86%E6%9E%B6"><span class="toc-number">4.</span> <span class="toc-text">四. Android框架</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94-%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92"><span class="toc-number">5.</span> <span class="toc-text">五. 学习计划</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&text=Android源码(1)-Android源码学习指南"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&title=Android源码(1)-Android源码学习指南"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&is_video=false&description=Android源码(1)-Android源码学习指南"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Android源码(1)-Android源码学习指南&body=Check out this article: http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&title=Android源码(1)-Android源码学习指南"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&title=Android源码(1)-Android源码学习指南"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&title=Android源码(1)-Android源码学习指南"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&title=Android源码(1)-Android源码学习指南"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&name=Android源码(1)-Android源码学习指南&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/18/Android-%E6%BA%90%E7%A0%81(1)-Android%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/&t=Android源码(1)-Android源码学习指南"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    yuan lang
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
