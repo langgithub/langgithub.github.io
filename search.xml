@@ -4,6 +4,56 @@
   
     
     <entry>
+      <title>逆向-爬虫-代理</title>
+      <link href="/2025/08/07/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E4%BB%A3%E7%90%86/"/>
+      <url>/2025/08/07/%E9%80%86%E5%90%91-%E7%88%AC%E8%99%AB-%E4%BB%A3%E7%90%86/</url>
+      
+        <content type="html"><![CDATA[<blockquote><p>搬砖</p></blockquote><h1 id="自建代理"><a href="#自建代理" class="headerlink" title="自建代理"></a>自建代理</h1><p>大量实践证明，连接wifi ，做路由转发是常见挖掘手段<br>使用实体卡挖掘</p><h2 id="1-frp快速建代理"><a href="#1-frp快速建代理" class="headerlink" title="1. frp快速建代理"></a>1. frp快速建代理</h2><h2 id="2-netty建立代理"><a href="#2-netty建立代理" class="headerlink" title="2. netty建立代理"></a>2. netty建立代理</h2><p>对于集中式代理，链路耗时接近普通两倍，但对于散落在全国各地手机其管理方式却很方便<br>直接使用frp_android即可快速使用</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[[proxies]]</span><br><span class="line">name = &quot;plugin_http&quot;</span><br><span class="line">type = &quot;tcp&quot;</span><br><span class="line"></span><br><span class="line">[proxies.plugin]</span><br><span class="line">type = &quot;http_proxy&quot;</span><br><span class="line">#httpUser = &quot;test&quot;</span><br><span class="line">#httpPassword = &quot;123&quot;</span><br><span class="line"></span><br><span class="line">[proxies.transport]</span><br><span class="line">useEncryption = true</span><br><span class="line">useCompression = true</span><br></pre></td></tr></table></figure><h2 id="3-点对点代理"><a href="#3-点对点代理" class="headerlink" title="3. 点对点代理"></a>3. 点对点代理</h2><p>如 n2n 本质是vpn隧道</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 逆向 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 逆向 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>逆向-js-RectNative</title>
+      <link href="/2025/06/22/%E9%80%86%E5%90%91-js-RectNative/"/>
+      <url>/2025/06/22/%E9%80%86%E5%90%91-js-RectNative/</url>
+      
+        <content type="html"><![CDATA[<h1 id="RectNative"><a href="#RectNative" class="headerlink" title="RectNative"></a>RectNative</h1><h3 id="相关资源"><a href="#相关资源" class="headerlink" title="相关资源"></a><a href="https://bbs.kanxue.com/thread-273544-1.htm">相关资源</a></h3><h3 id="分析过程"><a href="#分析过程" class="headerlink" title="分析过程"></a>分析过程</h3><pre><code>1. 查魔术是否是 Hermes bytecode 格式2. 选择反编译工具     * https://github.com/P1sec/hermes-dec    * https://github.com/bongtrop/hbctool3. hbc-decompiler assets/index.android.bundle /tmp/my_output_file.js</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> 爬虫-js逆向 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 逆向-js </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Android源码(8)-Binder</title>
       <link href="/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/"/>
       <url>/2025/05/18/Android-%E6%BA%90%E7%A0%81(8)-Binder/</url>
@@ -390,7 +440,7 @@
       
       <categories>
           
-          <category> 逆向-js </category>
+          <category> 爬虫-js逆向 </category>
           
       </categories>
       
